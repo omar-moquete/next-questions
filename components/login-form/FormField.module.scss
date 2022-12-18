@@ -1,0 +1,31 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+
+  input {
+    background-color: transparent;
+    border: none;
+    border-bottom: solid 2px white;
+    color: #fff;
+    font-size: 1.1rem;
+    outline: none;
+    padding: 5px 5px 5px 37px;
+    width: 100%;
+    position: relative;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  }
+}
+
+.form-svg {
+  position: absolute;
+  fill: none;
+  stroke-width: 1.5;
+  stroke: currentColor;
+  width: 24px;
+  height: 24px;
+}
