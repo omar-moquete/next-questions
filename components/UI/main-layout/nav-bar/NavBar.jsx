@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "./NavBar.module.scss";
-import BaseButton from "../../buttons/BaseButton";
+import PrimaryButton from "../../buttons/PrimaryButton";
 
 export default function NavBar() {
   return (
@@ -8,7 +8,7 @@ export default function NavBar() {
       <h2>NJSQuestions</h2>
       <div>
         <nav>
-          <BaseButton href="/login">Login</BaseButton>
+          <PrimaryButton href="/login">Login</PrimaryButton>
         </nav>
       </div>
     </header>

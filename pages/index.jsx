@@ -1,5 +1,9 @@
 import React from "react";
-
+import HomePageIllustration from "../components/UI/svg/HomePageIllustration";
 export default function HomePage() {
-  return <h1>Home page</h1>;
+  return (
+    <div>
+      <HomePageIllustration />
+    </div>
+  );
 }

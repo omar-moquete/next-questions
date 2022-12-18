@@ -1,3 +1,4 @@
+@use "../../styles/variables";
 .field {
   display: flex;
   flex-direction: column;
@@ -7,8 +8,8 @@
   input {
     background-color: transparent;
     border: none;
-    border-bottom: solid 2px white;
-    color: #fff;
+    border-bottom: solid 2px variables.$input-border-bottom-color;
+    color: variables.$input-text-color;
     font-size: 1.1rem;
     outline: none;
     padding: 5px 5px 5px 37px;
@@ -16,7 +17,7 @@
     position: relative;
 
     &::placeholder {
-      color: rgba(255, 255, 255, 0.8);
+      color: variables.$input-placeholder-color;
     }
   }
 }

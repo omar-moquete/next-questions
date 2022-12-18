@@ -1,13 +1,18 @@
 // Dark mode
 
-// Light mode
+$nav-bar-color: #fff;
 $nav-bar-text-color: #444;
-$button-text-color: #444;
-$button-hover-text-color: rgba(255, 255, 255, 0.9);
+$nav-bar-small-screen-color: rgba(255, 255, 255, 0.9);
+
+$primary-button-text-color: #444;
+$primary-button-hover-text-color: rgba(255, 255, 255, 0.9);
+
+$secondary-button-border-color: #fff;
+$secondary-button-text-color: #fff;
+
+$input-border-bottom-color: #fff;
+$input-text-color: #fff;
+$input-placeholder-color: rgba(255, 255, 255, 0.8);
 
 //
-$gradient: linear-gradient(
-  -45deg,
-  rgba(106, 0, 244, 1) 12%,
-  rgba(209, 0, 209, 1) 56%
-);
+$gradient: linear-gradient(-45deg, #6a00f4 12%, #d100d1 56%);

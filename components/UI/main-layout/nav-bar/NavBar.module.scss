@@ -4,17 +4,23 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px 38px;
-  color: variables.$nav-bar-text-color;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   width: 100vw;
   z-index: 500;
-  background-color: #fff;
+  background-color: variables.$nav-bar-color;
   height: 65px;
+  h2 {
+    font-family: "Corinthia", cursive;
+    color: variables.$nav-bar-text-color;
+    font-size: 3rem;
+  }
 }
 
 @media (max-width: 500px) {
   .nav-bar {
     position: fixed;
     top: 0;
+    background-color: variables.$nav-bar-small-screen-color;
+    backdrop-filter: blur(5px);
   }
 }

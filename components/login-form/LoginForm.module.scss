@@ -5,15 +5,21 @@
   flex-direction: column;
 }
 
-.form {
+.form-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
   width: 450px;
-  margin: auto;
-  gap: 68px;
+  margin: 80px auto;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
   padding: 78px 58px;
   background-image: variables.$gradient;
   color: #fff;
   border-radius: 10px;
+
+  .form {
+    gap: 68px;
+  }
 
   a {
     &:link,
@@ -34,18 +40,22 @@
     align-self: center;
   }
 
+  h2 {
+    margin-bottom: 20px;
+  }
+
   .login-controls {
     gap: 48px;
   }
 }
 
 @media (max-width: 500px) {
-  .form {
+  .form-container {
     width: 100vw;
     height: 100vh;
     border-radius: 0;
     position: absolute;
-    top: 0;
-    justify-content: space-between;
+    margin-bottom: 0;
+    bottom: 0;
   }
 }

@@ -1,6 +1,6 @@
 import React from "react";
-import UserIcon from "../UI/svg-icons/UserIcon";
-import PasswordIcon from "../UI/svg-icons/PasswordIcon";
+import UserIcon from "../UI/svg/UserIcon";
+import PasswordIcon from "../UI/svg/PasswordIcon";
 import classes from "./FormField.module.scss";
 
 export default function FormField(props) {
