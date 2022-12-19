@@ -4,9 +4,11 @@ import Layout from "../components/UI/main-layout/Layout";
 
 const MyApp = function ({ Component, pageProps }) {
   return (
-    <Layout>
-      <Component {...pageProps} />
-    </Layout>
+    <React.StrictMode>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </React.StrictMode>
   );
 };
 export default MyApp;

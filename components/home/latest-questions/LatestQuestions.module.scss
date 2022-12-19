@@ -1,0 +1,61 @@
+@use "../../../styles/variables";
+@use "../../../styles/mixins";
+
+.container {
+  margin: auto;
+  position: relative;
+  &::before,
+  &::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 32px;
+    position: absolute;
+    left: 0;
+    z-index: 1;
+  }
+  &::before {
+    top: 0;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 12%,
+      rgba(255, 255, 255, 0.4) 85%
+    );
+  }
+  &::after {
+    bottom: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 12%,
+      rgba(255, 255, 255, 0.4) 85%
+    );
+  }
+
+  h2 {
+    position: absolute;
+    top: 0;
+    font-family: "Corinthia", cursive;
+    font-size: 3rem;
+    font-weight: 600;
+    top: -40px;
+    left: 0;
+    z-index: 5;
+  }
+}
+
+.latest-questions {
+  width: 48rem;
+  padding: 32px 32px 0 32px;
+  border-radius: 8px;
+  @include mixins.shadow;
+  background-image: variables.$gradient;
+  height: 270px;
+  overflow-y: scroll;
+  position: relative;
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

@@ -6,15 +6,17 @@ const PrimaryButton = function (props) {
   if (props.href)
     return (
       <Link
-        className={`${classes.button} ${props.className}`}
+        className={`${classes.button} ${props.className || ""}`}
         href={props.href}
       >
+        <div className={classes.overlay}></div>
         {props.children}
       </Link>
     );
   else
     return (
-      <button className={`${classes.button} ${props.className}`}>
+      <button className={`${classes.button} ${props.className || ""}`}>
+        <div className={classes.overlay}></div>
         {props.children}
       </button>
     );

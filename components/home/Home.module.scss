@@ -1,6 +1,21 @@
 .home {
   display: flex;
+  flex-direction: column;
+  gap: 46px;
+  margin: 0 50px;
+}
+
+.section1 {
+  display: flex;
   justify-content: center;
   gap: 24px;
+  margin: auto;
   margin-top: 24px;
+  width: 100%;
+}
+
+@media (max-width: 800px) {
+  .section1 {
+    justify-content: left;
+  }
 }

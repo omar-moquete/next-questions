@@ -18,6 +18,7 @@ const Introduction = function () {
           comment on the answers.
         </p>
       </div>
+
       <PrimaryButton className={classes.button}>Get started</PrimaryButton>
     </div>
   );

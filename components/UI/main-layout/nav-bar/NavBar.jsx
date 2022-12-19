@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "./NavBar.module.scss";
-import PrimaryButton from "../../buttons/PrimaryButton";
+import PrimaryLink from "../../buttons/PrimaryLink";
 
 const NavBar = function () {
   return (
@@ -8,7 +8,7 @@ const NavBar = function () {
       <h2>NJSQuestions</h2>
       <div>
         <nav>
-          <PrimaryButton href="/login">Login</PrimaryButton>
+          <PrimaryLink href="/login">Login</PrimaryLink>
         </nav>
       </div>
     </header>

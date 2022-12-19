@@ -1,5 +1,18 @@
+@use "../../../styles/variables";
+
 .illustration {
-  width: 600px;
+  max-width: 600px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: auto;
   z-index: 0;
+  position: relative;
+  @media (max-width: 800px) {
+    & {
+      position: absolute;
+      transform: translateX(100px);
+    }
+  }
 }

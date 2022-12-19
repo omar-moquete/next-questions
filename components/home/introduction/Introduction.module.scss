@@ -4,14 +4,15 @@
 .introduction {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  width: 26rem;
   z-index: 2;
   margin-top: 3rem;
+  gap: 44px;
 
   .text {
     display: flex;
     flex-direction: column;
+    width: 26rem;
+
     gap: 22px;
   }
 
@@ -36,5 +37,15 @@
       transform: scale(1.05);
       @include mixins.shadow;
     }
+  }
+}
+
+@media (max-width: 800px) {
+  .introduction {
+    @include mixins.shadow;
+    padding: 24px;
+    background-color: variables.$introduction-background-responsive-color;
+    transform: translateY(20px);
+    border-radius: 8px;
   }
 }
