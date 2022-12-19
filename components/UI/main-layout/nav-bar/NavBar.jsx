@@ -2,7 +2,7 @@ import React from "react";
 import classes from "./NavBar.module.scss";
 import PrimaryButton from "../../buttons/PrimaryButton";
 
-export default function NavBar() {
+const NavBar = function () {
   return (
     <header className={classes["nav-bar"]}>
       <h2>NJSQuestions</h2>
@@ -13,4 +13,6 @@ export default function NavBar() {
       </div>
     </header>
   );
-}
+};
+
+export default NavBar;

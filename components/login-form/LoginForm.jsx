@@ -4,7 +4,7 @@ import Link from "next/link";
 import classes from "./LoginForm.module.scss";
 import FormField from "./FormField";
 
-export default function LoginForm() {
+const LoginForm = function () {
   const usernameInputRef = useRef();
   const passwordInputRef = useRef();
 
@@ -32,4 +32,6 @@ export default function LoginForm() {
       </form>
     </div>
   );
-}
+};
+
+export default LoginForm;

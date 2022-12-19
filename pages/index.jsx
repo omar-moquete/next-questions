@@ -1,9 +1,12 @@
 import React from "react";
-import HomePageIllustration from "../components/UI/svg/HomePageIllustration";
-export default function HomePage() {
+import Home from "../components/home/Home";
+
+const HomePage = function () {
   return (
     <div>
-      <HomePageIllustration />
+      <Home />
     </div>
   );
-}
+};
+
+export default HomePage;

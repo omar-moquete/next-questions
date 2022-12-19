@@ -3,7 +3,7 @@ import UserIcon from "../UI/svg/UserIcon";
 import PasswordIcon from "../UI/svg/PasswordIcon";
 import classes from "./FormField.module.scss";
 
-export default function FormField(props) {
+const FormField = function (props) {
   return (
     <div className={classes.field}>
       <label htmlFor="password">password</label>
@@ -27,4 +27,6 @@ export default function FormField(props) {
       </div>
     </div>
   );
-}
+};
+
+export default FormField;

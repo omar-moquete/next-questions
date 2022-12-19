@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function PasswordIcon(props) {
+const PasswordIcon = function (props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -16,4 +16,6 @@ export default function PasswordIcon(props) {
       />
     </svg>
   );
-}
+};
+
+export default PasswordIcon;

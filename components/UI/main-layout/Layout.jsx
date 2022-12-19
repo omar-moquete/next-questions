@@ -1,12 +1,13 @@
 import React from "react";
-import classes from "./Layout.module.scss";
 import NavBar from "./nav-bar/NavBar";
 
-export default function Layout(props) {
+const Layout = function (props) {
   return (
     <>
       <NavBar />
-      <div className={classes.content}>{props.children}</div>
+      <div>{props.children}</div>
     </>
   );
-}
+};
+
+export default Layout;
