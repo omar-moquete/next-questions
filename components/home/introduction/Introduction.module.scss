@@ -5,7 +5,6 @@
   display: flex;
   flex-direction: column;
   z-index: 2;
-  margin-top: 3rem;
   gap: 44px;
 
   .text {
@@ -13,7 +12,7 @@
     flex-direction: column;
     width: 26rem;
 
-    gap: 22px;
+    gap: 16px;
   }
 
   h2 {
@@ -25,19 +24,6 @@
   p {
     font-size: 1.2rem;
   }
-
-  .button {
-    color: variables.$primary-button-text-color-in-introduction;
-    box-shadow: none;
-
-    &::before {
-      opacity: 1;
-    }
-    &:hover {
-      transform: scale(1.05);
-      @include mixins.shadow;
-    }
-  }
 }
 
 @media (max-width: 800px) {
@@ -45,7 +31,28 @@
     @include mixins.shadow;
     padding: 24px;
     background-color: variables.$introduction-background-responsive-color;
-    transform: translateY(20px);
+    transform: translateY(-100px);
+    margin-bottom: -100px;
     border-radius: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .introduction {
+    padding: 0;
+    border-radius: unset;
+    background-color: transparent;
+    box-shadow: none;
+    transform: none;
+    margin-bottom: unset;
+    width: 80vw;
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      gap: 16px;
+    }
   }
 }

@@ -12,7 +12,12 @@
   color: variables.$secondary-button-text-color;
   border-radius: 5px;
 
-  &:hover {
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+  &:active {
     transform: scale(1.1);
   }
 }

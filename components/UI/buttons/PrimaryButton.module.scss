@@ -1,39 +1,34 @@
 @use "../../../styles/variables";
+@use "../../../styles/mixins";
 
-.button {
-  font-size: 1.4rem;
+.button,
+.link {
+  display: inline-block;
+  font-size: 1.2rem;
   font-weight: 500;
   text-decoration: none;
   width: fit-content;
   border: none;
-  color: transparent;
-  position: relative;
-  transition: all 0.25s ease-out;
+  border-radius: 5px;
   cursor: pointer;
-  background-image: variables.$gradient;
-  background-clip: text;
+  background: variables.$gradient;
+  color: variables.$primary-button-text-color;
 
-  .overlay {
-    position: absolute;
-    padding: 8px 16px;
-    border-radius: 8px;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: variables.$gradient;
-    opacity: 0;
-    transition: all 0.2s ease-out;
-    white-space: nowrap;
-  }
+  padding: 9px 18px;
+  transition: all 0.1s ease-out;
 
-  &:hover {
-    color: variables.$primary-button-hover-text-color;
-    border: none;
-    border-radius: 5px;
-    .overlay {
-      opacity: 1;
-      border-radius: 5px;
+  color: variables.$primary-button-text-color;
+  // box-shadow: none;
+
+  // If hovering and pointer. Solves sticky hover problem in touch devices.
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.04);
+      @include mixins.shadow;
     }
+  }
+  &:active {
+    transform: scale(1.04);
+    @include mixins.shadow;
   }
 }

@@ -1,0 +1,52 @@
+@use "../../../../styles/mixins";
+.footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 250px;
+  background-color: #333;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
+
+  .link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 38px;
+    background-color: #222;
+    width: fit-content;
+    padding: 48px;
+    border-radius: 8px;
+    transform: translateY(-60px);
+    @include mixins.shadow;
+  }
+
+  h3 {
+    font-weight: 400;
+    font-size: 1.2rem;
+  }
+  .cr {
+    width: fit-content;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #888;
+  }
+}
+
+@media (max-width: 500px) {
+  .footer {
+    h3 {
+      font-size: 1rem;
+    }
+    .cr {
+      font-size: 0.8rem;
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}

@@ -23,5 +23,9 @@
     top: 0;
     background-color: variables.$nav-bar-small-screen-color;
     backdrop-filter: blur(5px);
+
+    h2 {
+      font-size: 2.2rem;
+    }
   }
 }

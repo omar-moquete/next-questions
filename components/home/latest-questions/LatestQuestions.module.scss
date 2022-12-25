@@ -3,53 +3,26 @@
 
 .container {
   margin: auto;
-  position: relative;
-  &::before,
-  &::after {
-    content: "";
-    display: block;
-    width: 100%;
-    height: 32px;
-    position: absolute;
-    left: 0;
-    z-index: 1;
-  }
-  &::before {
-    top: 0;
-    background: linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0) 12%,
-      rgba(255, 255, 255, 0.4) 85%
-    );
-  }
-  &::after {
-    bottom: 0;
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0) 12%,
-      rgba(255, 255, 255, 0.4) 85%
-    );
-  }
-
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   h2 {
-    position: absolute;
-    top: 0;
     font-family: "Corinthia", cursive;
     font-size: 3rem;
     font-weight: 600;
-    top: -40px;
     left: 0;
     z-index: 5;
   }
 }
 
 .latest-questions {
-  width: 48rem;
-  padding: 32px 32px 0 32px;
+  width: 50vw;
+  min-width: 450px;
+  padding: 24px;
   border-radius: 8px;
   @include mixins.shadow;
   background-image: variables.$gradient;
-  height: 270px;
+  height: 400px;
   overflow-y: scroll;
   position: relative;
 
@@ -57,5 +30,24 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    margin: 0;
+
+    h2 {
+      margin-left: 50px;
+    }
+  }
+
+  .latest-questions {
+    width: 100vw;
+    border-radius: unset;
+    min-width: unset;
+    box-shadow: none;
+    border-top: 1px solid #363795;
+    border-bottom: 2px solid #363795;
   }
 }

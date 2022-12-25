@@ -14,7 +14,9 @@ const LatestQuestionItem = function (props) {
     <li className={classes["question-item"]} onClick={goToQuestionHandler}>
       {/* div > image + username */}
       <div className={classes["image-and-username"]}>
-        <img className={classes["user-image"]} src={image} />
+        <div className={classes["user-image"]}>
+          <img src={image} />
+        </div>
         <Link href="/user-id" className={classes.username}>
           {username}
         </Link>

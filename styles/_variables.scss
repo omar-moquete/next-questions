@@ -3,7 +3,7 @@ $root-text-color: #333;
 $nav-bar-color: #fff;
 $nav-bar-small-screen-color: rgba(255, 255, 255, 0.9);
 
-$primary-button-text-color: #444;
+$primary-button-text-color: #fff;
 $primary-button-hover-text-color: rgba(255, 255, 255, 0.9);
 
 $primary-button-text-color-in-introduction: rgba(255, 255, 255, 0.9);
@@ -20,4 +20,8 @@ $latest-questions-bubble-color: rgba(255, 255, 255, 0.8);
 
 $introduction-background-responsive-color: rgba(255, 255, 255, 0.9);
 //
-$gradient: linear-gradient(-45deg, #6a00f4 12%, #d100d1 56%);
+$gradient: linear-gradient(
+  270deg,
+  rgba(54, 55, 149, 1) 0%,
+  rgba(0, 92, 151, 1) 100%
+);

@@ -12,17 +12,33 @@
   flex-direction: column;
   align-items: center;
   width: 4rem;
-  gap: 3px;
+  gap: 6px;
 }
 .user-image {
-  height: 70px;
-  width: 70px;
-  border-radius: 50%;
-  background-color: green;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  img {
+    position: relative;
+    display: inline-block;
+    height: 45px;
+    width: 45px;
+    border-radius: 50%;
+    z-index: 2;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    height: 120%;
+    width: 120%;
+    border-radius: 50%;
+    background-color: #363795;
+    z-index: 1;
+  }
 }
 .username {
   color: variables.$latest-questions-text-color;
-  font-size: 0.8rem;
   text-decoration: none;
   cursor: pointer;
   &:hover {

@@ -5,21 +5,13 @@ import classes from "./PrimaryButton.module.scss";
 const PrimaryButton = function (props) {
   if (props.href)
     return (
-      <Link
-        className={`${classes.button} ${props.className || ""}`}
-        href={props.href}
-      >
-        <div className={classes.overlay}></div>
+      <Link className={classes.link} {...props}>
+        {console.log(props.href)}
+
         {props.children}
       </Link>
     );
-  else
-    return (
-      <button className={`${classes.button} ${props.className || ""}`}>
-        <div className={classes.overlay}></div>
-        {props.children}
-      </button>
-    );
+  else return <button className={classes.button}>{props.children}</button>;
 };
 
 export default PrimaryButton;

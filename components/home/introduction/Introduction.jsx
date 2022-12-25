@@ -8,14 +8,13 @@ const Introduction = function () {
       <div className={classes.text}>
         <h2>Welcome!</h2>
         <p>
-          Welcome to NJSQuestions. If you are a curious person or if you like to
-          help others with their questions about things you know, then this is
+          Are you a curious person? Do you like helping others with their
+          questions about things you know? If your answer is yes, then this is
           the place where you can be yourself.
         </p>
         <p>
-          Feel free to ask and answer any questions you'd like. You can select
-          your favorite topic, vote for your favorite questions and answers, and
-          comment on the answers.
+          Ask and answer any questions you'd like, select your favorite topics,
+          vote for your favorite questions and answers and more.
         </p>
       </div>
 
