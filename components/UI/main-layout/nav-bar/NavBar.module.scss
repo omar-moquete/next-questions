@@ -9,11 +9,13 @@
   z-index: 500;
   background-color: variables.$nav-bar-color;
   height: 65px;
+  user-select: none;
   @include mixins.shadow;
   h2 {
     font-family: "Corinthia", cursive;
     font-weight: 400;
     font-size: 3rem;
+    cursor: pointer;
   }
 }
 

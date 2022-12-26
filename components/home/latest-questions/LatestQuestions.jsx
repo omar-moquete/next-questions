@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "./LatestQuestions.module.scss";
-import LatestQuestionItem from "./question-item/LatestQuestionItem";
+import LatestQuestionItem from "./latest-question-item/LatestQuestionItem";
 
 const questions = [
   {

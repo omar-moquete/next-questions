@@ -6,6 +6,24 @@
   gap: 16px;
   width: 80vw;
   width: fit-content;
+  transition: all 0.2s ease-out;
+
+  // If hovering and pointer. Solves sticky hover problem in touch devices.
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.02);
+      margin-top: 10px;
+      margin-bottom: 10px;
+
+      & > .question-bubble {
+        border: solid 2px #fff;
+      }
+    }
+  }
+  &:active {
+    transform: scale(1.04);
+    @include mixins.shadow;
+  }
 }
 .image-and-username {
   display: flex;
@@ -30,10 +48,11 @@
   &::before {
     content: "";
     position: absolute;
-    height: 120%;
-    width: 120%;
+    height: 105%;
+    width: 105%;
     border-radius: 50%;
-    background-color: #363795;
+    background-color: variables.$latest-questions-bubble-color;
+    opacity: 0.5;
     z-index: 1;
   }
 }
@@ -54,4 +73,6 @@
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   align-self: center;
+  user-select: none;
+  cursor: pointer;
 }

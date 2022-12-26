@@ -1,15 +1,16 @@
 import React from "react";
-import UserIcon from "../UI/svg/UserIcon";
-import PasswordIcon from "../UI/svg/PasswordIcon";
+import UserIcon from "../svg/UserIcon";
+import PasswordIcon from "../svg/PasswordIcon";
 import classes from "./FormField.module.scss";
 
 const FormField = function (props) {
   return (
     <div className={classes.field}>
-      <label htmlFor="password">password</label>
+      {props.name === "email" && <label htmlFor="email">Email</label>}
+      {props.name === "password" && <label htmlFor="password">Password</label>}
       <div>
         <span>
-          {props.name === "username" && (
+          {props.name === "email" && (
             <UserIcon className={classes["form-svg"]} />
           )}
 
