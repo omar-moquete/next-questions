@@ -1,7 +1,7 @@
 import React from "react";
 import classes from "./LatestQuestions.module.scss";
-import LatestQuestionItem from "./latest-question-item/LatestQuestionItem";
 
+import QuestionGroup from "../../questions-group/QuestionsGroup";
 const questions = [
   {
     id: "1",
@@ -64,18 +64,7 @@ const LatestQuestions = function () {
   return (
     <div className={classes.container}>
       <h2>Latest questions</h2>
-
-      <ul className={classes["latest-questions"]}>
-        {questions.map((questionItem) => (
-          <LatestQuestionItem
-            key={questionItem.id}
-            username={questionItem.username}
-            image={questionItem.image}
-            link={questionItem.link}
-            question={questionItem.question}
-          />
-        ))}
-      </ul>
+      <QuestionGroup questions={questions} />
     </div>
   );
 };

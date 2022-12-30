@@ -1,0 +1,134 @@
+@use "../../styles/mixins";
+@use "../../styles/variables";
+
+.container,
+.user-information {
+  display: flex;
+  justify-content: center;
+  gap: 46px;
+}
+
+.picture,
+.name,
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.user-information,
+.about > p,
+.btns {
+  border-radius: 8px;
+  @include mixins.shadow;
+}
+
+.container {
+  margin-top: 150px;
+  margin-bottom: 150px;
+}
+
+.user-information {
+  flex-direction: column;
+  font-size: 1.2rem;
+  align-items: center;
+  width: 350px;
+  background-image: variables.$gradient;
+  padding: 38px;
+  color: #fff;
+  height: fit-content;
+}
+.picture {
+  align-items: center;
+  img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    z-index: 200;
+    position: relative;
+  }
+}
+
+.name {
+  width: 100%;
+
+  input {
+    font-size: 1.2rem;
+    color: #fff;
+    background: transparent;
+    border: none;
+    border-bottom: 1px white solid;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.about {
+  width: 100%;
+
+  p {
+    padding: 16px;
+    height: fit-content;
+    font-family: inherit;
+    font-size: 1.1rem;
+    background-color: #fff;
+    color: #333;
+  }
+}
+
+.member {
+  align-self: flex-start;
+}
+
+.btns {
+  display: flex;
+  width: fit-content;
+  align-self: center;
+  justify-content: center;
+  gap: 18px;
+  background: variables.$gradient;
+  padding: 32px;
+  .delete-account {
+    background-color: #f33b50;
+  }
+}
+
+.profile-questions {
+  width: 50vw;
+  height: 320px;
+}
+
+.qa {
+  display: flex;
+  flex-direction: column;
+  gap: 46px;
+
+  h2 {
+    font-family: "Corinthia", cursive;
+    font-weight: 600;
+    font-size: 3rem;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 850px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .user-information {
+    width: 90vw;
+  }
+
+  .profile-questions {
+    width: 90vw;
+    height: 420px;
+  }
+
+  .btns {
+    width: 90vw;
+  }
+}

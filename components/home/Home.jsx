@@ -13,8 +13,6 @@ const Home = function () {
 
       <section className={classes.section2}></section>
       <LatestQuestions />
-
-      {/* add footer here */}
     </div>
   );
 };

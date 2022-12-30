@@ -22,8 +22,9 @@ const FormField = function (props) {
           type={props.type}
           id={props.name}
           name={props.name}
-          placeholder={`Enter your ${props.name}`}
+          placeholder={props.name ? `Enter your ${props.name}` : ""}
           ref={props.inputRef}
+          {...props}
         />
       </div>
     </div>

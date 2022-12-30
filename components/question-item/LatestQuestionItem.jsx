@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React from "react";
-import LikeIcon from "../../../UI/svg/LikeIcon";
-import AnswerIcon from "../../../UI/svg/AnswerIcon";
+import LikeIcon from "../UI/svg/LikeIcon";
+import AnswerIcon from "../UI/svg/AnswerIcon";
 import classes from "./LatestQuestionItem.module.scss";
 
 const LatestQuestionItem = function (props) {

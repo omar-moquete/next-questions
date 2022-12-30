@@ -3,7 +3,7 @@ import classes from "./SecondaryButton.module.scss";
 
 const SecondaryButton = function (props) {
   return (
-    <button className={classes.button} {...props}>
+    <button {...props} className={`${classes.button} ${props.className}`}>
       {props.children}
     </button>
   );
