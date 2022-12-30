@@ -1,0 +1,12 @@
+@use "../../../styles/variables";
+.answer {
+  fill: none;
+  stroke-width: 1.5;
+  stroke: variables.$accent-color;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  &:hover {
+    fill: variables.$latest-question-icon-item-hover-color;
+  }
+}

@@ -4,30 +4,35 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 38px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+  padding-right: 25px;
   width: 100vw;
   z-index: 500;
-  background-color: variables.$nav-bar-color;
+  background-color: variables.$nav-bar-small-screen-color;
+
   height: 65px;
   user-select: none;
+  position: fixed;
+  top: 0;
+  backdrop-filter: blur(5px);
+
   @include mixins.shadow;
   h2 {
     font-family: "Corinthia", cursive;
     font-weight: 400;
     font-size: 3rem;
     cursor: pointer;
+    margin-left: 38px;
   }
 }
 
 @media (max-width: 500px) {
   .nav-bar {
-    position: fixed;
-    top: 0;
-    background-color: variables.$nav-bar-small-screen-color;
-    backdrop-filter: blur(5px);
-
     h2 {
       font-size: 2.2rem;
+      margin-left: 28px;
+      z-index: -1;
     }
   }
 }

@@ -65,19 +65,17 @@ const LatestQuestions = function () {
     <div className={classes.container}>
       <h2>Latest questions</h2>
 
-      <div className={classes["latest-questions"]}>
-        <ul>
-          {questions.map((questionItem) => (
-            <LatestQuestionItem
-              key={questionItem.id}
-              username={questionItem.username}
-              image={questionItem.image}
-              link={questionItem.link}
-              question={questionItem.question}
-            />
-          ))}
-        </ul>
-      </div>
+      <ul className={classes["latest-questions"]}>
+        {questions.map((questionItem) => (
+          <LatestQuestionItem
+            key={questionItem.id}
+            username={questionItem.username}
+            image={questionItem.image}
+            link={questionItem.link}
+            question={questionItem.question}
+          />
+        ))}
+      </ul>
     </div>
   );
 };

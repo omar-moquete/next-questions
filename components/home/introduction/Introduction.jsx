@@ -18,7 +18,7 @@ const Introduction = function () {
         </p>
       </div>
 
-      <PrimaryButton className={classes.button}>Get started</PrimaryButton>
+      <PrimaryButton href="/login">Get started</PrimaryButton>
     </div>
   );
 };

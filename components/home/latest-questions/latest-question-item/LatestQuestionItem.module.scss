@@ -1,78 +1,50 @@
-@use "../../../../styles/variables";
 @use "../../../../styles/mixins";
 
 .question-item {
   display: flex;
-  gap: 16px;
-  width: 80vw;
-  width: fit-content;
-  transition: all 0.2s ease-out;
-
-  // If hovering and pointer. Solves sticky hover problem in touch devices.
-  @media (hover: hover) {
-    &:hover {
-      transform: scale(1.02);
-      margin-top: 10px;
-      margin-bottom: 10px;
-
-      & > .question-bubble {
-        border: solid 2px #fff;
-      }
-    }
-  }
-  &:active {
-    transform: scale(1.04);
-    @include mixins.shadow;
-  }
-}
-.image-and-username {
-  display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 4rem;
-  gap: 6px;
-}
-.user-image {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  gap: 18px;
+  padding: 16px;
+  list-style-type: none;
+  border-radius: 8px;
+  max-width: 700px;
+  background-color: #fff;
+  @include mixins.shadow;
+
   img {
-    position: relative;
-    display: inline-block;
-    height: 45px;
-    width: 45px;
+    height: 40px;
+    width: 40px;
     border-radius: 50%;
-    z-index: 2;
-  }
-  &::before {
-    content: "";
-    position: absolute;
-    height: 105%;
-    width: 105%;
-    border-radius: 50%;
-    background-color: variables.$latest-questions-bubble-color;
-    opacity: 0.5;
-    z-index: 1;
   }
 }
-.username {
-  color: variables.$latest-questions-text-color;
-  text-decoration: none;
-  cursor: pointer;
-  &:hover {
-    text-decoration: underline;
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .username {
+    text-decoration: none;
+    color: inherit;
+    font-size: 1.2rem;
+  }
+  .question-date {
+    color: #888;
   }
 }
-.question-bubble {
-  width: fit-content;
-  height: fit-content;
-  padding: 10px;
-  background-color: variables.$latest-questions-bubble-color;
-  border-top-right-radius: 8px;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  align-self: center;
-  user-select: none;
-  cursor: pointer;
+
+.stats {
+  display: flex;
+  justify-content: flex-end;
+  color: #888;
+  gap: 12px;
+
+  .stats-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.question-text {
 }
