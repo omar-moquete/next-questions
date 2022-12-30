@@ -1,5 +1,4 @@
 import React from "react";
-import classes from "./LikeIcon.module.scss";
 
 const Like = function (props) {
   return (
@@ -7,7 +6,7 @@ const Like = function (props) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       stroke="currentColor"
-      className={classes.like}
+      className={props.className}
     >
       <path
         strokeLinecap="round"

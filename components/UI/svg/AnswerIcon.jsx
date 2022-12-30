@@ -1,5 +1,4 @@
 import React from "react";
-import classes from "./AnswerIcon.module.scss";
 
 const AnswerIcon = function (props) {
   return (
@@ -7,7 +6,8 @@ const AnswerIcon = function (props) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       stroke="currentColor"
-      className={classes.answer}
+      className={props.className}
+      fill="none"
     >
       <path
         strokeLinecap="round"

@@ -2,8 +2,11 @@ import React, { useRef } from "react";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import Link from "next/link";
 import classes from "./LoginForm.module.scss";
-import FormField from "../UI/forms/FormField";
+import CustomField from "../UI/custom-field/CustomField";
 import PrimaryForm from "../UI/forms/PrimaryForm";
+
+import UserIcon from "../UI/svg/UserIcon";
+import PasswordIcon from "../UI/svg/PasswordIcon";
 
 const LoginForm = function () {
   const usernameInputRef = useRef();
@@ -18,11 +21,19 @@ const LoginForm = function () {
     <PrimaryForm className={classes["primary-form"]} onSubmit={submitHandler}>
       <h2>User Login</h2>
       <div className={classes["login-controls"]}>
-        <FormField inputRef={usernameInputRef} type="text" name="email" />
-        <FormField
-          inputRef={passwordInputRef}
+        <CustomField
+          type="text"
+          label="Email"
+          placeholder="Enter your email"
+          Icon={UserIcon}
+          inputRef={usernameInputRef}
+        />
+        <CustomField
           type="password"
-          name="password"
+          label="Password"
+          placeholder="Enter your password"
+          Icon={PasswordIcon}
+          inputRef={passwordInputRef}
         />
 
         <SecondaryButton>Login</SecondaryButton>

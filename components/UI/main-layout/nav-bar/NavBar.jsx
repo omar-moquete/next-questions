@@ -2,6 +2,7 @@ import React from "react";
 import classes from "./NavBar.module.scss";
 import PrimaryButton from "../../buttons/PrimaryButton";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import NavBarUserProfile from "./navbar-user-profile/NavBarUserProfile";
 
 const NavBar = function () {
@@ -19,9 +20,14 @@ const NavBar = function () {
       <div>
         <nav>
           {/* if logged in */}
-          <NavBarUserProfile picture={userPictureState} />
+          {/* <NavBarUserProfile picture={userPictureState} /> */}
           {/* if NOT logged in */}
-          {/* <PrimaryButton href="/login">Login</PrimaryButton> */}
+          <div className={classes["login-controls"]}>
+            <PrimaryButton href="/login">Login</PrimaryButton>
+            <Link className={classes.signup} href="/signup">
+              Signup
+            </Link>
+          </div>
         </nav>
       </div>
     </header>

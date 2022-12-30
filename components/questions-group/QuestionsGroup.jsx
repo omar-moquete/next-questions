@@ -1,6 +1,6 @@
 import React from "react";
 import classes from "./QuestionGroup.module.scss";
-import QuestionItem from "../question-item/LatestQuestionItem";
+import QuestionItem from "../question-item/QuestionItem";
 
 const QuestionGroup = function (props) {
   return (

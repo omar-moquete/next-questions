@@ -1,4 +1,5 @@
 @use "../../styles/mixins";
+@use "../../styles/variables";
 
 .question-item {
   display: flex;
@@ -43,6 +44,30 @@
     display: flex;
     align-items: center;
     gap: 4px;
+  }
+}
+
+.answer-icon {
+  fill: none;
+  stroke-width: 1.5;
+  stroke: variables.$accent-color;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  &:hover {
+    fill: variables.$latest-question-icon-item-hover-color;
+  }
+}
+
+.like-icon {
+  fill: none;
+  stroke-width: 1.5;
+  stroke: variables.$accent-color;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  &:hover {
+    fill: variables.$latest-question-icon-item-hover-color;
   }
 }
 

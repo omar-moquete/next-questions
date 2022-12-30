@@ -12,13 +12,19 @@
     color: variables.$input-text-color;
     font-size: 1.1rem;
     outline: none;
-    padding: 5px 5px 5px 37px;
     width: 100%;
     position: relative;
 
     &::placeholder {
       color: variables.$input-placeholder-color;
     }
+  }
+  .input-with-icon {
+    padding: 5px 5px 5px 37px;
+  }
+
+  .input-without-icon {
+    padding: 5px;
   }
 }
 

@@ -11,6 +11,7 @@
   background-image: variables.$gradient;
   color: #fff;
   border-radius: 8px;
+  height: fit-content;
 }
 
 .form {
@@ -22,10 +23,10 @@
 @media (max-width: 500px) {
   .form-container {
     width: 100vw;
-    height: 100vh;
     box-shadow: none;
     border-radius: 0;
     margin: 0;
     bottom: 0;
+    padding: 158px 58px;
   }
 }

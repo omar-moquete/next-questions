@@ -9,7 +9,6 @@
 }
 
 .picture,
-.name,
 .about {
   display: flex;
   flex-direction: column;
@@ -34,7 +33,6 @@
   align-items: center;
   width: 350px;
   background-image: variables.$gradient;
-  padding: 38px;
   color: #fff;
   height: fit-content;
 }
@@ -49,22 +47,10 @@
   }
 }
 
-.name {
-  width: 100%;
-
-  input {
-    font-size: 1.2rem;
-    color: #fff;
-    background: transparent;
-    border: none;
-    border-bottom: 1px white solid;
-
-    &:focus {
-      outline: none;
-    }
-  }
+.user-information,
+.btns {
+  padding: 26px;
 }
-
 .about {
   width: 100%;
 
@@ -89,9 +75,12 @@
   justify-content: center;
   gap: 18px;
   background: variables.$gradient;
-  padding: 32px;
   .delete-account {
     background-color: #f33b50;
+  }
+
+  button {
+    font-size: 0.9rem;
   }
 }
 
@@ -110,6 +99,25 @@
     font-weight: 600;
     font-size: 3rem;
     margin-bottom: 8px;
+  }
+}
+
+.question-icon,
+.answer-icon {
+  width: 32px;
+  height: 32px;
+  stroke-width: 1;
+}
+
+.user-stats {
+  display: flex;
+  gap: 18px;
+
+  div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
   }
 }
 

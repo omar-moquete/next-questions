@@ -10,7 +10,6 @@
   width: 100vw;
   z-index: 500;
   background-color: variables.$nav-bar-small-screen-color;
-
   height: 65px;
   user-select: none;
   position: fixed;
@@ -27,12 +26,49 @@
   }
 }
 
+.login-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+.signup {
+  text-decoration: none;
+  color: variables.$accent-color;
+  font-size: 1.2rem;
+  border: solid 1px variables.$accent-color;
+  border-radius: 5px;
+  padding: 8px 12px;
+  transition: all 0.1s ease-out;
+
+  &:link,
+  &:active {
+    color: variables.$accent-color;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.04);
+      @include mixins.shadow;
+    }
+  }
+  &:active {
+    transform: scale(1.04);
+    @include mixins.shadow;
+  }
+}
+
 @media (max-width: 500px) {
   .nav-bar {
     h2 {
       font-size: 2.2rem;
-      margin-left: 28px;
+      margin-left: 18px;
       z-index: -1;
+    }
+
+    a {
+      font-size: 1rem;
+      padding: 6px 14px;
     }
   }
 }

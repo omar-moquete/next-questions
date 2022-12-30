@@ -2,9 +2,9 @@ import Link from "next/link";
 import React from "react";
 import LikeIcon from "../UI/svg/LikeIcon";
 import AnswerIcon from "../UI/svg/AnswerIcon";
-import classes from "./LatestQuestionItem.module.scss";
+import classes from "./QuestionItem.module.scss";
 
-const LatestQuestionItem = function (props) {
+const QuestionItem = function (props) {
   const { image, username, question, link } = props;
   console.log(image);
 
@@ -26,11 +26,11 @@ const LatestQuestionItem = function (props) {
 
       <div className={classes.stats}>
         <div className={classes["stats-group"]}>
-          <LikeIcon />
+          <LikeIcon className={classes["like-icon"]} />
           <p className={classes["likes-count"]}>{34}</p>
         </div>
         <div className={classes["stats-group"]}>
-          <AnswerIcon />
+          <AnswerIcon className={classes["answer-icon"]} />
           <p className={classes["answers-count"]}>{5}</p>
         </div>
       </div>
@@ -38,4 +38,4 @@ const LatestQuestionItem = function (props) {
   );
 };
 
-export default LatestQuestionItem;
+export default QuestionItem;

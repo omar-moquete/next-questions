@@ -3,6 +3,8 @@ import classes from "./UserProfile.module.scss";
 import PrimaryForm from "../UI/forms/PrimaryForm";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import QuestionGroup from "../questions-group/QuestionsGroup";
+import QuestionIcon from "../UI/svg/QuestionIcon";
+import AnswerIcon from "../UI/svg/AnswerIcon";
 
 const UserProfile = function (props) {
   console.log(props.userData);
@@ -70,21 +72,21 @@ const UserProfile = function (props) {
         <div className={classes.picture}>
           <img src={props.userData.profilePictureUrl} alt="User picture" />
           <h2>testuser123</h2>
-        </div>
 
-        <div className={classes.name}>
-          <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            name="name"
-            id="name"
-            readOnly
-            defaultValue="Chris Martin"
-          />
+          <div className={classes["user-stats"]}>
+            <div>
+              <QuestionIcon className={classes["question-icon"]} />
+              <p>53</p>
+            </div>
+            <div>
+              <AnswerIcon className={classes["answer-icon"]} />
+              <p>19</p>
+            </div>
+          </div>
         </div>
 
         <div className={classes.about}>
-          <label htmlFor="about">About</label>
+          <label htmlFor="about">About me</label>
           <p>Hi! I'm a developer at Google.</p>
         </div>
 
