@@ -1,0 +1,49 @@
+@use "../styles/variables";
+@use "../styles/mixins";
+
+.main,
+.main > div {
+  display: flex;
+  flex-direction: column;
+  gap: 46px;
+}
+
+.main {
+  width: 90vw;
+  max-width: 600px;
+  height: auto;
+  margin: auto;
+  margin-top: 150px;
+  margin-bottom: 150px;
+
+  div {
+    @include mixins.shadow;
+    padding: 24px;
+    color: #fff;
+    background: variables.$gradient;
+    border-radius: 8px;
+  }
+
+  h2 {
+    text-align: left;
+    font-family: "Corinthia", cursive;
+    font-size: 2.2rem;
+    border-bottom: solid 1px #fff;
+  }
+
+  p {
+    text-align: center;
+  }
+}
+
+.btn {
+  align-self: center;
+}
+
+@media (max-width: 500px) {
+  .main {
+    p {
+      text-align: left;
+    }
+  }
+}

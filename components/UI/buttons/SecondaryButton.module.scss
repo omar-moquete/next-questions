@@ -1,6 +1,7 @@
 @use "../../../styles/variables";
 
-.button {
+.button,
+.link {
   font-size: 1rem;
   font-weight: 500;
   padding: 8px 12px;
@@ -11,7 +12,18 @@
   background-color: transparent;
   color: variables.$secondary-button-text-color;
   border-radius: 5px;
+}
 
+.link {
+  text-decoration: none;
+  &:link,
+  &:visited {
+    color: inherit;
+  }
+}
+
+.button,
+.link {
   @media (hover: hover) {
     &:hover {
       transform: scale(1.1);
