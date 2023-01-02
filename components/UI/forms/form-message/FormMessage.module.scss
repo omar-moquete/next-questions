@@ -1,0 +1,16 @@
+@use "../../../../styles/mixins";
+.messages {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: rgb(240, 70, 70);
+  padding: 18px;
+  width: 90%;
+
+  font-weight: 500;
+  font-size: 1.1rem;
+  backdrop-filter: blur(2px);
+  @include mixins.shadow;
+  border-radius: 8px;
+  left: 5%;
+  top: 10px;
+}

@@ -10,7 +10,7 @@ const NotFound = function () {
       <div>
         <h2>404</h2>
         <p>Sorry, the page you're looking for does not exist.</p>
-        <SecondaryButton href="./" className={classes.btn}>
+        <SecondaryButton href="/" className={classes.btn}>
           Home page
         </SecondaryButton>
       </div>

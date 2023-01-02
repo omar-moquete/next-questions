@@ -7,7 +7,7 @@ const CustomField = function (props) {
 
   const inputClassWithIcon = classes["input-with-icon"];
   const inputClassWithoutIcon = classes["input-without-icon"];
-  // If no lable is provided, these attributes are not added
+  // Prevent attributes from being added to the input if they're not received through props
   const formAttributes = props.label
     ? {
         id: format(props.label),
@@ -18,6 +18,9 @@ const CustomField = function (props) {
   const placeholder = props.placeholder
     ? { placeholder: props.placeholder }
     : {};
+  const onChange = props.onChange ? { onChange: props.onChange } : {};
+  const onFocus = props.onFocus ? { onFocus: props.onFocus } : {};
+  const onClick = props.onClick ? { onClick: props.onClick } : {};
 
   return (
     <div className={classes.field}>
@@ -40,6 +43,9 @@ const CustomField = function (props) {
           ref={props.inputRef}
           {...(props.label ? formAttributes : {})}
           {...(props.placeholder ? placeholder : {})}
+          {...(props.onChange ? onChange : {})}
+          {...(props.onFocus ? onFocus : {})}
+          {...(props.onClick ? onClick : {})}
         />
       </div>
     </div>
