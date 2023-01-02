@@ -6,15 +6,18 @@ import CustomField from "../UI/custom-field/CustomField";
 import PrimaryForm from "../UI/forms/PrimaryForm";
 import UserIcon from "../UI/svg/UserIcon";
 import PasswordIcon from "../UI/svg/PasswordIcon";
-import { INVALID_PASSWORD_MESSAGE } from "../../app-config";
 import FormMessage from "../UI/forms/form-message/FormMessage";
-import { clearField, isValidPassword } from "../../utils";
+import { clearField, formatFirebaseErrorCode } from "../../utils";
+import { AUTH_URL } from "../../backend-apis";
+import { useRouter } from "next/router";
 
 const LoginForm = function () {
   //
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const [message, setMessage] = useState("");
+  //
+  const router = useRouter();
 
   const clearMessage = () => {
     if (message === "") return;
@@ -28,7 +31,7 @@ const LoginForm = function () {
     const password = passwordInputRef.current.value;
 
     try {
-      const response = await fetch("/api/auth", {
+      const response = await fetch(AUTH_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -36,10 +39,15 @@ const LoginForm = function () {
         body: JSON.stringify({ email, password }),
       });
 
-      const responseBody = await response.json();
+      const responseData = await response.json();
+
+      if (response.ok) {
+        // set app state user data
+        console.log(responseData);
+        router.replace("/" + responseData.uid);
+      } else throw new Error(responseData);
     } catch (error) {
-      console.warn(error);
-      setMessage(error.message);
+      setMessage(formatFirebaseErrorCode(error.message));
       clearField(passwordInputRef);
     }
   };
@@ -54,6 +62,7 @@ const LoginForm = function () {
           placeholder="Enter your email"
           Icon={UserIcon}
           inputRef={emailInputRef}
+          onChange={clearMessage}
           required
         />
         <CustomField
@@ -68,7 +77,7 @@ const LoginForm = function () {
 
         <SecondaryButton>Login</SecondaryButton>
       </div>
-      {message && <FormMessage message={message} />}
+      {message && <FormMessage message={message} onClick={clearMessage} />}
 
       <Link href="/login/reset-password">Forgot your password?</Link>
     </PrimaryForm>

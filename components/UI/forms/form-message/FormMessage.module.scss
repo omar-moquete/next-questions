@@ -13,4 +13,8 @@
   border-radius: 8px;
   left: 5%;
   top: 10px;
+
+  @media (max-width: 500px) {
+    top: 116px;
+  }
 }
