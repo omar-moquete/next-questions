@@ -43,8 +43,7 @@ const LoginForm = function () {
 
       if (response.ok) {
         // set app state user data
-        console.log(responseData);
-        router.replace("/" + responseData.uid);
+        // router.replace("/" + responseData.uid);
       } else throw new Error(responseData);
     } catch (error) {
       setMessage(formatFirebaseErrorCode(error.message));

@@ -9,8 +9,6 @@ export const clearField = (ref) => {
 };
 
 export const formatFirebaseErrorCode = function (errorString) {
-  console.log(errorString);
-
   // Initial errorString format: firebaseService/error-message-no-spaces
 
   // Remove "/" and "-"s

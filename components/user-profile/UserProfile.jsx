@@ -7,7 +7,6 @@ import QuestionIcon from "../UI/svg/QuestionIcon";
 import AnswerIcon from "../UI/svg/AnswerIcon";
 
 const UserProfile = function (props) {
-  console.log(props.userData);
   const questions = [
     {
       id: "1",
