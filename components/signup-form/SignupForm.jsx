@@ -1,24 +1,24 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import CustomField from "../UI/custom-field/CustomField";
 import classes from "./SignupForm.module.scss";
 import PrimaryForm from "../UI/forms/PrimaryForm";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
-import { clearField, isValidPassword } from "../../utils";
 import FormMessage from "../UI/forms/form-message/FormMessage";
 import {
   EMAIL_VALIDATION_REGEX,
+  USERNAME_VALIDATION_REGEX,
+  INVALID_EMAIL_MESSAGE,
+  INVALID_PASSWORD_MESSAGE,
+  INVALID_USERNAME_MESSAGE,
   PASSWORDS_DO_NOT_MATCH_MESSAGE,
-  USERNAME_MAX_CHARACTERS,
-  USERNAME_MIN_CHARACTERS,
+  PASSWORD_VALIDATION_REGEX,
 } from "../../app-config";
-import { useRouter } from "next/router";
 import {
-  EMAIL_EXISTS_URL,
-  SIGNUP_URL,
-  USERNAME_EXISTS_URL,
+  CREATE_ACCOUNT_ENDPOINT,
+  EMAIL_EXISTS_ENDPOINT,
+  USERNAME_EXISTS_ENDPOINT,
 } from "../../backend-apis";
-import { collection, doc, getDoc, query, where } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
+import { clearField } from "../../utils";
 
 const SignupForm = function () {
   const emailInputRef = useRef();
@@ -26,23 +26,43 @@ const SignupForm = function () {
   const password1InputRef = useRef();
   const password2InputRef = useRef();
   const [message, setMessage] = useState("");
-  const [isFormValidated, setIsFormValidated] = useState(false);
-
+  const [formState, setFormState] = useState({
+    emailAvailable: null,
+    emailValid: false,
+    usernameAvailable: null,
+    usernameValid: false,
+    passwordValid: false,
+    passwordsMatch: false,
+    data: { email: null, username: null, password1: null, password2: null },
+  });
   const clearMessage = () => {
     if (message === "") return;
     else setMessage("");
   };
 
-  const checkIfEmailExists = async () => {
+  const validateEmail = async () => {
     // Ensures message is cleared on email field change
     clearMessage();
     const email = emailInputRef.current.value;
-    // Ensure test only happens when user finishes typing a correct email address
-    if (!EMAIL_VALIDATION_REGEX.test(email)) return;
+
+    // Ensure test only happens when user finishes typing a correct email address. If user types a valid email address, set emailValid = true]
+    if (!EMAIL_VALIDATION_REGEX.test(email)) {
+      if (formState.emailValid === false) return; // Prevent settin state to false if it's already false
+
+      setFormState((latestState) => {
+        // Ensures that a valid email address cannot be an available email address
+        return { ...latestState, emailValid: false, emailAvailable: false };
+      });
+      return;
+    } else {
+      setFormState((latestState) => {
+        return { ...latestState, emailValid: true };
+      });
+    }
 
     // Check if email address exists in db.
     try {
-      const res = await fetch(EMAIL_EXISTS_URL, {
+      const res = await fetch(EMAIL_EXISTS_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,33 +72,43 @@ const SignupForm = function () {
 
       const responseData = await res.json();
 
-      if (res.ok) {
-        console.log("ok");
+      if (responseData.found === false) {
+        setFormState((latestState) => {
+          return { ...latestState, emailAvailable: true };
+        });
       } else {
+        setFormState((latestState) => {
+          return { ...latestState, emailAvailable: false };
+        });
         throw new Error(responseData.message);
       }
     } catch (error) {
-      console.error(error);
       setMessage(error.message);
     }
   };
 
-  const checkIfUsernameExists = async () => {
+  const validateUsername = async () => {
+    // This function is the same as validate email, but for username. See comments on that function for help.
     clearMessage();
     const username = usernameInputRef.current.value;
-
-    // Username validation
-    if (
-      !(
-        username.length > USERNAME_MIN_CHARACTERS &&
-        username.length <= USERNAME_MAX_CHARACTERS
-      )
-    )
+    if (!USERNAME_VALIDATION_REGEX.test(username)) {
+      if (formState.usernameValid === false) return;
+      setFormState((latestState) => {
+        return {
+          ...latestState,
+          usernameValid: false,
+          usernameAvailable: false,
+        };
+      });
       return;
+    } else {
+      setFormState((latestState) => {
+        return { ...latestState, usernameValid: true };
+      });
+    }
 
-    // Check if username address exists in db.
     try {
-      const res = await fetch(USERNAME_EXISTS_URL, {
+      const res = await fetch(USERNAME_EXISTS_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,9 +118,14 @@ const SignupForm = function () {
 
       const responseData = await res.json();
 
-      if (res.ok) {
-        console.log("ok");
+      if (responseData.found === false) {
+        setFormState((latestState) => {
+          return { ...latestState, usernameAvailable: true };
+        });
       } else {
+        setFormState((latestState) => {
+          return { ...latestState, usernameAvailable: false };
+        });
         throw new Error(responseData.message);
       }
     } catch (error) {
@@ -106,59 +141,74 @@ const SignupForm = function () {
     const password1 = password1InputRef.current.value;
     const password2 = password2InputRef.current.value;
 
-    // Check if email is a valid email address
-    if (!EMAIL_VALIDATION_REGEX.test(email)) {
-      setMessage(`The email address "${email}" is not a valid email address.`);
+    // check if email is valid
+    if (!formState.emailValid) {
+      setMessage(INVALID_EMAIL_MESSAGE);
       return;
     }
 
-    // Check if username is a valid username
-
-    if (
-      !(
-        username.length >= USERNAME_MIN_CHARACTERS &&
-        username.length <= USERNAME_MAX_CHARACTERS
-      )
-    ) {
-      setMessage(`The username "${username}" is not a valid username.`);
-
+    // check if username is valid
+    if (!formState.usernameValid) {
+      setMessage(INVALID_USERNAME_MESSAGE);
       return;
     }
+    // Check if password1 is valid
+    if (!PASSWORD_VALIDATION_REGEX.test(password1)) {
+      // password validation regex here
+      setFormState({ ...formState, passwordValid: false });
+      setMessage(INVALID_PASSWORD_MESSAGE);
+    } else setFormState({ ...formState, passwordValid: true });
 
-    // Check if username is valid
-    if (!(username.length > 4 && username.length < 16)) return;
-    if (!isValidPassword(password1)) {
-      // Check if password is valid
-      clearField(password2InputRef);
-    }
-
-    // Check if passwords are the same
-    else if (password1 !== password2) {
-      console.log("tessst");
+    // Check if p2 === p1
+    if (password2 !== password1) {
+      setFormState((latestState) => {
+        return { ...latestState, passwordsMatch: false };
+      });
       clearField(password2InputRef);
       setMessage(PASSWORDS_DO_NOT_MATCH_MESSAGE);
-    }
+    } else
+      setFormState((latestState) => {
+        return { ...latestState, passwordsMatch: true };
+      });
 
-    // If checks are passed, create new user and setIsFormValidated(true)
-    // if (isFormValidated) {
-    //   const res = await fetch(SIGNUP_URL, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({email, password1}),
-    //   });
-    // }
-
-    // if isFormValidated, set authState and Navigate user to profile
-
-    // if (isFormValidated) {
-    //   // profile must be username
-    //   useRouter().push("/username");
-    // }
-
-    //==================
+    // If all checks are done, set data in state to be handled by usedEffect later.
+    setFormState((latestState) => {
+      return {
+        ...latestState,
+        data: { email, username, password1, password2 },
+      };
+    });
   };
+
+  useEffect(() => {
+    // Wrapping functionality in a async IIFE because useEffect does not accept promises as the return value of the callback function passed into it.
+    (async function () {
+      if (
+        !(
+          formState.emailAvailable &&
+          formState.emailValid &&
+          formState.usernameAvailable &&
+          formState.usernameValid &&
+          formState.passwordValid &&
+          formState.passwordsMatch
+        )
+      )
+        return;
+
+      try {
+        await fetch(CREATE_ACCOUNT_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formState.data),
+        });
+      } catch (e) {
+        console.log(e);
+        setMessage(e.message);
+      }
+    })();
+  }, [formState]);
 
   return (
     <PrimaryForm className={classes.form} onSubmit={submitHandler}>
@@ -169,7 +219,7 @@ const SignupForm = function () {
         placeholder="Enter your email"
         inputRef={emailInputRef}
         required
-        onChange={checkIfEmailExists}
+        onChange={validateEmail}
       />
       <CustomField
         type="text"
@@ -177,7 +227,7 @@ const SignupForm = function () {
         placeholder="Enter new username"
         inputRef={usernameInputRef}
         required
-        onChange={checkIfUsernameExists}
+        onChange={validateUsername}
       />
       <CustomField
         type="password"

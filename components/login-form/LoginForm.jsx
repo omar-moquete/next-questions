@@ -8,7 +8,7 @@ import UserIcon from "../UI/svg/UserIcon";
 import PasswordIcon from "../UI/svg/PasswordIcon";
 import FormMessage from "../UI/forms/form-message/FormMessage";
 import { clearField, formatFirebaseErrorCode } from "../../utils";
-import { AUTH_URL } from "../../backend-apis";
+import { AUTH_ENDPOINT } from "../../backend-apis";
 import { useRouter } from "next/router";
 
 const LoginForm = function () {
@@ -31,7 +31,7 @@ const LoginForm = function () {
     const password = passwordInputRef.current.value;
 
     try {
-      const response = await fetch(AUTH_URL, {
+      const response = await fetch(AUTH_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
