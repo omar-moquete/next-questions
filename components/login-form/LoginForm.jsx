@@ -8,7 +8,7 @@ import UserIcon from "../UI/svg/UserIcon";
 import PasswordIcon from "../UI/svg/PasswordIcon";
 import FormMessage from "../UI/forms/form-message/FormMessage";
 import { clearField, formatFirebaseErrorCode } from "../../utils";
-import { AUTH_ENDPOINT } from "../../backend-apis";
+import { AUTH_ENDPOINT } from "../../api-endpoints";
 import { useRouter } from "next/router";
 
 const LoginForm = function () {

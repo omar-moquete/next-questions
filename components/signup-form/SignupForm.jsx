@@ -17,7 +17,7 @@ import {
   CREATE_ACCOUNT_ENDPOINT,
   EMAIL_EXISTS_ENDPOINT,
   USERNAME_EXISTS_ENDPOINT,
-} from "../../backend-apis";
+} from "../../api-endpoints";
 import { clearField } from "../../utils";
 
 const SignupForm = function () {
@@ -45,10 +45,9 @@ const SignupForm = function () {
     clearMessage();
     const email = emailInputRef.current.value;
 
-    // Ensure test only happens when user finishes typing a correct email address. If user types a valid email address, set emailValid = true]
+    // Ensure test only happens when user finishes typing a correct email address. If user types a valid email address, set emailValid = true
     if (!EMAIL_VALIDATION_REGEX.test(email)) {
       if (formState.emailValid === false) return; // Prevent settin state to false if it's already false
-
       setFormState((latestState) => {
         // Ensures that a valid email address cannot be an available email address
         return { ...latestState, emailValid: false, emailAvailable: false };
