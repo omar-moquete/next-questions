@@ -13,14 +13,12 @@ import {
   PASSWORDS_DO_NOT_MATCH_MESSAGE,
   PASSWORD_VALIDATION_REGEX,
 } from "../../app-config";
-import {
-  CREATE_ACCOUNT_ENDPOINT,
-  EMAIL_EXISTS_ENDPOINT,
-  USERNAME_EXISTS_ENDPOINT,
-} from "../../api-endpoints";
-import { clearField } from "../../utils";
+import { CREATE_ACCOUNT_ENDPOINT, EXISTS_ENDPOINT } from "../../api-endpoints";
+import { clearField, scrollToTop } from "../../utils";
+import useAuth from "../../hooks/useAuth";
+import { useRouter } from "next/router";
 
-const SignupForm = function () {
+const SignUpForm = function () {
   const emailInputRef = useRef();
   const usernameInputRef = useRef();
   const password1InputRef = useRef();
@@ -35,6 +33,8 @@ const SignupForm = function () {
     passwordsMatch: false,
     data: { email: null, username: null, password1: null, password2: null },
   });
+  const router = useRouter();
+  const { createAccount } = useAuth();
   const clearMessage = () => {
     if (message === "") return;
     else setMessage("");
@@ -61,12 +61,23 @@ const SignupForm = function () {
 
     // Check if email address exists in db.
     try {
-      const res = await fetch(EMAIL_EXISTS_ENDPOINT, {
+      // Ditch api and do checks here... Will update security rules later
+      const res = await fetch(EXISTS_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        // Check if email exists in collection users, field email
+        body: JSON.stringify({
+          // What collection
+          inCollection: "/users",
+          // What field name
+          fieldName: "email",
+          // What should or should not exist in that fieldName
+          exists: email,
+          // What is it (constructs error message returned from API)
+          type: "email address",
+        }),
       });
 
       const responseData = await res.json();
@@ -82,6 +93,7 @@ const SignupForm = function () {
         throw new Error(responseData.message);
       }
     } catch (error) {
+      scrollToTop();
       setMessage(error.message);
     }
   };
@@ -107,12 +119,17 @@ const SignupForm = function () {
     }
 
     try {
-      const res = await fetch(USERNAME_EXISTS_ENDPOINT, {
+      const res = await fetch(EXISTS_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify({
+          inCollection: "/users",
+          fieldName: "username",
+          exists: username,
+          type: "username",
+        }),
       });
 
       const responseData = await res.json();
@@ -148,6 +165,7 @@ const SignupForm = function () {
 
     // check if username is valid
     if (!formState.usernameValid) {
+      scrollToTop();
       setMessage(INVALID_USERNAME_MESSAGE);
       return;
     }
@@ -155,6 +173,7 @@ const SignupForm = function () {
     if (!PASSWORD_VALIDATION_REGEX.test(password1)) {
       // password validation regex here
       setFormState({ ...formState, passwordValid: false });
+      scrollToTop();
       setMessage(INVALID_PASSWORD_MESSAGE);
     } else setFormState({ ...formState, passwordValid: true });
 
@@ -164,6 +183,7 @@ const SignupForm = function () {
         return { ...latestState, passwordsMatch: false };
       });
       clearField(password2InputRef);
+      scrollToTop();
       setMessage(PASSWORDS_DO_NOT_MATCH_MESSAGE);
     } else
       setFormState((latestState) => {
@@ -195,15 +215,16 @@ const SignupForm = function () {
         return;
 
       try {
-        await fetch(CREATE_ACCOUNT_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formState.data),
-        });
+        const userData = await createAccount(
+          emailInputRef.current.value,
+          password1InputRef.current.value,
+          usernameInputRef.current.value
+        );
+        // Navigate user to profile
+        router.replace("/" + userData.username);
       } catch (e) {
-        console.log(e);
+        console.error(e);
+        scrollToTop();
         setMessage(e.message);
       }
     })();
@@ -211,7 +232,7 @@ const SignupForm = function () {
 
   return (
     <PrimaryForm className={classes.form} onSubmit={submitHandler}>
-      <h2>User signup</h2>
+      <h2>Sign Up</h2>
       <CustomField
         type="email"
         label="Email"
@@ -244,11 +265,11 @@ const SignupForm = function () {
         required
         onChange={clearMessage}
       />
-      <SecondaryButton className={classes.btn}>Signup</SecondaryButton>
+      <SecondaryButton className={classes.btn}>Sign In</SecondaryButton>
 
-      {message && <FormMessage message={message} />}
+      {message && <FormMessage message={message} onClick={clearMessage} />}
     </PrimaryForm>
   );
 };
 
-export default SignupForm;
+export default SignUpForm;

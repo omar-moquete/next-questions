@@ -6,8 +6,6 @@ const PrimaryButton = function (props) {
   if (props.href)
     return (
       <Link className={classes.link} {...props}>
-        {console.log(props.href)}
-
         {props.children}
       </Link>
     );

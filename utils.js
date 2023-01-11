@@ -12,7 +12,7 @@ export const formatFirebaseErrorCode = function (errorString) {
   // Initial errorString format: firebaseService/error-message-no-spaces
 
   // Remove "/" and "-"s
-  const words = errorString.split("/")[1].split("-");
+  const words = errorString.split("/")[1].split(")")[0].split("-");
 
   // Get word to capitalize
   const firstWord = words[0];
@@ -30,4 +30,24 @@ export const formatFirebaseErrorCode = function (errorString) {
   const formattedWords = capitalizedSentenceArray.join(" ") + ".";
 
   return formattedWords;
+};
+
+export const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
+export const convertDate = function (
+  unixTimestamp,
+  options = {
+    dateStyle: "full",
+    timeStyle: "full",
+  }
+) {
+  const date = new Date(unixTimestamp * 1000);
+  const intl = new Intl.DateTimeFormat("en-US", options);
+
+  return intl.format(date);
 };

@@ -4,8 +4,11 @@ import PrimaryButton from "../../buttons/PrimaryButton";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import NavBarUserProfile from "./navbar-user-profile/NavBarUserProfile";
+import { useSelector } from "react-redux";
+import { ColorRing } from "react-loader-spinner";
 
 const NavBar = function () {
+  const authState = useSelector((state) => state.auth);
   const router = useRouter();
   const redirectHandler = function () {
     router.push("/");
@@ -19,15 +22,18 @@ const NavBar = function () {
       <h2 onClick={redirectHandler}>NJSQuestions</h2>
       <div>
         <nav>
+          {/* {authState.isLoading && "LOADING"} */}
           {/* if logged in */}
-          {/* <NavBarUserProfile picture={userPictureState} /> */}
+          {authState.user && <NavBarUserProfile picture={userPictureState} />}
           {/* if NOT logged in */}
-          <div className={classes["login-controls"]}>
-            <PrimaryButton href="/login">Login</PrimaryButton>
-            <Link className={classes.signup} href="/signup">
-              Signup
-            </Link>
-          </div>
+          {!authState.user && (
+            <div className={classes["login-controls"]}>
+              <PrimaryButton href="/login">Login</PrimaryButton>
+              <Link className={classes["sign-up"]} href="/sign-up">
+                Sign up
+              </Link>
+            </div>
+          )}
         </nav>
       </div>
     </header>

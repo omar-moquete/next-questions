@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import classes from "./UserProfile.module.scss";
-import PrimaryForm from "../UI/forms/PrimaryForm";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import QuestionGroup from "../questions-group/QuestionsGroup";
 import QuestionIcon from "../UI/svg/QuestionIcon";
 import AnswerIcon from "../UI/svg/AnswerIcon";
+import AvatarIllustration from "../UI/svg/AvatarIllustration";
+import { convertDate } from "../../utils";
+import { useSelector } from "react-redux";
+import useAuth from "../../hooks/useAuth";
 
 const UserProfile = function (props) {
+  useAuth();
   const questions = [
     {
       id: "1",
@@ -65,31 +69,58 @@ const UserProfile = function (props) {
     },
   ];
 
+  const authState = useSelector((state) => state.auth);
+  // Fix
+  const [canEdit, setCanEdit] = useState();
+  console.log(canEdit);
+
+  const authenticatedUser = useSelector((state) => state.auth.user);
+  console.log("authenticatedUser", authenticatedUser);
   return (
     <div className={classes.container}>
       <div className={classes["user-information"]}>
         <div className={classes.picture}>
-          <img src={props.userData.profilePictureUrl} alt="User picture" />
-          <h2>testuser123</h2>
+          <div className={classes["user-image"]}>
+            {props.publicUserData.imageUrl ? (
+              <img
+                src={props.publicUserData.profilePictureUrl}
+                alt="User picture"
+              />
+            ) : (
+              <AvatarIllustration className={classes.avatar} />
+            )}
+          </div>
+
+          <h2>{props.publicUserData.username}</h2>
 
           <div className={classes["user-stats"]}>
             <div>
               <QuestionIcon className={classes["question-icon"]} />
-              <p>53</p>
+              <p>{props.publicUserData.questionsAsked.length}</p>
             </div>
             <div>
               <AnswerIcon className={classes["answer-icon"]} />
-              <p>19</p>
+              <p>{props.publicUserData.questionsAnswered.length}</p>
             </div>
           </div>
         </div>
 
-        <div className={classes.about}>
-          <label htmlFor="about">About me</label>
-          <p>Hi! I'm a developer at Google.</p>
-        </div>
+        {/* If about is present, if not "" */}
+        {props.publicUserData.about ? (
+          <div className={classes.about}>
+            <label htmlFor="about">About me</label>
+            <p>{props.publicUserData.about}</p>
+          </div>
+        ) : (
+          ""
+        )}
 
-        <p className={classes.member}>Member since 00/00/000</p>
+        <p className={classes.member}>
+          Member since{" "}
+          {convertDate(props.publicUserData.memberSince.seconds, {
+            dateStyle: "medium",
+          })}
+        </p>
       </div>
 
       <div className={classes.qa}>
