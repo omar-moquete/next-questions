@@ -10,6 +10,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   query,
@@ -18,9 +19,10 @@ import {
   where,
 } from "firebase/firestore";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { firebaseConfig } from "../api/firebaseApp";
 import { authActions } from "../redux-store/authSlice";
+import { toSerializable } from "../utils";
 
 // useAuth initializes auth and returns apis to manage auth.
 const useAuth = function () {
@@ -29,28 +31,61 @@ const useAuth = function () {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const authStatusNames = useSelector((state) => state.auth.authStatusNames);
 
   // Will only run once
   let detachListener = null;
   useEffect(() => {
     detachListener = onAuthStateChanged(auth, async (user) => {
-      dispatch(authActions.setIsLoading(true));
       if (user) {
-        // Querying data: find username with uid
-        // Get query reference. __name__ is the name of the document which is meant to be the user id
-        const q = query(
-          collection(db, "/users"),
-          where("__name__", "==", user.uid)
-        );
-        // Get query snapshot
-        const querySnapshot = await getDocs(q);
-        // Iterate docs
-        let result = null;
-        querySnapshot.forEach((doc) => (result = doc.data()));
-        // Only one user will be returned from the query. Convert to json to object will prevent unserialized value error from redux.
-        dispatch(authActions._setUser(JSON.parse(JSON.stringify(result))));
-      } else dispatch(authActions._setUser(user)); // User will be null
-      dispatch(authActions.setIsLoading(false));
+        try {
+          dispatch(authActions.setAuthStatus(authStatusNames.checking));
+          // Querying data: find username with uid
+          // Get query reference. __name__ is the name of the document which is meant to be the user id
+          const queryInUsers = query(
+            collection(db, "/users"),
+            where("__name__", "==", user.uid)
+          );
+
+          // Get query snapshot
+          const queryInUsersSnapshot = await getDocs(queryInUsers);
+          // Iterate docs
+          let usersCollectionDocData = null;
+          queryInUsersSnapshot.forEach(
+            (doc) => (usersCollectionDocData = doc.data())
+          );
+          // Only one user will be returned from the query. Convert to json to object will prevent unserialized value error from redux.
+
+          // Get questions linked to user
+
+          let questionsCollectionDocData = null;
+          const queryInQuestions = query(
+            collection(db, "/questions"),
+            where("userId", "==", user.uid)
+          );
+
+          const queryInQuestionsSnapshot = await getDocs(queryInQuestions);
+
+          queryInQuestionsSnapshot.forEach(
+            (doc) => (questionsCollectionDocData = doc.data())
+          );
+
+          const userData = {
+            email: usersCollectionDocData.email,
+            username: usersCollectionDocData.username,
+            userId: usersCollectionDocData.userId,
+            imageUrl: usersCollectionDocData.imageUrl,
+            memberSince: usersCollectionDocData.memberSince,
+            questionsAsked: questionsCollectionDocData.questionsAsked,
+            questionsAnswered: questionsCollectionDocData.questionsAnswered,
+          };
+
+          dispatch(authActions._setUser(toSerializable(userData)));
+          dispatch(authActions.setAuthStatus(authStatusNames.checked));
+        } catch (error) {
+          dispatch(authActions.setAuthStatus(authStatusNames.checked));
+        }
+      } else dispatch(authActions._setUser(null));
     });
 
     return () => {
@@ -61,13 +96,11 @@ const useAuth = function () {
 
   return {
     async login(email, password) {
-      dispatch(authActions.setIsLoading(true));
       const userCredentials = await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
-      dispatch(authActions.setIsLoading(false));
       return userCredentials;
     },
 

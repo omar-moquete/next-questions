@@ -6,11 +6,26 @@ import QuestionIcon from "../UI/svg/QuestionIcon";
 import AnswerIcon from "../UI/svg/AnswerIcon";
 import AvatarIllustration from "../UI/svg/AvatarIllustration";
 import { convertDate } from "../../utils";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useAuth from "../../hooks/useAuth";
-
+import EditIcon from "../UI/svg/EditIcon";
+import About from "./about/About";
+import { useRouter } from "next/router";
+import { globalActions } from "../../redux-store/globalSlice";
 const UserProfile = function (props) {
   useAuth();
+  const router = useRouter();
+  const visitedUser = router.asPath.split("/")[1];
+  const dispatch = useDispatch();
+  // When <UserProfile> mounts the visited user will be saved to state, and when <UserProfile> unmounts the visited user will be null
+  useEffect(() => {
+    dispatch(globalActions.setVisitedUser(visitedUser));
+    return () => {
+      dispatch(globalActions.setVisitedUser(null));
+    };
+  });
+
+  const user = useSelector((state) => state.auth.user);
   const questions = [
     {
       id: "1",
@@ -69,23 +84,13 @@ const UserProfile = function (props) {
     },
   ];
 
-  const authState = useSelector((state) => state.auth);
-  // Fix
-  const [canEdit, setCanEdit] = useState();
-  console.log(canEdit);
-
-  const authenticatedUser = useSelector((state) => state.auth.user);
-  console.log("authenticatedUser", authenticatedUser);
   return (
     <div className={classes.container}>
       <div className={classes["user-information"]}>
         <div className={classes.picture}>
           <div className={classes["user-image"]}>
             {props.publicUserData.imageUrl ? (
-              <img
-                src={props.publicUserData.profilePictureUrl}
-                alt="User picture"
-              />
+              <img src={props.publicUserData.imageUrl} alt="User picture" />
             ) : (
               <AvatarIllustration className={classes.avatar} />
             )}
@@ -105,14 +110,9 @@ const UserProfile = function (props) {
           </div>
         </div>
 
-        {/* If about is present, if not "" */}
-        {props.publicUserData.about ? (
-          <div className={classes.about}>
-            <label htmlFor="about">About me</label>
-            <p>{props.publicUserData.about}</p>
-          </div>
-        ) : (
-          ""
+        {/* If about is present */}
+        {props.publicUserData.about && (
+          <About text={props.publicUserData.about} />
         )}
 
         <p className={classes.member}>
@@ -139,12 +139,16 @@ const UserProfile = function (props) {
             questions={questions}
           />
         </div>
-        <div className={classes.btns}>
-          <SecondaryButton>Change password</SecondaryButton>
-          <SecondaryButton className={classes["delete-account"]}>
-            Delete account
-          </SecondaryButton>
-        </div>
+
+        {/* If user logged in is the same as the user being visited */}
+        {user?.username === visitedUser && (
+          <div className={classes.btns}>
+            <SecondaryButton>Change password</SecondaryButton>
+            <SecondaryButton className={classes["delete-account"]}>
+              Delete account
+            </SecondaryButton>
+          </div>
+        )}
       </div>
     </div>
   );

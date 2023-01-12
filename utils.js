@@ -51,3 +51,5 @@ export const convertDate = function (
 
   return intl.format(date);
 };
+
+export const toSerializable = (obj) => JSON.parse(JSON.stringify(obj));

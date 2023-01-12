@@ -1,0 +1,16 @@
+@use "../../../styles/mixins";
+
+.inputarea {
+  width: 100%;
+  border-radius: 5px;
+  padding: 16px;
+  font-family: inherit;
+  background-color: #fff;
+  color: #333;
+  font-size: 1.1rem;
+  @include mixins.shadow;
+
+  &:focus {
+    outline: none;
+  }
+}

@@ -5,19 +5,37 @@
   justify-content: center;
   align-items: center;
   position: relative;
-  height: 56px;
-  width: 56px;
+  height: 58px;
+  width: 58px;
   border-radius: 50%;
-  background-color: #363795;
-  cursor: pointer;
-  .picture {
+  background-color: #fff;
+  border: solid 1px #c4c4c4;
+  transition: all 0.05s ease 0.16s;
+  img {
     position: absolute;
     height: 50px;
     width: 50px;
     border-radius: 50%;
+    object-fit: cover;
+    transition: all 0.5s cubic-bezier(0.25, 0.75, 0.5, 1.25);
+  }
+
+  .avatar {
+    width: 95%;
+    height: 95%;
   }
 }
 
+.grow {
+  border: none;
+  background-color: transparent;
+  transition: none;
+  img {
+    height: 130%;
+    width: 130%;
+    transform: translate(-50%, 12px);
+  }
+}
 .menu {
   position: absolute;
   display: flex;
@@ -28,7 +46,8 @@
   height: 56px;
   width: 56px;
   color: #fff;
-  transition: all 0.3s ease 0.12s;
+  transition: all 0.5s cubic-bezier(0.25, 0.75, 0.5, 1.25);
+
   overflow: hidden;
   background-color: transparent;
   box-shadow: none;
@@ -42,8 +61,8 @@
     height: fit-content;
     width: max-content;
     gap: 12px;
-    margin-right: 110px;
-    margin-top: 150px;
+    margin-right: 82px;
+    margin-top: 200px;
   }
   a {
     text-decoration: none;
@@ -75,19 +94,19 @@
   border-radius: 50%;
   height: 56px;
   width: 56px;
-  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  transition: all 0.5s cubic-bezier(0.25, 0.75, 0.5, 1.25);
   background-color: #363795;
   z-index: -1;
 }
 
 .menu:hover {
   & {
-    width: 380px;
-    height: 380px;
+    width: 350px;
+    height: 350px;
   }
   &::before {
-    width: 300px;
-    height: 300px;
+    width: 350px;
+    height: 350px;
     opacity: 1;
     @include mixins.shadow;
   }

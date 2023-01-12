@@ -22,7 +22,6 @@ const ProfilePage = function (props) {
 export default ProfilePage;
 
 export const getStaticProps = async function ({ params }) {
-  const authState = store.getState().auth;
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
@@ -35,6 +34,7 @@ export const getStaticProps = async function ({ params }) {
   const publicUserData = {
     username: "",
     imageUrl: "",
+    userId: "",
     memberSince: "",
     about: "",
     questionsAsked: [],
@@ -44,6 +44,7 @@ export const getStaticProps = async function ({ params }) {
   snapshot.forEach((doc) => {
     const userData = doc.data();
     publicUserData.username = userData.username;
+    publicUserData.userId = userData.userId;
     publicUserData.imageUrl = userData.imageUrl;
     publicUserData.memberSince = userData.memberSince;
     publicUserData.about = userData.about;

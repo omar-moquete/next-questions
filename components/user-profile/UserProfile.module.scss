@@ -8,15 +8,13 @@
   gap: 46px;
 }
 
-.picture,
-.about {
+.picture {
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
 .user-information,
-.about > p,
 .btns {
   border-radius: 8px;
   @include mixins.shadow;
@@ -48,6 +46,13 @@
     border-radius: 50%;
     overflow: hidden;
     background-color: #fff;
+
+    img {
+      width: 95%;
+      height: 95%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
   }
 }
 .avatar {
@@ -58,18 +63,6 @@
 .user-information,
 .btns {
   padding: 26px;
-}
-.about {
-  width: 100%;
-
-  p {
-    padding: 16px;
-    height: fit-content;
-    font-family: inherit;
-    font-size: 1.1rem;
-    background-color: #fff;
-    color: #333;
-  }
 }
 
 .member {
@@ -112,9 +105,9 @@
 
 .question-icon,
 .answer-icon {
-  width: 32px;
-  height: 32px;
-  stroke-width: 1;
+  width: 28px;
+  height: 28px;
+  stroke-width: 1.5;
 }
 
 .user-stats {

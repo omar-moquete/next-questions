@@ -1,0 +1,53 @@
+@use "../../../styles/mixins";
+
+.about {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-radius: 8px;
+  .label-and-icon {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 32px;
+    svg {
+      width: 32px;
+      height: 32px;
+      stroke-width: 1;
+      cursor: pointer;
+      transition: all 0.1s ease-in-out;
+      stroke-width: 1.5;
+      opacity: 0.7;
+
+      @media (hover: hover) {
+        &:hover {
+          transform: scale(1.2);
+          opacity: 1;
+        }
+      }
+      &:active {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+  }
+
+  p {
+    padding: 16px;
+    height: fit-content;
+    font-family: inherit;
+    background-color: #fff;
+    color: #333;
+    @include mixins.shadow;
+    border-radius: 5px;
+    font-size: 1.1rem;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+}
