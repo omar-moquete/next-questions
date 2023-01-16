@@ -9,10 +9,7 @@ import { useSelector } from "react-redux";
 const NavBarUserProfile = function (props) {
   const router = useRouter();
   const { logout } = useAuth();
-  const logoutHandler = function () {
-    logout();
-    router.replace("/login");
-  };
+  const logoutHandler = () => logout();
 
   const [isHovering, setIsHovering] = useState(false);
   const hoverEnterHandler = () => {

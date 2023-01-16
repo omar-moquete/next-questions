@@ -1,12 +1,11 @@
 import React from "react";
-import classes from "./HeartIcon.module.scss";
 
 const HeartIcon = function () {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
-      className={classes.heart}
+      className={props.className || ""}
     >
       <path
         strokeLinecap="round"

@@ -14,11 +14,12 @@ const LoginForm = function () {
     e.preventDefault();
   };
   return (
-    <PrimaryForm className={classes["primary-form"]} onCLick={submitHandler}>
-      <h2>Create a new password</h2>
-      <FormField inputRef={usernameInputRef} type="text" name="email" />
-      <SecondaryButton>Submit</SecondaryButton>
-    </PrimaryForm>
+    // <PrimaryForm className={classes["primary-form"]} onCLick={submitHandler}>
+    //   <h2>Create a new password</h2>
+    //   <FormField inputRef={usernameInputRef} type="text" name="email" />
+    //   <SecondaryButton>Submit</SecondaryButton>
+    // </PrimaryForm>
+    ""
   );
 };
 

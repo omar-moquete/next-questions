@@ -11,7 +11,6 @@ import {
   where,
 } from "firebase/firestore";
 import { firebaseConfig } from "../../api/firebaseApp";
-import store from "../../redux-store/store";
 
 const ProfilePage = function (props) {
   // After user public data has been received through props and state.auth had been set, check if the user that's signed in is the same as the user that's being displayed then update UI.

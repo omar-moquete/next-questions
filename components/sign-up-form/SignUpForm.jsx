@@ -16,6 +16,10 @@ import { EXISTS_ENDPOINT } from "../../api-endpoints";
 import { clearField, scrollToTop } from "../../utils";
 import useAuth from "../../hooks/useAuth";
 import { useRouter } from "next/router";
+import FormButtonSpinner from "../UI/forms/form-button-spinner/FormButtonSpinner";
+import EmailIcon from "../UI/svg/EmailIcon";
+import UserIcon from "../UI/svg/UserIcon";
+import PasswordIcon from "../UI/svg/PasswordIcon";
 
 const SignUpForm = function () {
   const emailInputRef = useRef();
@@ -33,6 +37,8 @@ const SignUpForm = function () {
     data: { email: null, username: null, password1: null, password2: null },
   });
   const router = useRouter();
+  const [isSubmitting, setIssubmitting] = useState(false);
+
   const { createAccount } = useAuth();
   const clearMessage = () => {
     if (message === "") return;
@@ -150,6 +156,7 @@ const SignUpForm = function () {
 
   const submitHandler = async function (e) {
     e.preventDefault();
+    setIssubmitting(true);
 
     const email = emailInputRef.current.value;
     const username = usernameInputRef.current.value;
@@ -214,6 +221,7 @@ const SignUpForm = function () {
         return;
 
       try {
+        setIssubmitting(true);
         const userData = await createAccount(
           emailInputRef.current.value,
           password1InputRef.current.value,
@@ -225,6 +233,7 @@ const SignUpForm = function () {
         console.error(e);
         scrollToTop();
         setMessage(e.message);
+        setIssubmitting(false);
       }
     })();
   }, [formState]);
@@ -239,6 +248,7 @@ const SignUpForm = function () {
         inputRef={emailInputRef}
         required
         onChange={validateEmail}
+        Icon={EmailIcon}
       />
       <CustomField
         type="text"
@@ -247,6 +257,7 @@ const SignUpForm = function () {
         inputRef={usernameInputRef}
         required
         onChange={validateUsername}
+        Icon={UserIcon}
       />
       <CustomField
         type="password"
@@ -255,6 +266,7 @@ const SignUpForm = function () {
         inputRef={password1InputRef}
         required
         onChange={clearMessage}
+        Icon={PasswordIcon}
       />
       <CustomField
         type="password"
@@ -263,8 +275,14 @@ const SignUpForm = function () {
         inputRef={password2InputRef}
         required
         onChange={clearMessage}
+        Icon={PasswordIcon}
       />
-      <SecondaryButton>Sign In</SecondaryButton>
+
+      {isSubmitting ? (
+        <FormButtonSpinner />
+      ) : (
+        <SecondaryButton>Sign In</SecondaryButton>
+      )}
 
       {message && <FormMessage message={message} onClick={clearMessage} />}
     </PrimaryForm>

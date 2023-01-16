@@ -8,7 +8,7 @@ const Home = function () {
     <div className={classes.home}>
       <section className={classes.section1}>
         <Introduction />
-        <HomepageIllustration />
+        <HomepageIllustration className={classes.illustration} />
       </section>
 
       <section className={classes.section2}></section>

@@ -19,6 +19,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
+import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { firebaseConfig } from "../api/firebaseApp";
 import { authActions } from "../redux-store/authSlice";
@@ -36,7 +37,7 @@ const useAuth = function () {
   const { listenerActive, authStatusNames, user } = useSelector(
     (state) => state.auth
   );
-
+  const router = useRouter();
   // listenerActive prevents the authListener from being set more than once.
   if (!listenerActive) {
     dispatch(authActions.setListenerActive());
@@ -102,22 +103,19 @@ const useAuth = function () {
       } else {
         dispatch(authActions._setUser(null));
         dispatch(authActions.setAuthStatus(authStatusNames.notLoaded));
+        // when state.user is changed by signOut()
       }
     });
   }
 
   return {
     async login(email, password) {
-      const userCredentials = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      return userCredentials;
+      return await signInWithEmailAndPassword(auth, email, password);
     },
 
     logout() {
       signOut(auth);
+      router.replace("/login");
     },
 
     async createAccount(email, password, username) {

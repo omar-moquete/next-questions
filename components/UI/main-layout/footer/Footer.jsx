@@ -15,7 +15,7 @@ const Footer = function () {
       <div className={classes.cr}>
         <p>
           Handcrafted with
-          <HeartIcon />
+          <HeartIcon className={classes.heart} />
           In NY, USA. &#174; 2022 by Omar Moquete. All rights reserved.
         </p>
       </div>
