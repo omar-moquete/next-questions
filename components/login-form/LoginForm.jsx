@@ -8,17 +8,19 @@ import UserIcon from "../UI/svg/UserIcon";
 import PasswordIcon from "../UI/svg/PasswordIcon";
 import FormMessage from "../UI/forms/form-message/FormMessage";
 import { clearField, formatFirebaseErrorCode, scrollToTop } from "../../utils";
-import { useDispatch, useSelector } from "react-redux";
-import { authActions, signIn } from "../../redux-store/authSlice";
+import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import useAuth from "../../hooks/useAuth";
-import { AuthErrorCodes } from "firebase/auth";
+import { TailSpin } from "react-loader-spinner";
 
 const LoginForm = function () {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const [message, setMessage] = useState("");
-  const user = useSelector((state) => state.auth.user);
+  const { user, authStatus, authStatusNames } = useSelector(
+    (state) => state.auth
+  );
+
   const router = useRouter();
   const { login } = useAuth();
   const clearMessage = () => {
@@ -36,7 +38,6 @@ const LoginForm = function () {
       await login(email, password);
     } catch (error) {
       scrollToTop();
-
       setMessage(formatFirebaseErrorCode(error.message));
       clearField(passwordInputRef);
     }
@@ -49,34 +50,51 @@ const LoginForm = function () {
     }
   }, [user]);
 
-  return (
-    <PrimaryForm className={classes["primary-form"]} onSubmit={submitHandler}>
-      <h2>Login</h2>
-      <div className={classes["login-controls"]}>
-        <CustomField
-          type="email"
-          label="Email"
-          placeholder="Enter your email"
-          Icon={UserIcon}
-          inputRef={emailInputRef}
-          onChange={clearMessage}
-          required
+  const test = function () {
+    const condition = authStatus === authStatusNames.checking;
+    if (condition) {
+      return (
+        <TailSpin
+          height="50"
+          width="50"
+          color="#fff"
+          ariaLabel="tail-spin-loading"
+          radius="1"
+          visible={true}
+          wrapperClass={classes.spinner}
         />
-        <CustomField
-          type="password"
-          label="Password"
-          placeholder="Enter your password"
-          Icon={PasswordIcon}
-          inputRef={passwordInputRef}
-          onChange={clearMessage}
-          required
-        />
+      );
+    }
+  };
 
-        <SecondaryButton>Login</SecondaryButton>
-      </div>
+  return (
+    <PrimaryForm onSubmit={submitHandler}>
+      <h2>Login</h2>
+      <CustomField
+        type="email"
+        label="Email"
+        placeholder="Enter your email"
+        Icon={UserIcon}
+        inputRef={emailInputRef}
+        onChange={clearMessage}
+        required
+      />
+      <CustomField
+        type="password"
+        label="Password"
+        placeholder="Enter your password"
+        Icon={PasswordIcon}
+        inputRef={passwordInputRef}
+        onChange={clearMessage}
+        required
+      />
+
+      <SecondaryButton>Login</SecondaryButton>
       {message && <FormMessage message={message} onClick={clearMessage} />}
 
-      <Link href="/login/reset-password">Forgot your password?</Link>
+      <Link className={classes["forgot-password"]} href="/login/reset-password">
+        Forgot your password?
+      </Link>
     </PrimaryForm>
   );
 };

@@ -9,7 +9,8 @@
   color: #fff;
   padding: 15px;
   text-align: center;
-
+  z-index: 500;
+  position: relative;
   .link {
     display: flex;
     flex-direction: column;
@@ -36,17 +37,21 @@
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 800px) {
   .footer {
-    h3 {
-      font-size: 1rem;
-    }
     .cr {
       font-size: 0.8rem;
       svg {
         width: 16px;
         height: 16px;
       }
+    }
+  }
+}
+@media (max-width: 500px) {
+  .footer {
+    h3 {
+      font-size: 1rem;
     }
   }
 }

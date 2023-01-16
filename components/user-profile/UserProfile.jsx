@@ -7,13 +7,11 @@ import AnswerIcon from "../UI/svg/AnswerIcon";
 import AvatarIllustration from "../UI/svg/AvatarIllustration";
 import { convertDate } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
-import useAuth from "../../hooks/useAuth";
-import EditIcon from "../UI/svg/EditIcon";
 import About from "./about/About";
 import { useRouter } from "next/router";
 import { globalActions } from "../../redux-store/globalSlice";
+import useAuth from "../../hooks/useAuth";
 const UserProfile = function (props) {
-  useAuth();
   const router = useRouter();
   const visitedUser = router.asPath.split("/")[1];
   const dispatch = useDispatch();
@@ -23,7 +21,7 @@ const UserProfile = function (props) {
     return () => {
       dispatch(globalActions.setVisitedUser(null));
     };
-  });
+  }, []);
 
   const user = useSelector((state) => state.auth.user);
   const questions = [
@@ -84,6 +82,10 @@ const UserProfile = function (props) {
     },
   ];
 
+  const changePasswordHandler = () => {
+    router.push("/change-password");
+  };
+
   return (
     <div className={classes.container}>
       <div className={classes["user-information"]}>
@@ -143,7 +145,9 @@ const UserProfile = function (props) {
         {/* If user logged in is the same as the user being visited */}
         {user?.username === visitedUser && (
           <div className={classes.btns}>
-            <SecondaryButton>Change password</SecondaryButton>
+            <SecondaryButton onClick={changePasswordHandler}>
+              Change password
+            </SecondaryButton>
             <SecondaryButton className={classes["delete-account"]}>
               Delete account
             </SecondaryButton>

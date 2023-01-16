@@ -1,34 +1,14 @@
 @use "../../styles/variables";
 
-.primary-form {
-  a {
-    &:link,
-    &:visited,
-    &:active {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    &:hover {
-      text-decoration: underline;
-    }
+.forgot-password {
+  &:link,
+  &:visited,
+  &:active {
+    color: inherit;
+    text-decoration: none;
   }
 
-  h2,
-  a,
-  button {
-    align-self: center;
+  &:hover {
+    text-decoration: underline;
   }
-
-  h2 {
-    margin-bottom: 20px;
-  }
-
-  .login-controls {
-    gap: 48px;
-  }
-}
-.login-controls {
-  display: flex;
-  flex-direction: column;
 }

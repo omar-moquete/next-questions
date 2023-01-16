@@ -11,7 +11,7 @@ const NavBarUserProfile = function (props) {
   const { logout } = useAuth();
   const logoutHandler = function () {
     logout();
-    router.replace("/");
+    router.replace("/login");
   };
 
   const [isHovering, setIsHovering] = useState(false);
@@ -21,6 +21,8 @@ const NavBarUserProfile = function (props) {
   const hoverExitHandler = () => {
     setIsHovering(false);
   };
+
+  const username = useSelector((state) => state.auth.user.username);
   return (
     <div
       className={`${classes["user-navBar-picture"]} ${
@@ -36,7 +38,7 @@ const NavBarUserProfile = function (props) {
         onMouseLeave={hoverExitHandler}
       >
         <div className={classes.controls}>
-          <Link className={classes.profile} href="/profile">
+          <Link className={classes.profile} href={"/" + username}>
             <p>My profile</p>
           </Link>
           <button className={classes.logout} onClick={logoutHandler}>

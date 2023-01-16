@@ -40,7 +40,6 @@ const About = function (props) {
       </div>
 
       {!isEditing && <p>{text}</p>}
-      {console.log(user?.username === visitedUser)}
       {isEditing && user?.username === visitedUser && (
         <>
           <ContentEditable ref={inputareaRef}>{text || ""}</ContentEditable>

@@ -5,41 +5,48 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
+  updatePassword,
+  reauthenticateWithCredential,
 } from "firebase/auth";
 import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
   getDocs,
   getFirestore,
   query,
+  serverTimestamp,
   setDoc,
-  Timestamp,
   where,
 } from "firebase/firestore";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { firebaseConfig } from "../api/firebaseApp";
 import { authActions } from "../redux-store/authSlice";
 import { toSerializable } from "../utils";
 
+// The user object returned by firebase auth. Required by specific firebase functions (such as updatePassword(user, newPassword)).
+let firebaseUserData = null;
+
 // useAuth initializes auth and returns apis to manage auth.
 const useAuth = function () {
   const dispatch = useDispatch();
-
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
-  const authStatusNames = useSelector((state) => state.auth.authStatusNames);
+  const { listenerActive, authStatusNames, user } = useSelector(
+    (state) => state.auth
+  );
 
-  // Will only run once
-  let detachListener = null;
-  useEffect(() => {
-    detachListener = onAuthStateChanged(auth, async (user) => {
+  // listenerActive prevents the authListener from being set more than once.
+  if (!listenerActive) {
+    dispatch(authActions.setListenerActive());
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          dispatch(authActions.setAuthStatus(authStatusNames.checking));
+          dispatch(authActions.setAuthStatus(authStatusNames.loading));
+          // Required by specific firebase functions:
+          firebaseUserData = user;
+
           // Querying data: find username with uid
           // Get query reference. __name__ is the name of the document which is meant to be the user id
           const queryInUsers = query(
@@ -50,14 +57,14 @@ const useAuth = function () {
           // Get query snapshot
           const queryInUsersSnapshot = await getDocs(queryInUsers);
           // Iterate docs
+
           let usersCollectionDocData = null;
           queryInUsersSnapshot.forEach(
             (doc) => (usersCollectionDocData = doc.data())
           );
+
           // Only one user will be returned from the query. Convert to json to object will prevent unserialized value error from redux.
-
           // Get questions linked to user
-
           let questionsCollectionDocData = null;
           const queryInQuestions = query(
             collection(db, "/questions"),
@@ -70,29 +77,34 @@ const useAuth = function () {
             (doc) => (questionsCollectionDocData = doc.data())
           );
 
+          if (!usersCollectionDocData) {
+            dispatch(authActions.setAuthStatus("authStatusNames.error"));
+            throw new Error("There was an error while getting user data.");
+          }
+
           const userData = {
             email: usersCollectionDocData.email,
             username: usersCollectionDocData.username,
             userId: usersCollectionDocData.userId,
             imageUrl: usersCollectionDocData.imageUrl,
             memberSince: usersCollectionDocData.memberSince,
-            questionsAsked: questionsCollectionDocData.questionsAsked,
-            questionsAnswered: questionsCollectionDocData.questionsAnswered,
+            questionsAsked: questionsCollectionDocData?.questionsAsked || [],
+            questionsAnswered:
+              questionsCollectionDocData?.questionsAnswered || [],
+            // REMOVE OR IN ARRAY
           };
-
+          dispatch(authActions.setAuthStatus(authStatusNames.loaded));
           dispatch(authActions._setUser(toSerializable(userData)));
-          dispatch(authActions.setAuthStatus(authStatusNames.checked));
-        } catch (error) {
-          dispatch(authActions.setAuthStatus(authStatusNames.checked));
+        } catch (e) {
+          console.error(`⛔ ${e}`);
+          dispatch(authActions.setAuthStatus(authStatusNames.error));
         }
-      } else dispatch(authActions._setUser(null));
+      } else {
+        dispatch(authActions._setUser(null));
+        dispatch(authActions.setAuthStatus(authStatusNames.notLoaded));
+      }
     });
-
-    return () => {
-      // Unsubscribe listener
-      detachListener();
-    };
-  }, []);
+  }
 
   return {
     async login(email, password) {
@@ -116,21 +128,40 @@ const useAuth = function () {
 
       // Structure data that will go in firestore
       const userData = {
-        userId,
         email,
         username,
-        memberSince: Timestamp.fromDate(new Date()),
+        userId,
+        // Make image null when creating account.
         imageUrl: null,
+        about: "",
+        memberSince: serverTimestamp(),
+        questionsAsked: [],
+        questionsAnswered: [],
       };
 
       const docRef = doc(db, `/users/${userId}`);
-      console.log(userData);
       await setDoc(docRef, userData);
       return userData;
     },
 
     async deleteAccount(uid) {
       await deleteDoc(doc(db, "/users/" + uid));
+    },
+
+    async changePassword(oldPassword, newPassword) {
+      try {
+        // Reauthentication required by firebase. Prevents CREDENTIAL_TOO_OLD_LOGIN_AGAIN error.
+        const { user: reauthenticatedUser } = await signInWithEmailAndPassword(
+          auth,
+          user.email,
+          oldPassword
+        );
+        // After the previous function executes, next the authState listener will be executed, which automatically updates the user in the state.
+
+        await updatePassword(reauthenticatedUser, newPassword);
+      } catch (e) {
+        throw new Error(e.message);
+      }
     },
   };
 };

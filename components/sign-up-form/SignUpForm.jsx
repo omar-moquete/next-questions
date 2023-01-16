@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
 import CustomField from "../UI/custom-field/CustomField";
-import classes from "./SignupForm.module.scss";
 import PrimaryForm from "../UI/forms/PrimaryForm";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import FormMessage from "../UI/forms/form-message/FormMessage";
@@ -13,7 +12,7 @@ import {
   PASSWORDS_DO_NOT_MATCH_MESSAGE,
   PASSWORD_VALIDATION_REGEX,
 } from "../../app-config";
-import { CREATE_ACCOUNT_ENDPOINT, EXISTS_ENDPOINT } from "../../api-endpoints";
+import { EXISTS_ENDPOINT } from "../../api-endpoints";
 import { clearField, scrollToTop } from "../../utils";
 import useAuth from "../../hooks/useAuth";
 import { useRouter } from "next/router";
@@ -231,7 +230,7 @@ const SignUpForm = function () {
   }, [formState]);
 
   return (
-    <PrimaryForm className={classes.form} onSubmit={submitHandler}>
+    <PrimaryForm onSubmit={submitHandler}>
       <h2>Sign Up</h2>
       <CustomField
         type="email"
@@ -265,7 +264,7 @@ const SignUpForm = function () {
         required
         onChange={clearMessage}
       />
-      <SecondaryButton className={classes.btn}>Sign In</SecondaryButton>
+      <SecondaryButton>Sign In</SecondaryButton>
 
       {message && <FormMessage message={message} onClick={clearMessage} />}
     </PrimaryForm>

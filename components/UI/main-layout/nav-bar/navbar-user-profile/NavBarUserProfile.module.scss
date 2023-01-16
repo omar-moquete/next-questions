@@ -103,6 +103,7 @@
   & {
     width: 350px;
     height: 350px;
+    @include mixins.shadow;
   }
   &::before {
     width: 350px;
