@@ -1,21 +1,21 @@
 import React from "react";
 
-const AnswerIcon = function (props) {
+const HashIcon = function (props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      {...props}
-      fill="none"
       viewBox="0 0 24 24"
-      stroke="currentColor"
+      fill="none"
+      stroke="CurrentColor"
+      {...props}
     >
       <path
+        d="M9.49999 3L6.49999 21M17.5 3L14.5 21M20.5 8H3.5M19.5 16H2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
       />
     </svg>
   );
 };
 
-export default AnswerIcon;
+export default HashIcon;

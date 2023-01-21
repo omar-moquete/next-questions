@@ -53,3 +53,7 @@ export const convertDate = function (
 };
 
 export const toSerializable = (obj) => JSON.parse(JSON.stringify(obj));
+
+export const bindArgs = (fn, ...args) => {
+  return () => fn(...args);
+};

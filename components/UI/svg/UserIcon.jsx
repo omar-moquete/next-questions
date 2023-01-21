@@ -8,7 +8,7 @@ const UserIcon = function (props) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={props.className}
+      {...props}
     >
       <path
         strokeLinecap="round"

@@ -12,11 +12,11 @@
   background-color: variables.$nav-bar-small-screen-color;
   height: 65px;
   user-select: none;
-  position: fixed;
   top: 0;
   backdrop-filter: blur(5px);
-
+  position: relative;
   @include mixins.shadow;
+  contain: layout;
   h2 {
     font-family: "Corinthia", cursive;
     font-weight: 400;
@@ -24,6 +24,13 @@
     cursor: pointer;
     margin-left: 38px;
   }
+}
+.fixed {
+  position: fixed;
+}
+
+.not-fixed {
+  box-shadow: none;
 }
 
 @media (max-width: 500px) {

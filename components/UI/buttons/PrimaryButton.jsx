@@ -5,11 +5,16 @@ import classes from "./PrimaryButton.module.scss";
 const PrimaryButton = function (props) {
   if (props.href)
     return (
-      <Link className={classes.link} {...props}>
+      <Link className={`${classes.link} ${props.className}`} {...props}>
         {props.children}
       </Link>
     );
-  else return <button className={classes.button}>{props.children}</button>;
+  else
+    return (
+      <button {...props} className={`${classes.button} ${props.className}`}>
+        {props.children}
+      </button>
+    );
 };
 
 export default PrimaryButton;

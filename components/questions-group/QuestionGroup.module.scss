@@ -2,10 +2,6 @@
 @use "../../styles/mixins";
 
 .question-group {
-  display: flex;
-  flex-direction: column;
-  align-items: left;
-  gap: 24px;
   padding: 26px;
   border-radius: 8px;
   height: 480px;
@@ -13,11 +9,15 @@
   background-image: variables.$gradient;
   max-width: max-content;
   @include mixins.shadow;
+
+  li {
+    margin-bottom: 10px;
+  }
 }
 
 @media (max-width: 600px) {
   .question-group {
-    width: 90vw;
+    width: 95vw;
     height: 580px;
     min-width: unset;
   }

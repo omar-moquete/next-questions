@@ -1,10 +1,6 @@
 const AvatarIllustration = function (props) {
   return (
-    <svg
-      className={props.className}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 532 532"
-    >
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 532 532">
       <g>
         <g>
           <circle cx="270.759" cy="260.92941" r="86.34897" fill="#a0616a" />

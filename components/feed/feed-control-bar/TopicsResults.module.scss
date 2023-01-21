@@ -1,0 +1,100 @@
+@use "../../../styles/mixins";
+@use "../../../styles/variables";
+.results {
+  display: grid;
+  grid-template-columns: 1fr;
+  position: absolute;
+  background-color: #fff;
+  width: 100%;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  list-style-type: none;
+  @include mixins.shadow;
+  top: 130%;
+  max-height: 380px;
+  min-height: 160px;
+  overflow-y: auto;
+
+  li {
+    padding: 16px;
+    width: 100%;
+    border-bottom: 1px solid #e4e4e4;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+
+    h3 {
+      color: #444;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: #f2f2f2;
+        span,
+        h3 {
+          text-decoration: underline solid 1px #444;
+        }
+      }
+    }
+    &:active {
+      background-color: #f2f2f2;
+      span,
+      h3 {
+        text-decoration: underline solid 1px #333;
+      }
+    }
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  span {
+    color: variables.$accent-color;
+    font-weight: 400;
+    opacity: 0.6;
+  }
+
+  span,
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  p {
+    font-size: 1rem;
+    color: #555;
+  }
+}
+
+.total-questions-wrapper {
+  display: flex;
+  align-items: flex-start;
+  color: variables.$accent-color;
+
+  .total-questions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px;
+    border-radius: 8px;
+    border: solid 1px #cdcdcd;
+    color: variables.$accent-color-lighter;
+    font-size: 1rem;
+  }
+
+  svg {
+    stroke: variables.$accent-color-lighter;
+    height: 22px;
+    width: 22px;
+    stroke-width: 1.1;
+  }
+}
+
+.no-topics {
+  font-size: 1.2rem;
+  font-weight: 400;
+  justify-self: center;
+  align-self: center;
+}

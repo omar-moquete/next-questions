@@ -1,12 +1,13 @@
 import React from "react";
 
-const NotFoundIllustration = function () {
+const NotFoundIllustration = function (props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       data-name="Layer 1"
       width="100%"
       viewBox="0 0 1144 651.26"
+      {...props}
     >
       <defs>
         <linearGradient

@@ -1,0 +1,46 @@
+.info {
+  display: grid;
+  width: 700px;
+  gap: 18px;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 24px 0 0 0;
+  border: 2px solid #fff;
+
+  color: #fff;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    border-bottom: solid 1px #fff;
+    height: 2.4rem;
+  }
+  div {
+    justify-self: flex-end;
+  }
+
+  .total {
+    justify-self: end;
+  }
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  @media (max-width: 700px) {
+    & {
+      width: 90vw;
+    }
+  }
+}
+
+.questions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  svg {
+    stroke-width: 1.5;
+  }
+}

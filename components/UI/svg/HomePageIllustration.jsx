@@ -1,8 +1,8 @@
 import React from "react";
 
-const HomepageIllustration = function () {
+const HomepageIllustration = function (props) {
   return (
-    <div className={classes.illustration}>
+    <div {...props}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         data-name="Layer 1"

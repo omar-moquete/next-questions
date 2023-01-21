@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classes from "./NavBar.module.scss";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
@@ -12,18 +12,28 @@ const NavBar = function () {
     router.push("/");
   };
 
+  const [isFixed, setIsFixed] = useState(true);
+
+  // NOTE: if path changes to "/feed" make navBar positioning relative, which brings it back to default DOM flow.
+  useEffect(() => {
+    if (router.asPath === "/feed") setIsFixed(false);
+    else setIsFixed(true);
+  }, [router.asPath]);
+
   const { user, authStatus, authStatusNames } = useSelector(
     (state) => state.auth
   );
 
-  // try assigning controltorender to a var
   return (
-    <header className={classes["nav-bar"]}>
+    <header
+      className={`${classes["nav-bar"]} ${
+        isFixed ? classes.fixed : classes["not-fixed"]
+      }`}
+    >
       <h2 onClick={redirectHandler}>NJSQuestions</h2>
       <div>
         <nav>
           {/* If loading user show spinner */}
-
           {authStatus === authStatusNames.loading && (
             <TailSpin
               height="50"

@@ -7,7 +7,7 @@ const EmailIcon = function (props) {
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
-      className={props.className || ""}
+      {...props}
     >
       <path
         strokeLinecap="round"

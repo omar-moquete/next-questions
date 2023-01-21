@@ -7,7 +7,7 @@ const PasswordIcon = function (props) {
       fill="none"
       viewBox="0 0 24 24"
       strokeWidth={1.5}
-      className={props.className}
+      {...props}
     >
       <path
         strokeLinecap="round"

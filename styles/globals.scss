@@ -12,10 +12,17 @@
   color: variables.$root-text-color;
 }
 
-body {
-  overflow-x: hidden;
-}
-
 header {
   user-select: none;
+}
+
+button,
+a,
+div {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  white-space: nowrap;
 }
