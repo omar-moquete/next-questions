@@ -8,7 +8,10 @@ const LatestQuestions = function () {
   return (
     <div className={classes.container}>
       <h2>Latest questions</h2>
-      <QuestionGroup questions={questions} />
+      <QuestionGroup
+        className={classes["latest-questions"]}
+        questions={questions}
+      />
     </div>
   );
 };

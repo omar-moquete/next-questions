@@ -1,6 +1,6 @@
 import React from "react";
 
-const AnswerIcon = function (props) {
+const CheckIcon = function (props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -18,4 +18,4 @@ const AnswerIcon = function (props) {
   );
 };
 
-export default AnswerIcon;
+export default CheckIcon;

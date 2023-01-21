@@ -7,18 +7,10 @@
   height: 480px;
   overflow-y: scroll;
   background-image: variables.$gradient;
-  max-width: max-content;
+  max-width: 700px;
   @include mixins.shadow;
 
   li {
-    margin-bottom: 10px;
-  }
-}
-
-@media (max-width: 600px) {
-  .question-group {
-    width: 95vw;
-    height: 580px;
-    min-width: unset;
+    width: 100%;
   }
 }

@@ -3,7 +3,7 @@ import classes from "./UserProfile.module.scss";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import QuestionGroup from "../questions-group/QuestionsGroup";
 import QuestionIcon from "../UI/svg/QuestionIcon";
-import AnswerIcon from "../UI/svg/AnswerIcon";
+import ReplyIcon from "../UI/svg/ReplyIcon";
 import AvatarIllustration from "../UI/svg/AvatarIllustration";
 import { convertDate } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
@@ -106,7 +106,7 @@ const UserProfile = function (props) {
               <p>{props.publicUserData.questionsAsked.length}</p>
             </div>
             <div>
-              <AnswerIcon className={classes["answer-icon"]} />
+              <ReplyIcon className={classes["answer-icon"]} />
               <p>{props.publicUserData.questionsAnswered.length}</p>
             </div>
           </div>

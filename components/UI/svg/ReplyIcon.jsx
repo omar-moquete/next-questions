@@ -1,10 +1,9 @@
 import React from "react";
 
-const AnswerIcon = function (props) {
+const ReplyIcon = function (props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
       {...props}
@@ -18,4 +17,4 @@ const AnswerIcon = function (props) {
   );
 };
 
-export default AnswerIcon;
+export default ReplyIcon;

@@ -4,6 +4,7 @@ import Layout from "../components/UI/main-layout/Layout";
 import { Provider } from "react-redux";
 import store from "../redux-store/store";
 
+
 const MyApp = function ({ Component, pageProps }) {
   return (
     <React.StrictMode>

@@ -19,10 +19,10 @@ const Feed = function (props) {
       image:
         "https://media.istockphoto.com/id/1372641621/photo/portrait-of-a-businessman-on-gray-background.jpg?s=612x612&w=is&k=20&c=I3K5XdgQpzPWui8j9CcvTa3f3gfifxZfetZd-h4a4BM=",
       question: {
-        text: "Feed a",
-        date: +new Date(),
+        title: "I like my feed",
+        text: "This is my feed and this is some lorem ipsum dolor sit amet.",
+        timeStamp: { seconds: +new Date() },
       },
-      link: "https://www.google.com",
     },
   ];
   const MY_FEED = [
@@ -34,17 +34,19 @@ const Feed = function (props) {
       question: {
         title: "What feed is this ?",
         text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati consequatur provident praesentium quas! Saepe odio aut iste voluptate! Veritatis ipsa quasi rerum, qui rem laborum dolor tempora cum officia quo?",
-        date: +new Date(),
+        timeStamp: { seconds: +new Date() },
       },
-      topics: [
-        {
-          uid: "topicnumber300049",
-          text: "cars",
-          description: "All about cars",
-          questionsAsked: ["questionUid"],
-        },
-      ],
-      link: "https://www.google.com",
+    },
+    {
+      id: "1",
+      username: "john234",
+      image:
+        "https://media.istockphoto.com/id/1372641621/photo/portrait-of-a-businessman-on-gray-background.jpg?s=612x612&w=is&k=20&c=I3K5XdgQpzPWui8j9CcvTa3f3gfifxZfetZd-h4a4BM=",
+      question: {
+        title: "What feed is this ?",
+        text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati consequatur provident praesentium quas! Saepe odio aut iste voluptate! Veritatis ipsa quasi rerum, qui rem laborum dolor tempora cum officia quo?",
+        timeStamp: { seconds: +new Date() },
+      },
     },
     {
       id: "2",
@@ -54,17 +56,8 @@ const Feed = function (props) {
       question: {
         title: "What feed is this ?",
         text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati consequatur provident praesentium quas! Saepe odio aut iste voluptate! Veritatis ipsa quasi rerum, qui rem laborum dolor tempora cum officia quo?",
-        date: +new Date(),
+        timeStamp: { seconds: +new Date() },
       },
-      topics: [
-        {
-          uid: "topicnumber300049",
-          text: "cars",
-          description: "All about cars",
-          questionsAsked: ["questionUid"],
-        },
-      ],
-      link: "https://www.google.com",
     },
     {
       id: "3",
@@ -74,17 +67,8 @@ const Feed = function (props) {
       question: {
         title: "What feed is this ?",
         text: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Obcaecati consequatur provident praesentium quas! Saepe odio aut iste voluptate! Veritatis ipsa quasi rerum, qui rem laborum dolor tempora cum officia quo?",
-        date: +new Date(),
+        timeStamp: { seconds: +new Date() },
       },
-      topics: [
-        {
-          uid: "topicnumber300049",
-          text: "cars",
-          description: "All about cars",
-          questionsAsked: ["questionUid"],
-        },
-      ],
-      link: "https://www.google.com",
     },
   ];
 

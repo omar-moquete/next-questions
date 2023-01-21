@@ -33,6 +33,7 @@
   background-image: variables.$gradient;
   color: #fff;
   height: fit-content;
+  max-width: 700px;
 }
 .picture {
   align-items: center;
@@ -85,11 +86,6 @@
   }
 }
 
-.profile-questions {
-  width: 50vw;
-  height: 320px;
-}
-
 .qa {
   display: flex;
   flex-direction: column;
@@ -122,6 +118,11 @@
   }
 }
 
+.profile-questions {
+  width: 100%;
+  height: 480px;
+}
+
 @media (max-width: 850px) {
   .container {
     flex-direction: column;
@@ -132,12 +133,11 @@
     width: 90vw;
   }
 
-  .profile-questions {
+  .btns {
     width: 90vw;
-    height: 420px;
   }
 
-  .btns {
+  .profile-questions {
     width: 90vw;
   }
 }
