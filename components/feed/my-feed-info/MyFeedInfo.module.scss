@@ -30,6 +30,13 @@
   text-align: center;
 }
 
+.topic {
+  margin: 5px;
+  width: fit-content;
+  height: fit-content;
+  display: inline-block;
+}
+
 .stats {
   display: flex;
   gap: 12px;

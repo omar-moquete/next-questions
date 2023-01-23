@@ -1,13 +1,25 @@
 import React, { useState } from "react";
 import classes from "./MyFeedInfo.module.scss";
 import QuestionIcon from "../../UI/svg/QuestionIcon";
-import TopicItem from "./TopicItem";
 import HashIcon from "../../UI/svg/HashIcon";
+import {
+  getListOfQuestionsWithListOfTopics,
+  getLoggedInUserTopics,
+  getTopicInfoWithTopicUid,
+  getUserAnsweredQuestions,
+  getUserAnsweredQuestionsWithListOfTopics,
+  isUserFollowngTopic,
+} from "../../../_TEST_DATA";
+import Topic from "../../topic/Topic";
 
 const MyFeedInfo = function () {
+  // Total amount of topics saved
+  const [userTopics, setUserTopics] = useState(getLoggedInUserTopics());
+
   const moreHandler = () => {
     // [ ]Todo: Show all favorite topics on click
   };
+
   return (
     <div className={classes.main}>
       <div className={classes.info}>
@@ -15,24 +27,25 @@ const MyFeedInfo = function () {
         <div className={classes.stats}>
           <div className={classes.stat}>
             <HashIcon />
-            <p className={classes.total}>23</p>
+            <p className={classes.total}>{userTopics.length}</p>
           </div>
-          <div className={classes.stat}>
-            <QuestionIcon />
-            <p className={classes.total}>23</p>
-          </div>
+          {/* Can add more stats here */}
         </div>
       </div>
 
       <div className={`${classes.topics} ${classes.small}`}>
-        <TopicItem uid="test" text="Cars" />
-        <TopicItem uid="test" text="SantoDomingo" />
-        <TopicItem uid="test" text="DominicanRepublic" />
-        <TopicItem uid="test" text="WhiteHouse" />
-        <TopicItem uid="test" text="President" />
-        <TopicItem uid="test" text="p" />
-        <TopicItem uid="test" text="Pent" />
-        <TopicItem uid="test" text="Jobs" />
+        {/* [ ]TODO: Limit results */}
+        {/* [ ]TODO: Make sure component updates when topic is removed */}
+
+        {userTopics.map((topic) => {
+          const topicInfo = getTopicInfoWithTopicUid(topic.uid);
+
+          return (
+            <div key={topicInfo.uid} className={classes.topic}>
+              <Topic uid={topicInfo.uid} text={topicInfo.text} />
+            </div>
+          );
+        })}
       </div>
       <label className={classes.more} onClick={moreHandler}>
         See all

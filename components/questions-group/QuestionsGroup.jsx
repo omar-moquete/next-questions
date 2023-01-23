@@ -1,17 +1,17 @@
 import React from "react";
 import classes from "./QuestionGroup.module.scss";
 import QuestionItem from "../question-item/QuestionItem";
+import { getUserImageUrlWithUsername } from "../../_TEST_DATA";
 
 const QuestionGroup = function (props) {
   return (
     <ul className={`${classes["question-group"]} ${props.className}`}>
-      {props.questions.map((questionItem) => (
+      {props.questions.map((question) => (
         <QuestionItem
-          key={questionItem.id}
-          username={questionItem.username}
-          image={questionItem.image}
-          link={questionItem.link}
-          question={questionItem.question}
+          key={question.id}
+          username={question.askedBy}
+          imageUrl={getUserImageUrlWithUsername(question.askedBy)}
+          question={question}
         />
       ))}
     </ul>

@@ -9,7 +9,6 @@ const TopicResults = function (props) {
   // 1) set selected topic to state
   const dispatch = useDispatch();
   const handleSelectedTopic = (topicUid) => {
-    console.log("topicUid", topicUid);
     dispatch(globalActions.setSelectedTopic(topicUid));
 
     // Dismount this element after a selection was made

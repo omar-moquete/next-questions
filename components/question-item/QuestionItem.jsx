@@ -4,9 +4,15 @@ import LikeIcon from "../UI/svg/LikeIcon";
 import ReplyIcon from "../UI/svg/ReplyIcon";
 import classes from "./QuestionItem.module.scss";
 import TimeAgo from "react-timeago";
+import {
+  getTopicInfoWithTopicUid,
+  getTopicNameWithTopicUid,
+} from "../../_TEST_DATA";
+import QuestionItemTopic from "./QuestionItemTopic";
+import Topic from "../topic/Topic";
 
 const QuestionItem = function (props) {
-  const { image, username, question } = props;
+  const { imageUrl, username, question } = props;
   // [x] Add question title
   // [x] Redirect to user profile page on user click
   // [ ] Add time ago instead of date if short time
@@ -18,23 +24,41 @@ const QuestionItem = function (props) {
     // [ ]TODO: Go to question detail page.
   };
 
+  const timeAgoFormatter = (value, unit, suffix) => {
+    const pluralize = (word) => word + "s";
+    if (value < 60 && unit === "second") return "just now";
+    return `${value}  ${value > 1 ? pluralize(unit) : unit} ${suffix}`;
+  };
+
+  const topicInfo = getTopicInfoWithTopicUid(question.topic.uid);
+
   return (
     <li
       className={`${classes.container} ${props.className}`}
       onClick={goToQuestionHandler}
     >
       <div className={classes.info}>
-        <img src={image} alt="User image" />
+        <img src={imageUrl} alt="User image" />
         <div className={classes["username-time-topic"]}>
           <div className={classes["username-time"]}>
             <Link className={classes.username} href={`/${username}`}>
               {username}
             </Link>
             <p className={classes.time}>
-              <TimeAgo date={question.timeStamp.seconds} />
+              <TimeAgo
+                date={question.timeStamp.seconds}
+                formatter={timeAgoFormatter}
+                minPeriod={60}
+              />
+              {/* [x]TODO: Fix formatter */}
             </p>
           </div>
-          <p className={classes.topic}>#question.topic.text</p>
+
+          <Topic
+            className={classes["topic-style-override"]}
+            uid={topicInfo.uid}
+            text={topicInfo.text}
+          />
         </div>
       </div>
 
@@ -51,7 +75,7 @@ const QuestionItem = function (props) {
           </div>
           <div className={classes.icon}>
             <ReplyIcon />
-            <p>{question.replies}</p>
+            <p>{question.answers}</p>
           </div>
         </div>
       </div>

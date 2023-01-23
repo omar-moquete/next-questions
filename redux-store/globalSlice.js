@@ -4,7 +4,7 @@ const initialState = {
   // The user that's currently being visited. Used to check if authenticated usr === visited user and display private UI components.
   visitedUser: null,
   // When selected topic is null, there is no selected topic and questions with about user's favorite topics will be displayed
-  selectedTopic: null,
+  selectedTopicUid: null,
 };
 const globalSlice = createSlice({
   name: "global",
@@ -15,7 +15,7 @@ const globalSlice = createSlice({
     },
 
     setSelectedTopic(state, { payload }) {
-      state.selectedTopic = payload;
+      state.selectedTopicUid = payload;
     },
   },
 });

@@ -92,6 +92,7 @@ const useAuth = function () {
             questionsAsked: questionsCollectionDocData?.questionsAsked || [],
             questionsAnswered:
               questionsCollectionDocData?.questionsAnswered || [],
+            // [ ]TODO: Add topic property
             // REMOVE OR IN ARRAY
           };
           dispatch(authActions.setAuthStatus(authStatusNames.loaded));

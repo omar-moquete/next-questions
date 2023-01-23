@@ -1,8 +1,7 @@
 import React from "react";
 import classes from "./LatestQuestions.module.scss";
-
+import { QUESTIONS_TEST_DATA } from "../../../_TEST_DATA";
 import QuestionGroup from "../../questions-group/QuestionsGroup";
-import { questions } from "../../../_TEST_DATA";
 
 const LatestQuestions = function () {
   return (
@@ -10,7 +9,7 @@ const LatestQuestions = function () {
       <h2>Latest questions</h2>
       <QuestionGroup
         className={classes["latest-questions"]}
-        questions={questions}
+        questions={QUESTIONS_TEST_DATA}
       />
     </div>
   );

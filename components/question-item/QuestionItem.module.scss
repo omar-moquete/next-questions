@@ -26,6 +26,21 @@
     height: 48px;
     border-radius: 50%;
   }
+  .topic-style-override {
+    border-color: variables.$accent-color;
+    color: variables.$accent-color;
+
+    div {
+      background-color: variables.$accent-color;
+      color: #fff;
+    }
+
+    @media (max-width: 500px) {
+      & {
+        border-width: 1px;
+      }
+    }
+  }
 }
 
 .text {
@@ -73,14 +88,6 @@
 .icons > .icon > p {
   color: #8c8c8c;
 }
-.topic {
-  margin-left: 10px;
-  border-radius: 25px;
-  border: solid 2px variables.$accent-color;
-  color: variables.$accent-color;
-  height: fit-content;
-  padding: 4px 6px;
-}
 
 .icons {
   display: flex;
@@ -103,19 +110,14 @@
     cursor: pointer;
   }
 }
+
 @media (hover: hover) {
   .icon > svg:hover {
     transform: scale(1.1);
-
-
-
   }
 }
 .icon > svg:active {
   transform: scale(1.1);
-
-
-
 }
 
 @media (max-width: 730px) {
@@ -128,11 +130,5 @@
   .username-time {
     flex-direction: row;
     gap: 18px;
-  }
-
-  .topic {
-    min-width: 60px;
-    font-size: 14px;
-    margin: 0;
   }
 }
