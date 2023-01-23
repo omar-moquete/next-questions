@@ -1,0 +1,19 @@
+@use "../../styles/variables";
+
+.topic {
+  margin-left: 10px;
+  border-radius: 25px;
+  border: solid 2px variables.$accent-color;
+  color: variables.$accent-color;
+  height: fit-content;
+  padding: 4px 6px;
+}
+
+@media (max-width: 500px) {
+  .topic {
+    min-width: 60px;
+    font-size: 14px;
+    margin: 0;
+    border-width: 1px;
+  }
+}
