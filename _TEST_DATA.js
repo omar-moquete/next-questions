@@ -198,6 +198,12 @@ export const isUserFollowngTopic = (topicUid) => {
   else return false;
 };
 
+export const getQuestionWithUid = (uid) => {
+  const match = QUESTIONS_TEST_DATA.find((question) => question.uid === uid);
+
+  return match;
+};
+
 //////////////////
 export const getUserImageUrlWithUsername = () => {
   return "https://static.vecteezy.com/system/resources/thumbnails/001/993/889/small/beautiful-latin-woman-avatar-character-icon-free-vector.jpg";

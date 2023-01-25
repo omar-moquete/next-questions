@@ -1,0 +1,53 @@
+@use "../../styles/variables";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  align-items: center;
+  min-height: calc(100vh - 65px);
+  padding: 150px 0;
+  background-image: variables.$gradient;
+}
+
+.question-item-override {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.border {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.input-wrapper {
+  background-color: #fff;
+  border-top: solid 1px #e4e4e4;
+  padding: 16px;
+  text-align: end;
+
+  button {
+    font-size: 1rem;
+    background-image: none;
+    color: variables.$accent-color;
+    background-color: #fff;
+    border: 1px solid variables.$accent-color;
+    &:hover {
+      box-shadow: none;
+    }
+  }
+  // [ ]TODO: Investigate auto grow:https://www.youtube.com/watch?v=87wfMZ56egU
+  textarea {
+    width: 100%;
+    padding: 8px;
+    font: inherit;
+    resize: none;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: solid 1px #e4e4e4;
+
+    &:focus {
+      outline-color: variables.$accent-color;
+    }
+  }
+}

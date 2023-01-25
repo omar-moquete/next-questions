@@ -41,8 +41,12 @@ const MyFeedInfo = function () {
           const topicInfo = getTopicInfoWithTopicUid(topic.uid);
 
           return (
-            <div key={topicInfo.uid} className={classes.topic}>
-              <Topic uid={topicInfo.uid} text={topicInfo.text} />
+            <div key={topicInfo.uid} className={classes["topic-wrapper"]}>
+              <Topic
+                className={classes.topic}
+                uid={topicInfo.uid}
+                text={topicInfo.text}
+              />
             </div>
           );
         })}

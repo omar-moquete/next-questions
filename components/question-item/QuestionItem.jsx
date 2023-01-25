@@ -8,7 +8,6 @@ import {
   getTopicInfoWithTopicUid,
   getTopicNameWithTopicUid,
 } from "../../_TEST_DATA";
-import QuestionItemTopic from "./QuestionItemTopic";
 import Topic from "../topic/Topic";
 
 const QuestionItem = function (props) {
@@ -20,6 +19,7 @@ const QuestionItem = function (props) {
   // [x] Add topic for question
   // [ ]TODO: create a get topic function that takes a topic uid and returns the topic data from the db, maybe a custom hook
 
+  [props.isQuestionDetail];
   const goToQuestionHandler = () => {
     // [ ]TODO: Go to question detail page.
   };
@@ -34,7 +34,7 @@ const QuestionItem = function (props) {
 
   return (
     <li
-      className={`${classes.container} ${props.className}`}
+      className={`${classes.container} ${props.className || ""}`}
       onClick={goToQuestionHandler}
     >
       <div className={classes.info}>
@@ -73,10 +73,12 @@ const QuestionItem = function (props) {
             <LikeIcon />
             <p>{question.likes}</p>
           </div>
-          <div className={classes.icon}>
-            <ReplyIcon />
-            <p>{question.answers}</p>
-          </div>
+          {props.isQuestionDetail && (
+            <div className={classes.icon}>
+              <ReplyIcon />
+              <p>{question.answers}</p>
+            </div>
+          )}
         </div>
       </div>
     </li>

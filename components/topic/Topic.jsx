@@ -37,11 +37,11 @@ const Topic = function (props) {
     <div
       onClick={showRemove}
       onMouseLeave={cancelRemove}
-      className={`${classes.topic} ${props.className}`}
+      className={`${classes.topic} ${props.className || ""}`}
     >
       {isRemoving && (
         <div
-          className={`${classes.unfollow} ${props.className}`}
+          className={`${classes.unfollow} ${props.className || ""}`}
           onClick={handleTopicSubscription}
         >
           {isFollowing && "unfollow"}

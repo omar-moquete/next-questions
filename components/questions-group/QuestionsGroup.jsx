@@ -5,7 +5,7 @@ import { getUserImageUrlWithUsername } from "../../_TEST_DATA";
 
 const QuestionGroup = function (props) {
   return (
-    <ul className={`${classes["question-group"]} ${props.className}`}>
+    <ul className={`${classes["question-group"]} ${props.className || ""}`}>
       {props.questions.map((question) => (
         <QuestionItem
           key={question.id}
