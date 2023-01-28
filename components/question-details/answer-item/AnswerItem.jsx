@@ -3,12 +3,17 @@ import { getUserImageUrlWithUsername } from "../../../_TEST_DATA";
 import classes from "./AnswerItem.module.scss";
 import LikeIcon from "../../UI/svg/LikeIcon";
 import ReplyItem from "./ReplyItem";
+import { useSelector } from "react-redux";
+import LikeButton from "../../question-item/LikeButton";
+import useReplyForm from "../../../hooks/useReplyForm";
+import ReplyButton from "../../question-item/ReplyButton";
 
 // [ ] TODO: ------> MAKE AnswerItemITEM
 const AnswerItem = function () {
-  /////
   const imageUrl = getUserImageUrlWithUsername();
-  ////
+
+  const { ReplyFormAnchor, show } = useReplyForm();
+
   return (
     <li className={classes.container}>
       <div className={classes["user-container"]}>
@@ -30,20 +35,20 @@ const AnswerItem = function () {
         eaque eos facilis?
       </p>
       <div className={classes.icons}>
-        <div className={classes.reply}>
-          <label>Reply</label>
-        </div>
-        <div className={classes.icon}>
-          <LikeIcon />
-          <p>1</p>
-        </div>
+        <label className={classes.reply} onClick={show}>
+          Reply
+        </label>
+        <LikeButton likes={10} />
       </div>
+
+      {/* ANCHOR */}
+      <ReplyFormAnchor placeholder="Enter your answer" />
 
       <ul className={classes.replies}>
         {/* Return list item per reply */}
-        <ReplyItem />
-        <ReplyItem />
-        <ReplyItem />
+        <ReplyItem imageUrl={getUserImageUrlWithUsername()} />
+        <ReplyItem imageUrl={getUserImageUrlWithUsername()} />
+        <ReplyItem imageUrl={getUserImageUrlWithUsername()} />
       </ul>
     </li>
   );

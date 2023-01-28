@@ -1,0 +1,35 @@
+@use "../../../../styles/variables";
+.container {
+  background-color: #fff;
+  border-top: solid 1px #e4e4e4;
+  text-align: end;
+
+  button {
+    font-size: 1rem;
+    background-image: none;
+    color: variables.$accent-color;
+    background-color: #fff;
+    border: 1px solid variables.$accent-color;
+    margin-left: 12px;
+    &:hover {
+      box-shadow: none;
+      outline: 1px solid variables.$accent-color;
+    }
+  }
+  // [ ]TODO: Investigate auto grow:https://www.youtube.com/watch?v=87wfMZ56egU
+}
+
+.textarea {
+  width: 100%;
+  padding: 8px;
+  font: inherit;
+  resize: none;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  outline: 1px solid #aaa;
+  border: none;
+  &:focus {
+    outline: solid 2px variables.$accent-color;
+    border: none;
+  }
+}

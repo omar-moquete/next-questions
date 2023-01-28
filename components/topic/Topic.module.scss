@@ -1,17 +1,17 @@
 .topic {
   display: inline-block;
-  transition: all 0.15s ease-in-out;
+  transition: all 0.1s ease-out;
   position: relative;
   height: fit-content;
   width: fit-content;
 }
 @media (hover: hover) {
   .topic:hover {
-    transform: scale(1.15);
+    transform: scale(1.1);
   }
 
   .topic:active {
-    transform: scale(1.15);
+    transform: scale(1.1);
   }
 }
 

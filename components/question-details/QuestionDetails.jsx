@@ -6,14 +6,12 @@ import PrimaryButton from "../UI/buttons/PrimaryButton";
 import { useState } from "react";
 import { useRef } from "react";
 import { setInputHeight } from "../../utils";
+import { useSelector } from "react-redux";
 
 const QuestionDetails = function ({ questionData, imageUrl, username }) {
-  const [isQuestionDetail, setIsQuestionDetail] = useState(true);
-  const [value, setValue] = useState("");
-  const test = (element) => {
-    element.style.height = element.style.scrollHeight;
-    console.log(element.style.height);
-  };
+  const isQuestionInputActive = useSelector(
+    (state) => state.global.questionUI.isQuestionInputActive
+  );
 
   return (
     <div className={classes.container}>
@@ -23,17 +21,8 @@ const QuestionDetails = function ({ questionData, imageUrl, username }) {
           imageUrl={imageUrl}
           username={username}
           className={classes["question-item-override"]}
-          isQuestionDetails={isQuestionDetail}
         />
         <ul className={classes["answers-container"]}>
-          <form className={classes["input-wrapper"]}>
-            <textarea
-              type="text"
-              placeholder="Enter an answer"
-              onChange={(e) => test(e.target)}
-            />
-            <PrimaryButton>Post</PrimaryButton>
-          </form>
           <AnswerItem />
           <AnswerItem />
           <AnswerItem />

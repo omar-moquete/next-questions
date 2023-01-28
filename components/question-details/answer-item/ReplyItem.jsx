@@ -1,10 +1,13 @@
 import React from "react";
-import { getUserImageUrlWithUsername } from "../../../_TEST_DATA";
 import classes from "./ReplyItem.module.scss";
-import LikeIcon from "../../UI/svg/LikeIcon";
+import MentionIcon from "../../UI/svg/MentionIcon";
+import { useSelector } from "react-redux";
+import LikeButton from "../../question-item/LikeButton";
+import useReplyForm from "../../../hooks/useReplyForm";
 
-const AnswerItem = function () {
-  const imageUrl = getUserImageUrlWithUsername();
+const ReplyItem = function ({ imageUrl, username, question }) {
+  const { show, ReplyFormAnchor } = useReplyForm();
+
   return (
     <li className={classes.container}>
       <div className={classes["user-container"]}>
@@ -14,6 +17,11 @@ const AnswerItem = function () {
 
           <div className={classes["username-and-datetime"]}>
             <a>Username</a>
+            <span>•</span>
+            <div className={classes.username}>
+              <p>user</p>
+              <MentionIcon className={classes["mention-icon"]} />
+            </div>
             <span>•</span>
             <p>just now</p>
           </div>
@@ -26,13 +34,19 @@ const AnswerItem = function () {
         eaque eos facilis?
       </p>
       <div className={classes.icons}>
-        <div className={classes.icon}>
-          <LikeIcon />
-          <p>1</p>
+        <div className={classes.reply} onClick={show}>
+          <label>Mention</label>
+          <MentionIcon className={classes["mention-icon"]} />
         </div>
+        <LikeButton likes={2} />
       </div>
+
+      {/* ANCHOR */}
+      {/* [ ]NOTE: Implement @username in mention */}
+      {/* [ ]NOTE: When question is posted, show user that's being replied to*/}
+      <ReplyFormAnchor placeholder={"@username"} />
     </li>
   );
 };
 
-export default AnswerItem;
+export default ReplyItem;

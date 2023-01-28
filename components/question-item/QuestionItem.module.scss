@@ -19,7 +19,7 @@
 .info {
   display: flex;
   gap: 8px;
-
+  user-select: none;
   img {
     width: 48px;
     height: 48px;
@@ -39,6 +39,11 @@
   @media (max-width: 500px) {
     & {
       border-width: 1px;
+    }
+  }
+  @media (hover: hover) {
+    &:hover {
+      outline: 1px solid variables.$accent-color;
     }
   }
 }
@@ -64,6 +69,11 @@
   gap: 4px;
   height: fit-content;
   flex-direction: column;
+
+  p,
+  span {
+    color: #8c8c8c;
+  }
 }
 
 .username {
@@ -84,9 +94,9 @@
   }
 }
 
-.time,
-.icons > .icon > p {
-  color: #8c8c8c;
+.dot-time {
+  display: flex;
+  gap: 12px;
 }
 
 .icons {
@@ -96,31 +106,7 @@
   gap: 12px;
 }
 
-.icon {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  svg {
-    width: 26px;
-    height: 26px;
-    fill: transparent;
-    stroke-width: 1.5;
-    stroke: variables.$accent-color;
-    transition: all 0.1s ease-out;
-    cursor: pointer;
-  }
-}
-
-@media (hover: hover) {
-  .icon > svg:hover {
-    transform: scale(1.1);
-  }
-}
-.icon > svg:active {
-  transform: scale(1.4);
-}
-
-@media (max-width: 730px) {
+@media (max-width: 830px) {
   .container {
     width: 90vw;
   }
@@ -129,6 +115,6 @@
 @media (max-width: 500px) {
   .username-time {
     flex-direction: row;
-    gap: 18px;
+    gap: 12px;
   }
 }

@@ -1,7 +1,5 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import LikeIcon from "../UI/svg/LikeIcon";
-import ReplyIcon from "../UI/svg/ReplyIcon";
 import classes from "./QuestionItem.module.scss";
 import TimeAgo from "react-timeago";
 import {
@@ -9,6 +7,12 @@ import {
   getTopicNameWithTopicUid,
 } from "../../_TEST_DATA";
 import Topic from "../topic/Topic";
+import LikeButton from "./LikeButton";
+import ReplyButton from "./ReplyButton";
+import { globalActions } from "../../redux-store/globalSlice";
+import { useDispatch, useSelector } from "react-redux";
+import useReplyForm from "../../hooks/useReplyForm";
+import ReplyForm from "../UI/forms/reply-form/ReplyForm";
 
 const QuestionItem = function (props) {
   const { imageUrl, username, question } = props;
@@ -24,13 +28,16 @@ const QuestionItem = function (props) {
     // [ ]TODO: Go to question detail page.
   };
 
+  // NOTE: TimeAgo-------------------------------
   const timeAgoFormatter = (value, unit, suffix) => {
     const pluralize = (word) => word + "s";
     if (value < 60 && unit === "second") return "just now";
     return `${value}  ${value > 1 ? pluralize(unit) : unit} ${suffix}`;
   };
-
   const topicInfo = getTopicInfoWithTopicUid(question.topic.uid);
+  // NOTE: End TimeAgo-----------------------------
+
+  const { ReplyFormAnchor, show } = useReplyForm();
 
   return (
     <li
@@ -44,14 +51,16 @@ const QuestionItem = function (props) {
             <Link className={classes.username} href={`/${username}`}>
               {username}
             </Link>
-            <p className={classes.time}>
-              <TimeAgo
-                date={question.timeStamp.seconds}
-                formatter={timeAgoFormatter}
-                minPeriod={60}
-              />
-              {/* [x]TODO: Fix formatter */}
-            </p>
+            <div className={classes["dot-time"]}>
+              <p>
+                <TimeAgo
+                  date={question.timeStamp.seconds}
+                  formatter={timeAgoFormatter}
+                  minPeriod={60}
+                />
+                {/* [x]TODO: Fix formatter */}
+              </p>
+            </div>
           </div>
 
           <Topic
@@ -69,18 +78,12 @@ const QuestionItem = function (props) {
 
       <div className={classes.controls}>
         <div className={classes.icons}>
-          <div className={classes.icon}>
-            <LikeIcon />
-            <p>{question.likes}</p>
-          </div>
-          {props.isQuestionDetail && (
-            <div className={classes.icon}>
-              <ReplyIcon />
-              <p>{question.answers}</p>
-            </div>
-          )}
+          <LikeButton likes={question.likes} />
+          <ReplyButton answers={question.answers} onClick={show} />
         </div>
       </div>
+      {/* ANCHOR */}
+      <ReplyFormAnchor />
     </li>
   );
 };

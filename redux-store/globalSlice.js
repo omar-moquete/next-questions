@@ -5,6 +5,9 @@ const initialState = {
   visitedUser: null,
   // When selected topic is null, there is no selected topic and questions with about user's favorite topics will be displayed
   selectedTopicUid: null,
+  questionUI: {
+    replyFormUnmounters: [],
+  },
 };
 const globalSlice = createSlice({
   name: "global",
@@ -16,6 +19,9 @@ const globalSlice = createSlice({
 
     setSelectedTopic(state, { payload }) {
       state.selectedTopicUid = payload;
+    },
+    setReplyFormUnmounter(state, { payload }) {
+      state.questionUI.replyFormUnmounters.push(payload);
     },
   },
 });

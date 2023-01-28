@@ -1,0 +1,29 @@
+@use "../../styles/variables";
+
+.icon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  p {
+    color: #8c8c8c;
+  }
+  svg {
+    width: 26px;
+    height: 26px;
+    fill: transparent;
+    stroke-width: 1.5;
+    stroke: variables.$accent-color;
+    transition: all 0.1s ease-out;
+    cursor: pointer;
+  }
+}
+
+@media (hover: hover) {
+  .icon > svg:hover {
+    transform: scale(1.1);
+  }
+}
+.icon > svg:active {
+  transform: scale(1.4);
+}

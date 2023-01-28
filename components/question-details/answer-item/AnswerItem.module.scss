@@ -51,30 +51,22 @@
 
 .username-and-datetime > p,
 .username-and-datetime > span,
-.icon > p,
 .reply {
   color: #8c8c8c;
   font-weight: 500;
 }
 
-.reply > label {
+.reply {
   cursor: pointer;
 }
 
 @media (hover: hover) {
-  .icon > svg:hover {
-    transform: scale(1.1);
-  }
-
   .reply:hover {
     text-decoration: underline 1px;
     color: variables.$accent-color;
   }
 }
 
-.icon > svg:active {
-  transform: scale(1.3);
-}
 .reply:active {
   text-decoration: underline 1px;
   color: variables.$accent-color;
@@ -86,24 +78,6 @@
   align-items: center;
   gap: 12px;
   user-select: none;
-
-  .icon {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  svg {
-    width: 26px;
-    height: 26px;
-    fill: transparent;
-    stroke-width: 1.5;
-    stroke: variables.$accent-color;
-    transition: all 0.1s ease-out;
-    cursor: pointer;
-  }
-
-  // [ ]TODO: add small screen styles for icons. Make them smaller
 }
 
 .replies,
@@ -111,8 +85,23 @@
   list-style-type: none;
 }
 
-@media (max-width: 730px) {
+.replies {
+  -top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  border-left: 1px solid #e4e4e4;
+  position: relative;
+}
+
+@media (max-width: 830px) {
   .container {
     width: 90vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 100%;
   }
 }

@@ -57,8 +57,3 @@ export const toSerializable = (obj) => JSON.parse(JSON.stringify(obj));
 export const bindArgs = (fn, ...args) => {
   return () => fn(...args);
 };
-
-export const setInputHeight = (e) => {
-  const defaultHeight = "100x";
-  e.current.style.height = `${target.scrollHeight}px`;
-};

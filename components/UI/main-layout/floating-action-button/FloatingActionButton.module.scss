@@ -1,0 +1,53 @@
+@use "../../../../styles/variables";
+@use "../../../../styles/mixins";
+
+.fab {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  stroke-width: 1.5;
+  background-image: variables.$gradient;
+  bottom: 50px;
+  left: 50px;
+  z-index: 501;
+  padding: 8px 12px;
+  border-radius: 8px;
+  gap: 4px;
+  opacity: 0.8;
+  user-select: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.1s ease-out;
+  border: 2px #fff solid;
+  @include mixins.shadow;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    transform: translateY(2px);
+  }
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+  &:active {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .fab {
+    left: 15px;
+    bottom: 20px;
+    font-size: 0.8rem;
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
