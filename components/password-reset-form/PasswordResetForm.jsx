@@ -2,9 +2,10 @@ import React, { useRef } from "react";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import classes from "./PasswordResetForm.module.scss";
 import PrimaryForm from "../UI/forms/PrimaryForm";
-import FormField from "../UI/forms/FormField";
+import CustomField from "../UI/custom-field/CustomField";
+import PasswordIcon from "../UI/svg/PasswordIcon";
 
-const LoginForm = function () {
+const PasswordResetForm = function () {
   const usernameInputRef = useRef();
   const passwordInputRef = useRef();
 
@@ -14,13 +15,18 @@ const LoginForm = function () {
     e.preventDefault();
   };
   return (
-    // <PrimaryForm className={classes["primary-form"]} onCLick={submitHandler}>
-    //   <h2>Create a new password</h2>
-    //   <FormField inputRef={usernameInputRef} type="text" name="email" />
-    //   <SecondaryButton>Submit</SecondaryButton>
-    // </PrimaryForm>
-    ""
+    <PrimaryForm className={classes["primary-form"]} onCLick={submitHandler}>
+      <h2>Create a new password</h2>
+      <CustomField
+        inputRef={usernameInputRef}
+        type="password"
+        name="email"
+        placeholder="New password"
+        Icon={PasswordIcon}
+      />
+      <SecondaryButton>Submit</SecondaryButton>
+    </PrimaryForm>
   );
 };
 
-export default LoginForm;
+export default PasswordResetForm;

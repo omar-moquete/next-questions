@@ -9,10 +9,6 @@ import { setInputHeight } from "../../utils";
 import { useSelector } from "react-redux";
 
 const QuestionDetails = function ({ questionData, imageUrl, username }) {
-  const isQuestionInputActive = useSelector(
-    (state) => state.global.questionUI.isQuestionInputActive
-  );
-
   return (
     <div className={classes.container}>
       <ul className={classes.border}>

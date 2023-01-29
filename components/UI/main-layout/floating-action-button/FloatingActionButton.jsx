@@ -1,15 +1,22 @@
 import React from "react";
 import classes from "./FloatingActionButton.module.scss";
 import QuestionIcon from "../../svg/QuestionIcon";
+import { useRouter } from "next/router";
 
-const FloatingActionButton = function (props) {
+const FloatingActionButton = function () {
+  const router = useRouter();
   return (
-    <div className={classes.fab}>
+    <button
+      className={classes.fab}
+      onClick={() => {
+        router.push("/new-question");
+      }}
+    >
       <div className={classes.filter}>
         <QuestionIcon />
       </div>
       <span>New question</span>
-    </div>
+    </button>
   );
 };
 

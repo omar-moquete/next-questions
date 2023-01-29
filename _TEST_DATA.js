@@ -167,7 +167,7 @@ export const getListOfQuestionsWithListOfTopics = (topics) => {
 
 export const getTopicsWithTopicText = (text) => {
   const results = TOPICS_TEST_DATA.filter((topic) =>
-    topic.text.toLowerCase().includes(text.toLowerCase())
+    topic.text.toLowerCase().startsWith(text.toLowerCase())
   );
 
   return results;
@@ -179,7 +179,6 @@ export const getTopicNameWithTopicUid = (topicUid) =>
 export const followTopic = (topicToFollow) => {
   // Adds a topic to the user topics
   FAKE_LOGGEDIN_USER.topics.push({ uid: topicToFollow });
-  console.log("followed", FAKE_LOGGEDIN_USER);
 };
 
 export const unfollowTopic = (topicUidToRemove) => {
@@ -187,7 +186,6 @@ export const unfollowTopic = (topicUidToRemove) => {
   FAKE_LOGGEDIN_USER.topics = FAKE_LOGGEDIN_USER.topics.filter(
     (topic) => topic.uid !== topicUidToRemove
   );
-  console.log("unfollowed", FAKE_LOGGEDIN_USER);
 };
 
 export const isUserFollowngTopic = (topicUid) => {

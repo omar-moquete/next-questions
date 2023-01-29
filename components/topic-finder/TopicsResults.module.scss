@@ -1,10 +1,11 @@
-@use "../../../styles/mixins";
-@use "../../../styles/variables";
+@use "../../styles/mixins";
+@use "../../styles/variables";
 .results {
   display: grid;
   grid-template-columns: 1fr;
   position: absolute;
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
   width: 100%;
   border-radius: 8px;
   font-size: 1.2rem;
@@ -12,7 +13,6 @@
   @include mixins.shadow;
   top: 130%;
   max-height: 380px;
-  min-height: 5rem;
   overflow-y: auto;
 
   li {
@@ -30,7 +30,6 @@
     @media (hover: hover) {
       &:hover {
         background-color: #f2f2f2;
-        span,
         h3 {
           text-decoration: underline solid 1px #444;
         }
@@ -38,7 +37,6 @@
     }
     &:active {
       background-color: #f2f2f2;
-      span,
       h3 {
         text-decoration: underline solid 1px #333;
       }
@@ -64,7 +62,8 @@
   }
   p {
     font-size: 1rem;
-    color: #555;
+    color: #8c8c8c;
+    font-weight: 400;
   }
 }
 
@@ -88,13 +87,19 @@
     stroke: variables.$accent-color-lighter;
     height: 22px;
     width: 22px;
-    stroke-width: 1.1;
+    stroke-width: 1.5;
   }
 }
 
-.no-topics {
-  font-size: 1.2rem;
-  font-weight: 400;
-  justify-self: center;
-  align-self: center;
+.new-topic {
+  display: flex;
+  align-items: center;
+  height: fit-content;
+}
+
+.no-questions {
+  text-align: center;
+  a {
+    white-space: unset;
+  }
 }

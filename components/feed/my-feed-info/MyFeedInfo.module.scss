@@ -1,3 +1,4 @@
+@use "../../../styles/mixins";
 .main {
   display: grid;
   width: 700px;
@@ -12,10 +13,15 @@
   .info {
     display: flex;
     align-items: center;
-    font-size: 1.2rem;
-    border-bottom: solid 1px #fff;
     height: 2.4rem;
     justify-content: space-between;
+    border-bottom: solid 1px #fff;
+
+    h3 {
+      @include mixins.main-font;
+      font-size: 3rem;
+      font-weight: 500;
+    }
   }
 
   @media (max-width: 730px) {

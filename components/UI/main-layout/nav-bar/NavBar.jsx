@@ -16,7 +16,7 @@ const NavBar = function () {
 
   // NOTE: if path changes to "/feed" make navBar positioning relative, which brings it back to default DOM flow.
   useEffect(() => {
-    if (router.asPath === "/feed") setIsFixed(false);
+    if (router.asPath.split("?")[0] === "/feed") setIsFixed(false);
     else setIsFixed(true);
   }, [router.asPath]);
 

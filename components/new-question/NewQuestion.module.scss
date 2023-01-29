@@ -1,0 +1,105 @@
+@use "../../styles/mixins";
+@use "../../styles/variables";
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-image: variables.$gradient;
+  width: 100%;
+  font: inherit;
+  form {
+    width: 700px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+    background-color: #fff;
+    padding: 78px 58px;
+    border-radius: 8px;
+    margin: 150px auto 150px auto;
+
+    .main-title {
+      @include mixins.main-font;
+      font-size: 3rem;
+      margin-bottom: 40px;
+    }
+
+    label {
+      align-self: flex-start;
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+    @include mixins.shadow;
+  }
+
+  textarea {
+    border: none;
+    padding-right: 16px;
+    width: 100%;
+    width: 100%;
+    border: solid 1px #333;
+    padding: 8px 16px;
+    border-radius: 8px;
+    resize: none;
+    font: inherit;
+    overflow: hidden;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .title {
+    font-weight: 500;
+  }
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  button {
+    border-color: variables.$accent-color;
+    color: variables.$accent-color;
+  }
+}
+@media (hover: hover) {
+  .controls > button:hover {
+    outline-color: variables.$accent-color;
+  }
+}
+.controls > button:active {
+  outline-color: variables.$accent-color;
+}
+.topic {
+  input {
+    font-size: 1rem;
+    padding: 0;
+    border-radius: 0;
+  }
+}
+.topic-wrapper {
+  background-image: variables.$gradient;
+  width: 100%;
+  padding: 16px;
+  border-radius: 8px;
+  @include mixins.shadow;
+
+  margin-bottom: 4px;
+}
+
+.topic-name-span {
+  font: inherit;
+}
+
+@media (max-width: 500px) {
+  .container {
+    background-image: unset;
+
+    form {
+      box-shadow: unset;
+      padding: 0 24px;
+    }
+  }
+}

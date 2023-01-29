@@ -1,4 +1,5 @@
 @use "../../../styles/variables";
+@use "../../../styles/mixins";
 
 .form-container {
   display: flex;
@@ -13,6 +14,12 @@
   color: #fff;
   border-radius: 8px;
   height: fit-content;
+
+  h2 {
+    @include mixins.main-font;
+    font-size: 3rem;
+    font-weight: 500;
+  }
 }
 
 .form {
@@ -24,11 +31,12 @@
 
 @media (max-width: 500px) {
   .form-container {
-    width: 100vw;
+    width: 100%;
     box-shadow: none;
     border-radius: 0;
     margin: 0;
     bottom: 0;
     padding: 158px 58px;
+    min-height: 100vh;
   }
 }

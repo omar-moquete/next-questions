@@ -8,11 +8,12 @@
   width: fit-content;
   transition: all 0.1s ease-out;
   cursor: pointer;
-  border: 2px variables.$secondary-button-border-color solid;
+  border: 1px #fff solid;
   background-color: transparent;
-  color: variables.$secondary-button-text-color;
+  color: #fff;
   border-radius: 5px;
   white-space: nowrap;
+  outline: 0;
 }
 
 .link {
@@ -28,9 +29,11 @@
   @media (hover: hover) {
     &:hover {
       transform: scale(1.1);
+      outline: 1px #fff solid;
     }
   }
   &:active {
     transform: scale(1.1);
+    outline: 1px #fff solid;
   }
 }

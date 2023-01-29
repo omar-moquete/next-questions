@@ -42,31 +42,6 @@
   }
 }
 
-.topics {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  position: relative;
-
-  button {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    svg {
-      stroke-width: 1.5;
-      width: 24px;
-      height: 24px;
-      stroke: #fff;
-    }
-  }
-}
-
-.my-feed-button {
-  font-size: 1rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
 @media (max-width: 800px) {
   .feed-control-bar {
     flex-direction: column;
