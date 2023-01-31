@@ -8,6 +8,7 @@
   width: 100%;
   height: 100%;
   min-height: calc(100vh - 65px);
+  position: relative;
   background-image: variables.$gradient;
 
   .questions {
@@ -20,4 +21,10 @@
 .feed,
 .questions {
   gap: 26px;
+}
+
+.spinner {
+  position: absolute;
+  top: calc(50% - (48px / 2));
+  left: calc(50% - (48px / 2));
 }

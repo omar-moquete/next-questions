@@ -16,36 +16,41 @@ import HashIcon from "../UI/svg/HashIcon";
 import FeedControlBar from "./feed-control-bar/FeedControlBar";
 import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "../../redux-store/globalSlice";
-import QuestionIcon from "../UI/svg/QuestionIcon";
+import Loading from "../loading/Loading";
+import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import FeedInfo from "./feed-info/FeedInfo";
 import MyFeedInfo from "./my-feed-info/MyFeedInfo";
 
-const Feed = function (props) {
-  const dispatch = useDispatch();
+const Feed = function () {
+  // is null initially
   const selectedTopicUid = useSelector(
     (state) => state.global.selectedTopicUid
   );
-  // Current feed is a list of questions
-  const [currentFeed, setCurrentFeed] = useState(
-    getListOfQuestionsWithListOfTopics(getLoggedInUserTopics())
-  ); // initially MY_FEED will be selected
 
-  // A topic is selected when a topic is clicked from the dropdown
+  const [loading, setLoading] = useState(true);
+  const [currentFeed, setCurrentFeed] = useState();
+
+  // useEffect re-runs when a topic is clicked from the dropdown (selectedTopicUid gets updated)
   useEffect(() => {
-    // NOTE: If selectedTopicUid === null means that my feed is active.
-    if (selectedTopicUid === null) {
-      // [ ] Find all questions with all fav topics and setCurrentFeed to it
-      // [ ]TODO: fix topic search algorithm to "startswith instead of "contains""
-      const topicsList = getLoggedInUserTopics();
-      const myFeed = getListOfQuestionsWithListOfTopics(topicsList);
-      setCurrentFeed(myFeed);
-    } else {
-      // NOTE: if this block executes is because there was a topic previously selected since it's the only way to update selectedTopicUid to a truthy value, therefore we can conclude that there must be a selected topic.
+    const renderFeed = async () => {
+      // NOTE: My feed is active if selectedTopicUid === null.
+      !loading && setLoading(true);
+      if (selectedTopicUid === null) {
+        // [ ] Find all questions with all fav topics and setCurrentFeed to it
+        // [ ]TODO: fix topic search algorithm to "startswith instead of "contains""
+        const topicsList = getLoggedInUserTopics();
+        const myFeed = await getListOfQuestionsWithListOfTopics(topicsList);
+        console.log("myFeed", myFeed);
+        setCurrentFeed(myFeed);
+      } else {
+        // [ ] Find all questions in db that include the topic uid and setCurrentFeed
+        const feed = await getQuestionsWithTopicUid(selectedTopicUid);
+        setCurrentFeed(feed);
+      }
+      setLoading(false);
+    };
 
-      // [ ] Find all questions in db that include the topic uid and setCurrentFeed
-      const feed = getQuestionsWithTopicUid(selectedTopicUid);
-      setCurrentFeed(feed);
-    }
+    renderFeed();
   }, [selectedTopicUid]);
 
   return (
@@ -55,23 +60,30 @@ const Feed = function (props) {
 
       {/* <FeedInfo/> outputs information about the currently selected topic */}
       {/* <MyFeeedInfo/> outputs the questions that belong to the user topics */}
-      {selectedTopicUid ? (
-        <FeedInfo topicUid={selectedTopicUid} />
-      ) : (
-        <MyFeedInfo />
-      )}
 
-      <ul className={classes.questions}>
-        {currentFeed.map((questionItem) => (
-          <QuestionItem
-            key={questionItem.uid}
-            className={classes["question-item"]}
-            username={questionItem.askedBy}
-            imageUrl={getUserImageUrlWithUsername(questionItem.askedBy)}
-            question={questionItem}
-          />
-        ))}
-      </ul>
+      {loading ? (
+        <InlineSpinner className={classes.spinner} color="#fff" />
+      ) : (
+        <>
+          {selectedTopicUid ? (
+            <FeedInfo topicUid={selectedTopicUid} />
+          ) : (
+            <MyFeedInfo />
+          )}
+
+          <ul className={classes.questions}>
+            {currentFeed.map((questionItem) => (
+              <QuestionItem
+                key={questionItem.uid}
+                className={classes["question-item"]}
+                username={questionItem.askedBy}
+                imageUrl={getUserImageUrlWithUsername(questionItem.askedBy)}
+                question={questionItem}
+              />
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 };

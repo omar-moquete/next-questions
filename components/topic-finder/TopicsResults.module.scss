@@ -15,28 +15,35 @@
   max-height: 380px;
   overflow-y: auto;
 
+  li:not(.no-questions) {
+    justify-content: space-between;
+  }
+
   li {
     padding: 16px;
     width: 100%;
-    border-bottom: 1px solid #e4e4e4;
+    border-bottom: 1px solid #eee;
     display: flex;
-    justify-content: space-between;
     cursor: pointer;
 
     h3 {
       color: #444;
     }
 
+    a {
+      text-decoration: none;
+    }
+
     @media (hover: hover) {
       &:hover {
-        background-color: #f2f2f2;
+        background-color: #eee;
         h3 {
           text-decoration: underline solid 1px #444;
         }
       }
     }
     &:active {
-      background-color: #f2f2f2;
+      background-color: #eee;
       h3 {
         text-decoration: underline solid 1px #333;
       }
@@ -99,6 +106,7 @@
 
 .no-questions {
   text-align: center;
+  justify-content: space-around;
   a {
     white-space: unset;
   }

@@ -13,6 +13,7 @@ import { globalActions } from "../../redux-store/globalSlice";
 import { useDispatch, useSelector } from "react-redux";
 import useReplyForm from "../../hooks/useReplyForm";
 import ReplyForm from "../UI/forms/reply-form/ReplyForm";
+import { useRouter } from "next/router";
 
 const QuestionItem = function (props) {
   const { imageUrl, username, question } = props;
@@ -38,6 +39,12 @@ const QuestionItem = function (props) {
   // NOTE: End TimeAgo-----------------------------
 
   const { ReplyFormAnchor, show } = useReplyForm();
+
+  const router = useRouter();
+
+  const redirectToQuestion = () => {
+    router.push("/questions/" + question.uid);
+  };
 
   return (
     <li
@@ -75,11 +82,17 @@ const QuestionItem = function (props) {
         <h3>{question.title}</h3>
         <p>{question.text}</p>
       </div>
-
       <div className={classes.controls}>
         <div className={classes.icons}>
           <LikeButton likes={question.likes} />
-          <ReplyButton answers={question.answers} onClick={show} />
+          <ReplyButton
+            answers={question.answers}
+            onClick={
+              router.asPath.split("?")[0] === "/questions/" + question.uid
+                ? show
+                : redirectToQuestion
+            }
+          />
         </div>
       </div>
       {/* ANCHOR */}

@@ -110,11 +110,15 @@ export const ANSWERS_TEST_DATA = [
   },
 ];
 
-export const getQuestionsWithTopicUid = (topicUid) => {
-  const filteredQuestion = QUESTIONS_TEST_DATA.filter(
+export const getQuestionsWithTopicUid = async (topicUid) => {
+  const results = QUESTIONS_TEST_DATA.filter(
     (question) => question.topic.uid === topicUid
   );
-  return filteredQuestion;
+  return await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(results);
+    }, 2000);
+  });
 };
 
 export const getTopicInfoWithTopicUid = (topicUid) =>
@@ -129,11 +133,16 @@ export const getTopicInfoWithTopicName = (topicName) => {
 
 export const getLoggedInUserTopics = () => FAKE_LOGGEDIN_USER.topics;
 
-export const getListOfQuestionsWithListOfTopics = (topics) => {
+export const getListOfQuestionsWithListOfTopics = async (topics) => {
   const results = topics.map((topic) => getQuestionsWithTopicUid(topic.uid))[0];
-  return results;
+  return await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(results);
+    }, 2000);
+  });
 };
 
+export const getAllQuestions = () => QUESTIONS_TEST_DATA;
 // export const getUserAnsweredQuestionsWithListOfTopics = (topics) => {
 //   // return questions the user has asked under topics
 //   const questionsAskedByUser = QUESTIONS_TEST_DATA.filter(
@@ -199,7 +208,8 @@ export const isUserFollowngTopic = (topicUid) => {
 export const getQuestionWithUid = (uid) => {
   const match = QUESTIONS_TEST_DATA.find((question) => question.uid === uid);
 
-  return match;
+  // Array.find returns undefined if no matches were found, in which case an empty array is returned.
+  return match || [];
 };
 
 //////////////////

@@ -16,7 +16,7 @@ import { EXISTS_ENDPOINT } from "../../api-endpoints";
 import { clearField, scrollToTop } from "../../utils";
 import useAuth from "../../hooks/useAuth";
 import { useRouter } from "next/router";
-import FormButtonSpinner from "../UI/forms/form-button-spinner/FormButtonSpinner";
+import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import EmailIcon from "../UI/svg/EmailIcon";
 import UserIcon from "../UI/svg/UserIcon";
 import PasswordIcon from "../UI/svg/PasswordIcon";
@@ -279,7 +279,7 @@ const SignUpForm = function () {
       />
 
       {isSubmitting ? (
-        <FormButtonSpinner />
+        <InlineSpinner color="#fff" />
       ) : (
         <SecondaryButton>Sign In</SecondaryButton>
       )}

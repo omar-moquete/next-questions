@@ -35,10 +35,13 @@ const NavBarUserProfile = function (props) {
         onMouseLeave={hoverExitHandler}
       >
         <div className={classes.controls}>
-          <Link className={classes.profile} href={"/" + username}>
+          <Link href={"/" + username}>
             <p>My profile</p>
           </Link>
-          <button className={classes.logout} onClick={logoutHandler}>
+          <Link href={"/feed" + username}>
+            <p>My feed</p>
+          </Link>
+          <button onClick={logoutHandler}>
             <p>Logout</p>
           </button>
         </div>

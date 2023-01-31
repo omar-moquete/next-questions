@@ -11,10 +11,15 @@ import {
   where,
 } from "firebase/firestore";
 import { firebaseConfig } from "../../api/firebaseApp";
+import { useRouter } from "next/router";
+import Loading from "../../components/loading/Loading";
 
 const ProfilePage = function (props) {
+  const router = useRouter();
+  if (router.isFallback) {
+    return <Loading />;
+  }
   // After user public data has been received through props and state.auth had been set, check if the user that's signed in is the same as the user that's being displayed then update UI.
-
   return <UserProfile publicUserData={props.publicUserData} />;
 };
 
@@ -28,7 +33,12 @@ export const getStaticProps = async function ({ params }) {
   const usersCollection = collection(db, `/users`);
   // Query for user basic info
   const q = query(usersCollection, where("username", "==", params.usernameId));
-  const snapshot = await getDocs(q);
+
+  const querySnapshot = await getDocs(q);
+
+  if (querySnapshot.empty) {
+    return { notFound: true };
+  }
 
   const publicUserData = {
     username: "",
@@ -40,7 +50,7 @@ export const getStaticProps = async function ({ params }) {
     questionsAnswered: [],
   };
   // Only one result, only one iteration.
-  snapshot.forEach((doc) => {
+  querySnapshot.forEach((doc) => {
     const userData = doc.data();
     publicUserData.username = userData.username;
     publicUserData.userId = userData.userId;
@@ -60,18 +70,23 @@ export const getStaticProps = async function ({ params }) {
 };
 
 export const getStaticPaths = async function () {
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const paths = [];
+  // This code is commented out because this page is now server side rendered on demand by Next JS.
+  // const app = initializeApp(firebaseConfig);
+  // const db = getFirestore(app);
+  // const paths = [];
 
-  const usersCollection = collection(db, "/users");
+  // const usersCollection = collection(db, "/users");
 
-  const snapshot = await getDocs(usersCollection);
-  snapshot.forEach((doc) =>
-    paths.push({ params: { usernameId: doc.data().username } })
-  );
+  // const querySnapshot = await getDocs(usersCollection);
+  // querySnapshot.forEach((doc) =>
+  //   paths.push({ params: { usernameId: doc.data().username } })
+  // );
+  // return {
+  //   paths,
+  //   fallback: false,
+  // };
   return {
-    paths,
-    fallback: false,
+    paths: [],
+    fallback: true,
   };
 };

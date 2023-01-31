@@ -11,7 +11,8 @@ import About from "./about/About";
 import { useRouter } from "next/router";
 import { globalActions } from "../../redux-store/globalSlice";
 import useAuth from "../../hooks/useAuth";
-const UserProfile = function (props) {
+import { getAllQuestions } from "../../_TEST_DATA";
+const UserProfile = function ({ publicUserData }) {
   // [ ]Todo: Update view and add followed topics with the hability to unfollow.
   const router = useRouter();
   const visitedUser = router.asPath.split("/")[1];
@@ -35,69 +36,73 @@ const UserProfile = function (props) {
       <div className={classes["user-information"]}>
         <div className={classes.picture}>
           <div className={classes["user-image"]}>
-            {props.publicUserData.imageUrl ? (
-              <img src={props.publicUserData.imageUrl} alt="User picture" />
+            {publicUserData.imageUrl ? (
+              <img src={publicUserData.imageUrl} alt="User picture" />
             ) : (
               <AvatarIllustration className={classes.avatar} />
             )}
           </div>
 
-          <h2>{props.publicUserData.username}</h2>
+          <h2>{publicUserData.username}</h2>
 
           <div className={classes["user-stats"]}>
             <div>
               <QuestionIcon className={classes["question-icon"]} />
-              <p>{props.publicUserData.questionsAsked.length}</p>
+              <p>{publicUserData.questionsAsked.length}</p>
             </div>
             <div>
               <ReplyIcon className={classes["answer-icon"]} />
-              <p>{props.publicUserData.questionsAnswered.length}</p>
+              <p>{publicUserData.questionsAnswered.length}</p>
             </div>
           </div>
         </div>
 
         {/* If about is present */}
-        {props.publicUserData.about && (
-          <About text={props.publicUserData.about} />
-        )}
+        {publicUserData.about && <About text={publicUserData.about} />}
 
         <p className={classes.member}>
           Member since{" "}
-          {convertDate(props.publicUserData.memberSince.seconds, {
+          {convertDate(publicUserData.memberSince.seconds, {
             dateStyle: "medium",
           })}
         </p>
       </div>
 
-      <div className={classes.qa}>
-        <div>
-          <h2>My questions</h2>
-          <QuestionGroup
-            className={classes["profile-questions"]}
-            questions={questions}
-          />
-        </div>
-        <div>
-          <h2>My answers</h2>
-
-          <QuestionGroup
-            className={classes["profile-questions"]}
-            questions={questions}
-          />
-        </div>
-
-        {/* If user logged in is the same as the user being visited */}
-        {user?.username === visitedUser && (
-          <div className={classes.btns}>
-            <SecondaryButton onClick={changePasswordHandler}>
-              Change password
-            </SecondaryButton>
-            <SecondaryButton className={classes["delete-account"]}>
-              Delete account
-            </SecondaryButton>
+      {true && (
+        <>
+          <div className={classes.q}>
+            <h2 className={classes.h2}>
+              {user ? "My questions" : "Questions"}
+            </h2>
+            <QuestionGroup
+              className={classes["profile-questions"]}
+              questions={getAllQuestions()}
+            />
           </div>
-        )}
-      </div>
+
+          <div className={classes.a}>
+            <h2 className={classes.h2}>
+              {user ? "My answered questions" : "Answered questions"}
+            </h2>
+            <QuestionGroup
+              className={classes["profile-questions"]}
+              questions={getAllQuestions()}
+            />
+          </div>
+
+          {/* If user logged in is the same as the user being visited */}
+          {user?.username === visitedUser && (
+            <div className={classes.btns}>
+              <SecondaryButton onClick={changePasswordHandler}>
+                Change password
+              </SecondaryButton>
+              <SecondaryButton className={classes["delete-account"]}>
+                Delete account
+              </SecondaryButton>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

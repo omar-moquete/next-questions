@@ -13,7 +13,7 @@ import {
 import { clearField, formatFirebaseErrorCode } from "../../utils";
 import useAuth from "../../hooks/useAuth";
 import { useRouter } from "next/router";
-import FormButtonSpinner from "../UI/forms/form-button-spinner/FormButtonSpinner";
+import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import CheckIcon from "../UI/svg/CheckIcon";
 
 const PasswordChangeForm = function () {
@@ -104,7 +104,9 @@ const PasswordChangeForm = function () {
         required
       />
 
-      {isSubmitting && passwordChanged === false && <FormButtonSpinner />}
+      {isSubmitting && passwordChanged === false && (
+        <InlineSpinner color="#fff" />
+      )}
       {!isSubmitting && passwordChanged === false && (
         <SecondaryButton>Update password</SecondaryButton>
       )}

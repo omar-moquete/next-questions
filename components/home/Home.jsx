@@ -12,7 +12,7 @@ const Home = function () {
       </section>
 
       <section className={classes.section2}></section>
-      <LatestQuestions />
+      <LatestQuestions className={classes["latest-questions"]} />
     </div>
   );
 };
