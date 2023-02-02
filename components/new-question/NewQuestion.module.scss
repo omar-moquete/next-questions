@@ -10,96 +10,76 @@
   width: 100%;
   font: inherit;
   form {
-    width: 700px;
     display: flex;
     flex-direction: column;
     gap: 24px;
-    align-items: center;
+    width: 700px;
     background-color: #fff;
-    padding: 78px 58px;
+    padding: 24px;
     border-radius: 8px;
-    margin: 150px auto 150px auto;
+    margin-left: 16px;
+    margin-right: 16px;
+    @include mixins.shadow;
 
-    .main-title {
+    h2 {
       @include mixins.main-font;
       font-size: 3rem;
-      margin-bottom: 40px;
+      text-align: center;
+      margin-top: -8px;
+      margin-bottom: -8px;
     }
-
-    label {
-      align-self: flex-start;
-      font-size: 1.4rem;
-      font-weight: 500;
-    }
-    @include mixins.shadow;
-  }
-
-  textarea {
-    border: none;
-    padding-right: 16px;
-    width: 100%;
-    width: 100%;
-    border: solid 1px #333;
-    padding: 8px 16px;
-    border-radius: 8px;
-    resize: none;
-    font: inherit;
-    overflow: hidden;
-
-    &:focus {
-      outline: none;
-    }
-  }
-
-  .title {
-    font-weight: 500;
   }
 }
 
 .controls {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  justify-content: center;
   button {
-    border-color: variables.$accent-color;
-    color: variables.$accent-color;
+    border-color: variables.$accent-color-1;
+    color: variables.$accent-color-1;
   }
 }
 @media (hover: hover) {
   .controls > button:hover {
-    outline-color: variables.$accent-color;
+    outline-color: variables.$accent-color-1;
   }
 }
-.controls > button:active {
-  outline-color: variables.$accent-color;
+.controls button > :active {
+  outline-color: variables.$accent-color-1;
 }
 .topic {
+  z-index: 2;
   input {
     font-size: 1rem;
     padding: 0;
     border-radius: 0;
   }
 }
-.topic-wrapper {
-  background-image: variables.$gradient;
-  width: 100%;
-  padding: 16px;
-  border-radius: 8px;
-  @include mixins.shadow;
 
-  margin-bottom: 4px;
+.topic-finder {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field {
+  transition: all 0.2s ease-in;
+}
+.inactive {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
-.topic-name-span {
-  font: inherit;
-}
-
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .container {
     background-image: unset;
 
     form {
+      margin: 0;
+      border-radius: 0;
+      height: 100%;
+      width: 100%;
       box-shadow: unset;
-      padding: 0 24px;
     }
   }
 }

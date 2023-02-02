@@ -10,7 +10,6 @@ import { useDispatch, useSelector } from "react-redux";
 import About from "./about/About";
 import { useRouter } from "next/router";
 import { globalActions } from "../../redux-store/globalSlice";
-import useAuth from "../../hooks/useAuth";
 import { getAllQuestions } from "../../_TEST_DATA";
 const UserProfile = function ({ publicUserData }) {
   // [ ]Todo: Update view and add followed topics with the hability to unfollow.

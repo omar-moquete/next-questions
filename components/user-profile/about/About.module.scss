@@ -5,7 +5,6 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
-  border-radius: 8px;
   .label-and-icon {
     display: flex;
     justify-content: space-between;
@@ -33,15 +32,15 @@
     }
   }
 
-  p {
+  pre {
     padding: 16px;
-    height: fit-content;
     font-family: inherit;
     background-color: #fff;
     color: #333;
     @include mixins.shadow;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 1.1rem;
+    white-space: pre-wrap;
   }
 
   .controls {
@@ -49,5 +48,22 @@
     align-items: center;
     justify-content: center;
     gap: 20px;
+  }
+}
+
+.autosize {
+  width: 100%;
+  border-radius: 8px;
+  padding: 16px;
+  font-family: inherit;
+  background-color: #fff;
+  color: #333;
+  font-size: 1.1rem;
+  resize: none;
+  overflow: hidden;
+  @include mixins.shadow;
+
+  &:focus {
+    outline: none;
   }
 }

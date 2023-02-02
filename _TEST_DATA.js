@@ -27,7 +27,8 @@ export const QUESTIONS_TEST_DATA = [
   {
     uid: "q1",
     title: "Tire pressure light won't go off",
-    text: "I've been trying to fix this issue for a while now. And I'm really trying to learn how to fix my own car. Any suggestions?",
+    description:
+      "I've been trying to fix this issue for a while now. And I'm really trying to learn how to fix my own car. Any suggestions?",
     topic: { uid: "t1" },
     timeStamp: { seconds: 1674361910 },
     askedBy: "the_connoisseur77",
@@ -37,7 +38,7 @@ export const QUESTIONS_TEST_DATA = [
   {
     uid: "q0x1",
     title: "Best programming language",
-    text: "JavaScript is the best programming language!",
+    description: "JavaScript is the best programming language!",
     topic: { uid: "t3" },
     timeStamp: { seconds: 1674361910 },
     askedBy: "the_connoisseur77",
@@ -47,7 +48,7 @@ export const QUESTIONS_TEST_DATA = [
   {
     uid: "q2",
     title: "How fast do airplanes take off?",
-    text: "I've been wondering the speed...",
+    description: "I've been wondering the speed...",
     topic: { uid: "t2" },
     timeStamp: { seconds: 1674361910 },
     askedBy: "the_connoisseur77",
@@ -57,7 +58,8 @@ export const QUESTIONS_TEST_DATA = [
   {
     uid: "q3",
     title: "Why don't airplanes have parachutes?",
-    text: "This is probably a dumb question, but why? I mean, it would save a lot of lives! 😁",
+    description:
+      "This is probably a dumb question, but why? I mean, it would save a lot of lives! 😁",
     topic: { uid: "t2" },
     timeStamp: { seconds: 1674361910 },
     askedBy: "the_connoisseur77",
@@ -82,21 +84,21 @@ export const TOPICS_TEST_DATA = [
   {
     uid: "t1",
     authorUsername: "coco_809",
-    text: "CarRepairs",
+    title: "CarRepairs",
     description: "Explore car repair questions.",
     questionsAsked: [{ uid: "q1" }],
   },
   {
     uid: "t2",
     authorUsername: "coco_809",
-    text: "Airplanes",
+    title: "Airplanes",
     description: "Questions about Airplanes.",
     questionsAsked: [{ uid: "q2" }, { uid: "q3" }],
   },
   {
     uid: "t3",
     authorUsername: "Valiente_02",
-    text: "JavaScript",
+    title: "JavaScript",
     description: "All about JS!",
     questionsAsked: [{ uid: "q0x1" }],
   },
@@ -176,7 +178,7 @@ export const getAllQuestions = () => QUESTIONS_TEST_DATA;
 
 export const getTopicsWithTopicText = (text) => {
   const results = TOPICS_TEST_DATA.filter((topic) =>
-    topic.text.toLowerCase().startsWith(text.toLowerCase())
+    topic.title.toLowerCase().startsWith(text.toLowerCase())
   );
 
   return results;
@@ -215,4 +217,9 @@ export const getQuestionWithUid = (uid) => {
 //////////////////
 export const getUserImageUrlWithUsername = () => {
   return "https://static.vecteezy.com/system/resources/thumbnails/001/993/889/small/beautiful-latin-woman-avatar-character-icon-free-vector.jpg";
+};
+
+export const createTopicInDb = (topicText) => {
+  // Creates a topic in the db and returns its Uid
+  return Math.random().toString();
 };

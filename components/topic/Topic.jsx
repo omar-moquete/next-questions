@@ -48,7 +48,7 @@ const Topic = function (props) {
           {!isFollowing && "follow"}
         </div>
       )}
-      #{props.text}
+      #{props.title}
     </div>
   );
 };

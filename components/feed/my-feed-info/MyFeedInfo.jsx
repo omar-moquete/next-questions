@@ -45,7 +45,7 @@ const MyFeedInfo = function () {
               <Topic
                 className={classes.topic}
                 uid={topicInfo.uid}
-                text={topicInfo.text}
+                title={topicInfo.title}
               />
             </div>
           );

@@ -7,13 +7,13 @@
   button {
     font-size: 1rem;
     background-image: none;
-    color: variables.$accent-color;
+    color: variables.$accent-color-1;
     background-color: #fff;
-    border: 1px solid variables.$accent-color;
+    border: 1px solid variables.$accent-color-1;
     margin-left: 12px;
     &:hover {
       box-shadow: none;
-      outline: 1px solid variables.$accent-color;
+      outline: 1px solid variables.$accent-color-1;
     }
   }
   // [ ]TODO: Investigate auto grow:https://www.youtube.com/watch?v=87wfMZ56egU
@@ -29,7 +29,7 @@
   outline: 1px solid #aaa;
   border: none;
   &:focus {
-    outline: solid 2px variables.$accent-color;
+    outline: solid 2px variables.$accent-color-1;
     border: none;
   }
 }

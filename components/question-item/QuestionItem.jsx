@@ -73,14 +73,14 @@ const QuestionItem = function (props) {
           <Topic
             className={classes["topic-style-override"]}
             uid={topicInfo.uid}
-            text={topicInfo.text}
+            title={topicInfo.title}
           />
         </div>
       </div>
 
       <div className={classes.text}>
         <h3>{question.title}</h3>
-        <p>{question.text}</p>
+        <p>{question.description}</p>
       </div>
       <div className={classes.controls}>
         <div className={classes.icons}>

@@ -1,90 +1,184 @@
-import React from "react";
+import React, { useState } from "react";
 import classes from "./NewQuestion.module.scss";
-import TextareaAutosize from "react-textarea-autosize";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import TopicFinder from "../topic-finder/TopicFinder";
-import { useState } from "react";
+import ReactTextareaAutosize from "react-textarea-autosize";
 import { useRef } from "react";
 import { useSelector } from "react-redux";
+import { serverTimestamp } from "firebase/firestore";
+import CustomField2 from "../UI/custom-fields/CustomField2";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import useDatabase from "../../hooks/useDatabase";
 
-const NewQuestion = function (props) {
-  // topic structure
-  // question.topic: {
-  //   uid: "t1",
-  //   authorUsername: "coco_809",
-  //   text: "CarRepairs",
-  //   description: "Explore car repair questions.",
-  //   questionsAsked: [{ uid: "q1" }],
-  // },
+const NewQuestion = function () {
+  // 1) user types topic. Topics result shows
+  // if user selects an existing topic
+  // set existing topic to state
 
-  // question structure
-  // {
-  //   uid: "q1", // get from firebase
-  //   title: "Title...", // get from input
-  //   text: "Text...", // get from input
-  //   topic: { uid: "t1" }, // if new save to firebase, if current set current
-  //   timeStamp: { seconds: 1674361910 }, // server timestamp
-  //   askedBy: "the_connoisseur77", // get from auth state
-  //   likes: 23, // don't pass, generate on event
-  //   answers: 5, // don't pass , generate on event
-  // }
+  // if user selects a new topic
+  // show topic description box
 
-  const topicRef = useRef();
+  // 2) user fills Title or Summary
+  // unlock submit button
+
+  // 3) user clicks submit
+  // if submit a question in an existing topic
+  //add question to db, then add questionUid to that existing topic in db
+  // if submit a question with new topic
+  // add question to db, then add topic to topics in db
+  // lastly route imperatively to questionDetails
+  const topicDescriptionRef = useRef();
   const titleRef = useRef();
   const detailsRef = useRef();
-  const router = useRouter();
+  const [blocked, setBlocked] = useState(true);
 
+  const user = useSelector((state) => state.auth.user);
+  const [isNewTopic, setIsNewTopic] = useState(false);
+  // topic data
+  const [newTopicText, setNewTopicText] = useState("");
+
+  const onNewTopic = (text) => {
+    setIsNewTopic(true);
+    setNewTopicText(text);
+    setBlocked(false);
+  };
+
+  // if existing topic
+  const [existingTopicUid, setExistingTopicUid] = useState("");
+  const onExistingTopicSelection = (topicUid) => {
+    setIsNewTopic(false);
+    setExistingTopicUid(topicUid);
+    setBlocked(false);
+  };
+
+  const router = useRouter();
   const cancelHandler = (e) => {
     e.preventDefault();
     router.back();
   };
 
-  const handleSubmit = (e) => {
+  const database = useDatabase();
+  const onSubmit = async (e) => {
     e.preventDefault();
-
     const title = titleRef.current.value;
     const details = detailsRef.current.value;
+    if (isNewTopic) {
+      const description = topicDescriptionRef.current.value;
 
-    const question = {
-      topic: "",
-      title,
-      details,
-    };
+      //1) create topic in db
+      const topicData = {
+        title: newTopicText,
+        description,
+        author: user.username,
+      };
+
+      const topicUid = await database.createTopic(topicData);
+
+      console.log("topicUid", topicUid);
+
+      // 2) create new question tied to topic
+      const questionData = {
+        // uid received from doc Uid
+        title,
+        description: details,
+        topic: { uid: topicUid },
+        // likes added on like
+        // answers added on answer
+      };
+
+      database.createQuestion(questionData);
+    } else {
+      const topic = { uid: existingTopicUid };
+
+      // uid: "q1",
+      // title: "Tire pressure light won't go off",
+      // text: "I've been trying to fix this issue for a while now. And I'm really trying to learn how to fix my own car. Any suggestions?",
+      // topic: { uid: "t1" },
+      // timeStamp: { seconds: 1674361910 },
+      // askedBy: "the_connoisseur77",
+      // likes: 23,
+      // answers: 5,
+
+      const questionData = {
+        // uid received from doc Uid
+        title,
+        description: details,
+        topic,
+
+        // likes added on like
+        // answers added on answer
+      };
+
+      const questionUid = await database.createQuestion(questionData);
+
+      // Ensures only one request is sent
+      setBlocked(true);
+
+      router.replace(`/questions/${questionUid}`);
+    }
+  };
+
+  const onChange = () => {
+    // If user changes topic after selection, reset block
+    if (isNewTopic) setIsNewTopic(false);
+    if (!blocked) setBlocked(true);
   };
 
   return (
     <div className={classes.container}>
-      <form onSubmit={handleSubmit}>
-        <h2 className={classes["main-title"]}>New question</h2>
-
-        <div className={classes["topic-wrapper"]}>
+      <form onSubmit={onSubmit}>
+        <h2>New question</h2>
+        <div className={classes["topic-finder"]}>
+          <label>Topic name</label>
           <TopicFinder
             className={classes.topic}
-            onSelect={() => {}}
-            placeholder="Select or create a topic"
+            onSelect={onExistingTopicSelection}
+            placeholder="Select or create a new topic"
+            onNewTopic={onNewTopic}
+            required
+            onChange={onChange}
           />
         </div>
-        <label htmlFor="title">Title</label>
-        <TextareaAutosize
-          minRows={1}
-          type="text"
-          name="title"
-          placeholder="What is the...?"
-          className={classes.title}
+
+        {isNewTopic && (
+          <CustomField2
+            className={`${classes.field} ${blocked ? classes.inactive : ""}`}
+            label="What is this topic about?"
+            name="topic-description"
+            placeholder="This topic is about..."
+            ref={topicDescriptionRef}
+            required
+          />
+        )}
+
+        <CustomField2
+          className={`${classes.field} ${blocked ? classes.inactive : ""}`}
+          label="Title or summary"
+          name="question"
+          placeholder="What is the..."
+          ref={titleRef}
+          required
+          disabled={blocked}
         />
 
-        <label htmlFor="details">Details</label>
-        <TextareaAutosize
-          minRows={5}
+        <CustomField2
+          className={`${classes.field} ${blocked ? classes.inactive : ""}`}
+          afterRenderClass={blocked ? classes.inactive : ""}
+          label="Details (optional)"
           name="details"
-          placeholder="I've been wondering..."
+          minRows={3}
+          placeholder="I'm asking this question because I was wondering..."
+          ref={detailsRef}
+          disabled={blocked}
         />
-
         <div className={classes.controls}>
           <SecondaryButton onClick={cancelHandler}>Cancel</SecondaryButton>
-          <SecondaryButton>Submit</SecondaryButton>
+          <SecondaryButton
+            className={`${classes.submit} ${blocked ? classes.inactive : ""}`}
+            disabled={blocked}
+          >
+            Submit
+          </SecondaryButton>
         </div>
       </form>
     </div>
@@ -92,3 +186,53 @@ const NewQuestion = function (props) {
 };
 
 export default NewQuestion;
+
+// <div className={classes.container}>
+// <form>
+//   <div className={`${classes.step2} ${classes.active}`}>
+//     <h2 className={classes["main-title"]}>Question</h2>
+
+//     <label className={classes.label} htmlFor="title">
+//       Title or summary
+//     </label>
+//     <ReactTextareaAutosize
+//       minRows={1}
+//       type="text"
+//       name="title"
+//       placeholder="What is the...?"
+//       className={classes.title}
+//       // value={title}
+//       onChange={(e) => setTitle(e.target.value)}
+//       // disabled={currentStep === 2 ? false : true}
+//       // ref={titleRef}
+//       required
+//     />
+
+//     <label className={classes.label} htmlFor="details">
+//       Details (optional)
+//     </label>
+//     <ReactTextareaAutosize
+//       minRows={5}
+//       name="details"
+//       placeholder="For the past few days I've been wondering..."
+//       // ref={detailsRef}
+//       // disabled={currentStep === 2 ? false : true}
+//     />
+//   </div>
+
+//   <div className={classes.controls}>
+//     <SecondaryButton
+//     //  onClick={cancelHandler}
+//     >
+//       Cancel
+//     </SecondaryButton>
+
+//     <SecondaryButton
+//       className={`${classes["submit-btn"]} ${classes.active}`}
+//       // onClick={handleSubmit}
+//     >
+//       Submit
+//     </SecondaryButton>
+//   </div>
+// </form>
+// </div>

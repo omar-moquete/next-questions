@@ -13,9 +13,12 @@ import { useRouter } from "next/router";
 
 const TopicFinder = function ({
   onSelect,
+  onNewTopic,
+  onChange,
   className = "",
   placeholder,
   value,
+  required = false,
 }) {
   // Controls typed data
   const topicInputRef = useRef();
@@ -52,14 +55,16 @@ const TopicFinder = function ({
     document.addEventListener("click", handleOutsideClick);
 
     document.addEventListener("keyup", handleEscKeyPress);
+
     return () => {
       document.removeEventListener("click", handleOutsideClick);
       document.removeEventListener("keyup", handleOutsideClick);
     };
   }, []);
 
-  const selectText = () => {
+  const onFocus = () => {
     topicInputRef.current.select();
+    if (topicInputRef.current.value) setIsTyping(true);
   };
 
   // set currentTopic to null (null is the default of my feed)
@@ -71,6 +76,7 @@ const TopicFinder = function ({
   };
 
   const handleResults = () => {
+    onChange && onChange();
     const currentQuery = topicInputRef.current.value;
 
     // if no query user is not typing
@@ -89,6 +95,9 @@ const TopicFinder = function ({
       topicInputRef.current.value = router.query.query;
   }, [topicInputRef]);
 
+  // if user leaves focus and did not select, clear input.
+  // if user presses esc and did not select, clear.
+
   return (
     <div className={`${classes.topics} ${className}`}>
       <div className={classes["input-wrapper"]}>
@@ -96,10 +105,11 @@ const TopicFinder = function ({
         <input
           ref={topicInputRef}
           onChange={handleResults}
-          onFocus={selectText}
+          onFocus={onFocus}
           type="text"
           placeholder={placeholder || ""}
           value={value}
+          required={required}
         />
         {selectedTopicUid && (
           <PrimaryButton
@@ -115,8 +125,10 @@ const TopicFinder = function ({
         <TopicResults
           topics={topicResults}
           query={topicQuery}
+          setQuery={setTopicQuery}
           unmount={unmount}
           onSelect={onSelect}
+          onNewTopic={onNewTopic}
           inputRef={topicInputRef}
         />
       )}

@@ -11,16 +11,23 @@ import Link from "next/link";
 
 // [ ]TODO: Add author to topic results
 
-const TopicResults = function ({ topics, query, unmount, onSelect, inputRef }) {
+const TopicResults = function ({
+  topics,
+  query,
+  unmount,
+  onSelect,
+  onNewTopic,
+  inputRef,
+  setQuery,
+}) {
   const router = useRouter();
-  const dispatch = useDispatch();
 
   // 1) set selected topic to state
-  const handleSelectedTopic = (topicUid, topicText) => {
+  const handleSelectedTopic = (topicUid, topicTitle) => {
     // Set input to selected topic
 
-    inputRef.current.value = topicText;
-
+    inputRef.current.value = topicTitle;
+    setQuery(topicTitle);
     onSelect(topicUid);
     // Dismount this element after a selection was made
     unmount();
@@ -28,15 +35,23 @@ const TopicResults = function ({ topics, query, unmount, onSelect, inputRef }) {
 
   return (
     <ul className={classes.results}>
-      {router.asPath.split("?")[0] === "/new-question" && (
-        <li className={classes["new-topic"]}>
-          <div>
-            <h3>
-              Create new topic: <span>#{query}</span>.
-            </h3>
-          </div>
-        </li>
-      )}
+      {router.asPath.split("?")[0] === "/new-question" &&
+        topics.every(
+          (topic) => topic.title.toLowerCase() !== query.toLowerCase()
+        ) && (
+          <li
+            className={classes["new-topic"]}
+            onClick={() => {
+              onNewTopic(query);
+            }}
+          >
+            <div>
+              <h3>
+                Create new topic: <span>#{query}</span>.
+              </h3>
+            </div>
+          </li>
+        )}
 
       {topics.length < 1 && router.asPath.split("?")[0] === "/feed" && (
         <li className={classes["no-questions"]}>
@@ -56,7 +71,7 @@ const TopicResults = function ({ topics, query, unmount, onSelect, inputRef }) {
       {topics.map((topic) => (
         <li
           key={topic.uid}
-          onClick={bindArgs(handleSelectedTopic, topic.uid, topic.text)}
+          onClick={bindArgs(handleSelectedTopic, topic.uid, topic.title)}
         >
           <div className={classes.text}>
             <h3>
@@ -68,10 +83,10 @@ const TopicResults = function ({ topics, query, unmount, onSelect, inputRef }) {
                       01234 + ...
               output: CarR + epairs   
 
-          highlight(CarR) +  topic.text.substring(query.length)(epairs)         
+          highlight(CarR) +  topic.title.substring(query.length)(epairs)         
               */}
-              <Highlight value={topic.text.substring(0, query.length)} />
-              {topic.text.substring(query.length)}
+              <Highlight value={topic.title.substring(0, query.length)} />
+              {topic.title.substring(query.length)}
             </h3>
             <p>{topic.description}</p>
           </div>

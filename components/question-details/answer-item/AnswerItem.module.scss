@@ -63,13 +63,13 @@
 @media (hover: hover) {
   .reply:hover {
     text-decoration: underline 1px;
-    color: variables.$accent-color;
+    color: variables.$accent-color-1;
   }
 }
 
 .reply:active {
   text-decoration: underline 1px;
-  color: variables.$accent-color;
+  color: variables.$accent-color-1;
 }
 
 .icons {

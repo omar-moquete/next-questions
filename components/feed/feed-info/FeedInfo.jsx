@@ -17,7 +17,7 @@ const FeedInfo = function ({ topicUid }) {
   return (
     <div className={classes.main}>
       <div className={classes.info}>
-        <h3>#{topicInfo.text}</h3>
+        <h3>#{topicInfo.title}</h3>
         <div className={classes.stats}>
           <div className={classes.stat}>
             <QuestionIcon />

@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import classes from "./NavBarUserProfile.module.scss";
-import { useRouter } from "next/router";
 import useAuth from "../../../../../hooks/useAuth";
 import AvatarIllustration from "../../../svg/AvatarIllustration";
 import { useSelector } from "react-redux";
 
 const NavBarUserProfile = function (props) {
-  const router = useRouter();
   const { logout } = useAuth();
   const logoutHandler = () => logout();
 
@@ -38,7 +36,7 @@ const NavBarUserProfile = function (props) {
           <Link href={"/" + username}>
             <p>My profile</p>
           </Link>
-          <Link href={"/feed" + username}>
+          <Link href={"/feed"}>
             <p>My feed</p>
           </Link>
           <button onClick={logoutHandler}>

@@ -89,7 +89,7 @@
 
   .reply:hover {
     text-decoration: underline 1px;
-    color: variables.$accent-color;
+    color: variables.$accent-color-1;
   }
 }
 
@@ -106,7 +106,7 @@
 }
 .reply:active {
   text-decoration: underline 1px;
-  color: variables.$accent-color;
+  color: variables.$accent-color-1;
 }
 
 .icons {
@@ -130,7 +130,7 @@
   }
 
   svg:not(.mention-icon) {
-    stroke: variables.$accent-color;
+    stroke: variables.$accent-color-1;
     width: 26px;
     height: 26px;
     stroke-width: 1.5;
