@@ -5,18 +5,18 @@ import PrimaryButton from "../../UI/buttons/PrimaryButton";
 const Introduction = function () {
   return (
     <div className={classes.introduction}>
-      <div className={classes.text}>
-        <h2>Welcome!</h2>
-        <p>
-          Are you a curious person? Do you like helping others with their
-          questions about things you know? If your answer is yes, then this is
-          the place where you can be yourself.
-        </p>
-        <p>
-          Ask and answer any questions you'd like, select your favorite topics,
-          vote for your favorite questions and answers and more.
-        </p>
-      </div>
+      {/* <div className={classes.text}> */}
+      <h2>Welcome!</h2>
+      <p>
+        Are you a curious person? Do you like helping others with their
+        questions about things you know? If your answer is yes, then this is the
+        place!
+      </p>
+      <p>
+        Here you can ask and answer any questions, follow and create topics,
+        like your favorite questions and answers and much more.
+      </p>
+      {/* </div> */}
 
       <PrimaryButton href="/login">Get started</PrimaryButton>
     </div>

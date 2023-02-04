@@ -1,4 +1,5 @@
 @use "../../../styles/variables";
+@use "../../../styles/mixins";
 
 .container {
   display: flex;
@@ -7,8 +8,8 @@
   height: fit-content;
   background-color: #fff;
   width: 700px;
-  border-top: solid 1px #e4e4e4;
   padding: 16px;
+  @include mixins.divider-bottom;
 }
 
 .user {
@@ -90,8 +91,8 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  border-left: 1px solid #e4e4e4;
   position: relative;
+  @include mixins.divider-left;
 }
 
 @media (max-width: 830px) {

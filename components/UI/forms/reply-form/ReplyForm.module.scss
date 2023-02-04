@@ -1,9 +1,11 @@
 @use "../../../../styles/variables";
+@use "../../../../styles/mixins";
+
 .container {
   background-color: #fff;
-  border-top: solid 1px #e4e4e4;
   text-align: end;
   padding: 16px 2px;
+  @include mixins.divider-top;
 }
 
 .controls {

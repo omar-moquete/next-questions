@@ -9,9 +9,9 @@
   position: sticky;
   top: 0;
   background-color: #fff;
-  border-top: solid 1px #e4e4e4;
   padding: 24px;
   z-index: 499;
+  @include mixins.divider-top;
   @include mixins.shadow;
   input {
     font-size: 1.2rem;

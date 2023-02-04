@@ -1,16 +1,22 @@
 import React from "react";
 import classes from "./LatestQuestions.module.scss";
-import { QUESTIONS_TEST_DATA } from "../../../_TEST_DATA";
 import QuestionGroup from "../../questions-group/QuestionsGroup";
+import QuestionItem from "../../question-item/QuestionItem";
 
-const LatestQuestions = function ({ className }) {
+const LatestQuestions = function ({ latestQuestionsData }) {
   return (
     <div className={classes.container}>
-      <h2>Latest questions</h2>
-      <QuestionGroup
-        className={`${classes["latest-questions"]} ${className}`}
-        questions={QUESTIONS_TEST_DATA}
-      />
+      <h2>See what's new</h2>
+
+      <div className={classes.wrapper}>
+        {latestQuestionsData.map((question) => (
+          <QuestionItem
+            className={classes.question}
+            questionData={question}
+            imageUrl={question.questionAuthorData.imageUrl}
+          />
+        ))}
+      </div>
     </div>
   );
 };

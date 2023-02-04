@@ -7,10 +7,10 @@
   gap: 18px;
   padding: 26px;
   border-radius: 8px;
-  height: 580px;
+  height: fit-content;
+  max-height: 600px;
   overflow-y: scroll;
   background-image: variables.$gradient;
-  max-width: 700px;
   @include mixins.shadow;
 
   li {

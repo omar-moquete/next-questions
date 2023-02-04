@@ -5,20 +5,18 @@
   display: flex;
   flex-direction: column;
   z-index: 2;
-  gap: 44px;
-
-  .text {
-    display: flex;
-    flex-direction: column;
-    width: 26rem;
-
-    gap: 16px;
-  }
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 550px;
+  @include mixins.shadow;
 
   h2 {
     font-family: "Corinthia", cursive;
     font-weight: 600;
     font-size: 3rem;
+    text-align: center;
   }
 
   p {
@@ -28,31 +26,7 @@
 
 @media (max-width: 800px) {
   .introduction {
-    @include mixins.shadow;
-    padding: 24px;
-    background-color: variables.$introduction-background-responsive-color;
-    transform: translateY(-100px);
-    margin-bottom: -100px;
-    border-radius: 8px;
-  }
-}
-
-@media (max-width: 600px) {
-  .introduction {
-    padding: 0;
-    border-radius: unset;
-    background-color: transparent;
-    box-shadow: none;
-    transform: none;
-    margin-bottom: unset;
-    width: 80vw;
-
-    .text {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-
-      gap: 16px;
-    }
+    width: 90vw;
+    max-width: unset;
   }
 }

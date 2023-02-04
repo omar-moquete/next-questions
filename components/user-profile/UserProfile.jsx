@@ -73,20 +73,20 @@ const UserProfile = function ({ publicUserData }) {
             <h2 className={classes.h2}>
               {user ? "My questions" : "Questions"}
             </h2>
-            <QuestionGroup
+            {/* <QuestionGroup
               className={classes["profile-questions"]}
               questions={getAllQuestions()}
-            />
+            /> */}
           </div>
 
           <div className={classes.a}>
             <h2 className={classes.h2}>
               {user ? "My answered questions" : "Answered questions"}
             </h2>
-            <QuestionGroup
+            {/* <QuestionGroup
               className={classes["profile-questions"]}
               questions={getAllQuestions()}
-            />
+            /> */}
           </div>
 
           {/* If user logged in is the same as the user being visited */}

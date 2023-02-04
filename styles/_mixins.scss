@@ -5,3 +5,15 @@
 @mixin main-font {
   font-family: "Corinthia", cursive;
 }
+
+@mixin divider-top {
+  border-top: solid 1px #e4e4e4;
+}
+
+@mixin divider-bottom {
+  border-bottom: solid 1px #e4e4e4;
+}
+
+@mixin divider-left {
+  border-bottom: solid 1px #e4e4e4;
+}

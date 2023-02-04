@@ -1,54 +1,47 @@
 @use "../../styles/variables";
+@use "../../styles/mixins";
 
 .home {
   display: flex;
   flex-direction: column;
   gap: 44px;
-  margin: 200px 50px 150px 50px;
-
-  .section1 {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin: auto;
-    align-items: center;
-    width: 100%;
-  }
+}
+.section1 {
+  display: flex;
+  justify-content: center;
+  gap: 44px;
+  margin: auto;
+  align-items: center;
+  width: 90%;
+  margin-top: 260px;
 }
 
+.section2 {
+  margin-bottom: 150px;
+  @include mixins.divider-top;
+}
 .illustration {
   max-width: 600px;
   width: 100%;
   height: auto;
   z-index: 0;
-}
-
-@media (max-width: 600px) {
-  .illustration {
-    width: 90%;
-  }
+  transform: translate(-8px, -100px);
 }
 
 @media (max-width: 800px) {
-  .home {
-    margin: 60px 50px 150px 50px;
+  .section1 {
+    flex-direction: column-reverse;
+    justify-content: left;
+    margin-top: 150px;
+  }
 
-    .section1 {
-      flex-direction: column-reverse;
-      justify-content: left;
-    }
+  .illustration {
+    transform: translateX(-8px);
   }
 }
 
 @media (max-width: 600px) {
-  .home {
-    gap: 48px;
-    margin: 150px 0 150px 0;
-  }
-
-  .latest-questions {
-    width: 100%;
-    border-radius: 0;
-    height: fit-content;
+  .section2 {
+    border: unset;
   }
 }

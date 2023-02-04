@@ -50,6 +50,7 @@ const useDatabase = function () {
       ...questionData,
       askedBy: user.username,
       date: serverTimestamp(),
+      unixTimestamp: +new Date(),
     };
 
     try {
