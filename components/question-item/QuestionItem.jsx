@@ -1,22 +1,21 @@
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import classes from "./QuestionItem.module.scss";
 import TimeAgo from "react-timeago";
-import {
-  getTopicInfoWithTopicUid,
-  getTopicNameWithTopicUid,
-} from "../../_TEST_DATA";
 import Topic from "../topic/Topic";
 import LikeButton from "./LikeButton";
 import ReplyButton from "./ReplyButton";
-import { globalActions } from "../../redux-store/globalSlice";
-import { useDispatch, useSelector } from "react-redux";
 import useReplyForm from "../../hooks/useReplyForm";
-import ReplyForm from "../UI/forms/reply-form/ReplyForm";
 import { useRouter } from "next/router";
+import { timeAgoFormatter } from "../../utils";
 
-const QuestionItem = function (props) {
-  const { imageUrl, username, question } = props;
+const QuestionItem = function ({
+  imageUrl,
+  questionData,
+  className,
+  initWithForm = false,
+  answersState,
+}) {
   // [x] Add question title
   // [x] Redirect to user profile page on user click
   // [ ] Add time ago instead of date if short time
@@ -24,71 +23,60 @@ const QuestionItem = function (props) {
   // [x] Add topic for question
   // [ ]TODO: create a get topic function that takes a topic uid and returns the topic data from the db, maybe a custom hook
 
-  [props.isQuestionDetail];
-  const goToQuestionHandler = () => {
-    // [ ]TODO: Go to question detail page.
-  };
-
-  // NOTE: TimeAgo-------------------------------
-  const timeAgoFormatter = (value, unit, suffix) => {
-    const pluralize = (word) => word + "s";
-    if (value < 60 && unit === "second") return "just now";
-    return `${value}  ${value > 1 ? pluralize(unit) : unit} ${suffix}`;
-  };
-  const topicInfo = getTopicInfoWithTopicUid(question.topic.uid);
-  // NOTE: End TimeAgo-----------------------------
-
   const { ReplyFormAnchor, show } = useReplyForm();
 
   const router = useRouter();
 
   const redirectToQuestion = () => {
-    router.push("/questions/" + question.uid);
+    router.push("/questions/" + questionData.uid);
   };
 
+  useEffect(() => {
+    initWithForm && show();
+  }, []);
+
   return (
-    <li
-      className={`${classes.container} ${props.className || ""}`}
-      onClick={goToQuestionHandler}
-    >
+    <li className={`${classes.container} ${className || ""}`}>
       <div className={classes.info}>
+        {/* [ ]TODO: Implement avatar if no imageUrl */}
         <img src={imageUrl} alt="User image" />
         <div className={classes["username-time-topic"]}>
           <div className={classes["username-time"]}>
-            <Link className={classes.username} href={`/${username}`}>
-              {username}
+            <Link
+              className={classes.username}
+              href={`/${questionData.askedBy}`}
+            >
+              {questionData.askedBy}
             </Link>
             <div className={classes["dot-time"]}>
               <p>
                 <TimeAgo
-                  date={question.timeStamp.seconds}
+                  date={questionData.date}
                   formatter={timeAgoFormatter}
                   minPeriod={60}
                 />
-                {/* [x]TODO: Fix formatter */}
               </p>
             </div>
           </div>
-
           <Topic
             className={classes["topic-style-override"]}
-            uid={topicInfo.uid}
-            title={topicInfo.title}
+            uid={questionData.topic.uid}
+            title={questionData.topic.title}
           />
         </div>
       </div>
 
       <div className={classes.text}>
-        <h3>{question.title}</h3>
-        <p>{question.description}</p>
+        <h3>{questionData.title}</h3>
+        <p>{questionData.description}</p>
       </div>
       <div className={classes.controls}>
         <div className={classes.icons}>
-          <LikeButton likes={question.likes} />
+          <LikeButton likes={questionData.likes || 0} />
           <ReplyButton
-            answers={question.answers}
+            answers={questionData.answers || 0}
             onClick={
-              router.asPath.split("?")[0] === "/questions/" + question.uid
+              router.asPath.split("?")[0] === "/questions/" + questionData.uid
                 ? show
                 : redirectToQuestion
             }
@@ -96,7 +84,10 @@ const QuestionItem = function (props) {
         </div>
       </div>
       {/* ANCHOR */}
-      <ReplyFormAnchor />
+      <ReplyFormAnchor
+        questionUid={questionData.uid}
+        dataState={answersState}
+      />
     </li>
   );
 };

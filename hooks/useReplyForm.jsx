@@ -23,13 +23,7 @@ const useReplyForm = function (placeholder) {
     },
 
     ReplyFormAnchor(props) {
-      if (isVisible)
-        return (
-          <ReplyForm
-            unmounter={hideAll}
-            placeholder={props.placeholder || "Start typing..."}
-          />
-        );
+      if (isVisible) return <ReplyForm unmounter={hideAll} {...props} />;
       else return Empty;
     },
   };

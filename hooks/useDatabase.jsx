@@ -32,15 +32,13 @@ const useDatabase = function () {
   // apis
   async function createTopic(topicData) {
     try {
-      topicData.author = user.username;
-      topicData.timestamp = serverTimestamp();
-
+      const improvedTopicData = {
+        ...topicData,
+        author: user.username,
+        date: serverTimestamp(),
+      };
       const topicsCollectionRef = collection(db, "/topics");
-
-      const docRef = await addDoc(topicsCollectionRef, topicData);
-
-      console.log("added data: ", (await getDoc(docRef)).data());
-
+      const docRef = await addDoc(topicsCollectionRef, improvedTopicData);
       return docRef.id;
     } catch (error) {
       console.error(`useDatabase@createTopic()🚨${error}`);
@@ -48,14 +46,21 @@ const useDatabase = function () {
   }
 
   async function createQuestion(questionData) {
-    questionData.askedBy = user.username;
-    questionData.timestamp = serverTimestamp();
+    const improvedQuestionData = {
+      ...questionData,
+      askedBy: user.username,
+      date: serverTimestamp(),
+    };
+
     try {
       // 1) get a collection reference to /questions
       const questionsCollectionRef = collection(db, "/questions");
 
       // 2) add document to collection
-      const questionDocRef = await addDoc(questionsCollectionRef, questionData);
+      const questionDocRef = await addDoc(
+        questionsCollectionRef,
+        improvedQuestionData
+      );
 
       // 3) get a collection reference to /users/loggedInUserId/questionsAsked
       const userQuestionsCollectioRef = collection(
@@ -70,7 +75,10 @@ const useDatabase = function () {
 
       // 5) add a questionUid reference: {uid: questionUid} to the question topic in /topics
       await addDoc(
-        collection(db, `/topics/${questionData.topic.uid}/questionsAsked`),
+        collection(
+          db,
+          `/topics/${improvedQuestionData.topic.uid}/questionsAsked`
+        ),
         { uid: questionDocRef.id }
       );
 
@@ -81,9 +89,109 @@ const useDatabase = function () {
     }
   }
 
+  // TODO: Move get functions to getStaticProps
+  async function getQuestionDetails(questionUid) {
+    // const questionDetails = {
+    //   authorData: {
+    //     imageUrl: "",
+    //   },
+    //   questionData: {
+    //     title: "",
+    //     description: "",
+    //     topic: { uid: "" },
+    //     timestamp: {},
+    //     askedBy: "",
+    //     likes: undefined,
+    //     answers: undefined,
+    //   },
+    // };
+
+    // 1) find the question data with the uid
+    const questionDocumentRef = await getDoc(
+      doc(db, `/questions/${questionUid}`)
+    );
+
+    const questionData = questionDocumentRef.data();
+    // 2) find the user that asked the question and get the imageUrl
+    const authorData = await getUserDataWithUsername(questionData.askedBy);
+
+    const questionDetails = {
+      authorData: { imageUrl: authorData.imageUrl },
+      questionData,
+    };
+
+    return questionDetails;
+  }
+
+  async function getUserDataWithUsername(username) {
+    // [ ]TODO: reuse collection refs
+    const usersCollectionRef = collection(db, "/users");
+    // find where usernames field in /users === username argument
+    const queryRef = query(
+      usersCollectionRef,
+      where("username", "==", username)
+    );
+    const querySnapshot = await getDocs(queryRef);
+    const match = [];
+    querySnapshot.forEach((user) => match.push(user.data()));
+    const [userData] = match;
+    return userData;
+  }
+
+  async function getTopicInfoWithTopicUid(topicUid) {
+    const topicDocRef = await getDoc(db, `/topics/${topicUid}`);
+    return topicDocRef.data();
+  }
+
+  async function answer(text, questionUid) {
+    const data = {
+      answeredBy: user.username,
+      text,
+      date: serverTimestamp(),
+    };
+
+    const answerRef = await addDoc(collection(db, `/answers`), data);
+
+    // Add answer to questionUid.answers[] collection. This way it can be retrieved using the questionUid only.
+    const questionsCollection = collection(
+      db,
+      `/questions/${questionUid}/answers/`
+    );
+    addDoc(questionsCollection, { uid: answerRef.id });
+
+    return { ...data, date: new Date().toISOString(), uid: answerRef.id };
+  }
+
+  // questionUid -> answers[
+  // answer1,
+  // answer2: [
+  // replies: [answerRef2] <- keep ref to answer
+  // ],
+  // ]
+
+  async function reply(text, answerUid) {
+    const data = {
+      answer: answerUid,
+      repliedBy: user.username,
+      text,
+      date: serverTimestamp(),
+    };
+
+    const docRef = await addDoc(
+      collection(db, `/answers/${answerUid}/replies`),
+      data
+    );
+
+    return { ...data, uid: docRef.uid, date: new Date().toISOString() };
+  }
   return {
     createTopic,
     createQuestion,
+    getQuestionDetails,
+    getUserDataWithUsername,
+    getTopicInfoWithTopicUid,
+    answer,
+    reply,
   };
 };
 

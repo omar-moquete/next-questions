@@ -57,3 +57,8 @@ export const toSerializable = (obj) => JSON.parse(JSON.stringify(obj));
 export const bindArgs = (fn, ...args) => {
   return () => fn(...args);
 };
+export const timeAgoFormatter = (value, unit, suffix) => {
+  const pluralize = (word) => word + "s";
+  if (value < 60 && unit === "second") return "just now";
+  return `${value}  ${value > 1 ? pluralize(unit) : unit} ${suffix}`;
+};

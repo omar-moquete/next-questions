@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import classes from "./PasswordResetForm.module.scss";
 import PrimaryForm from "../UI/forms/PrimaryForm";
-import CustomField from "../UI/custom-field/CustomField";
+import CustomField from "../UI/custom-fields/CustomField";
 import PasswordIcon from "../UI/svg/PasswordIcon";
 
 const PasswordResetForm = function () {

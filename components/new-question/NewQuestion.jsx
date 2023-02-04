@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import classes from "./NewQuestion.module.scss";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import TopicFinder from "../topic-finder/TopicFinder";
-import ReactTextareaAutosize from "react-textarea-autosize";
 import { useRef } from "react";
 import { useSelector } from "react-redux";
-import { serverTimestamp } from "firebase/firestore";
 import CustomField2 from "../UI/custom-fields/CustomField2";
 import { useRouter } from "next/router";
 import useDatabase from "../../hooks/useDatabase";
+import { useEffect } from "react";
 
 const NewQuestion = function () {
   // 1) user types topic. Topics result shows
@@ -60,61 +59,39 @@ const NewQuestion = function () {
   const database = useDatabase();
   const onSubmit = async (e) => {
     e.preventDefault();
-    const title = titleRef.current.value;
-    const details = detailsRef.current.value;
-    if (isNewTopic) {
-      const description = topicDescriptionRef.current.value;
 
-      //1) create topic in db
-      const topicData = {
-        title: newTopicText,
-        description,
-        author: user.username,
-      };
+    try {
+      // Ensures only one request is sent
+      setBlocked(true);
+      const title = titleRef.current.value;
+      const details = detailsRef.current.value;
+      const currentTopic = { uid: existingTopicUid };
 
-      const topicUid = await database.createTopic(topicData);
+      if (isNewTopic) {
+        const description = topicDescriptionRef.current.value;
 
-      console.log("topicUid", topicUid);
+        //1) create topic in db
+        const topicData = {
+          title: newTopicText,
+          description,
+          author: user.username,
+        };
 
-      // 2) create new question tied to topic
-      const questionData = {
-        // uid received from doc Uid
-        title,
-        description: details,
-        topic: { uid: topicUid },
-        // likes added on like
-        // answers added on answer
-      };
-
-      database.createQuestion(questionData);
-    } else {
-      const topic = { uid: existingTopicUid };
-
-      // uid: "q1",
-      // title: "Tire pressure light won't go off",
-      // text: "I've been trying to fix this issue for a while now. And I'm really trying to learn how to fix my own car. Any suggestions?",
-      // topic: { uid: "t1" },
-      // timeStamp: { seconds: 1674361910 },
-      // askedBy: "the_connoisseur77",
-      // likes: 23,
-      // answers: 5,
+        currentTopic.uid = await database.createTopic(topicData);
+      }
 
       const questionData = {
-        // uid received from doc Uid
         title,
         description: details,
-        topic,
-
-        // likes added on like
-        // answers added on answer
+        topic: currentTopic,
       };
 
       const questionUid = await database.createQuestion(questionData);
 
-      // Ensures only one request is sent
-      setBlocked(true);
-
       router.replace(`/questions/${questionUid}`);
+    } catch (e) {
+      console.error(e);
+      setBlocked(false);
     }
   };
 
@@ -123,6 +100,12 @@ const NewQuestion = function () {
     if (isNewTopic) setIsNewTopic(false);
     if (!blocked) setBlocked(true);
   };
+
+  useEffect(() => {
+    if (!router.query.query) return setNewTopicText(router.query.query);
+    setIsNewTopic(true);
+    setBlocked(false);
+  }, []);
 
   return (
     <div className={classes.container}>

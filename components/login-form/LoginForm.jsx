@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import Link from "next/link";
 import classes from "./LoginForm.module.scss";
-import CustomField from "../UI/custom-field/CustomField";
+import CustomField from "../UI/custom-fields/CustomField";
 import PrimaryForm from "../UI/forms/PrimaryForm";
 import EmailIcon from "../UI/svg/EmailIcon";
 import PasswordIcon from "../UI/svg/PasswordIcon";

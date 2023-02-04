@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import classes from "./PasswordChangeForm.module.scss";
 import PrimaryForm from "../UI/forms/PrimaryForm";
-import CustomField from "../UI/custom-field/CustomField";
+import CustomField from "../UI/custom-field/CustomFields";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import PasswordIcon from "../UI/svg/PasswordIcon";
 import FormMessage from "../UI/forms/form-message/FormMessage";

@@ -13,7 +13,7 @@
   color: #fff;
   border-radius: 5px;
   white-space: nowrap;
-  outline: 0;
+  outline: 0 #fff solid;
 }
 
 .link {
@@ -28,12 +28,12 @@
 .link {
   @media (hover: hover) {
     &:hover {
-      transform: scale(1.1);
+      transform: scale(1.04);
       outline: 1px #fff solid;
     }
   }
   &:active {
-    transform: scale(1.1);
+    transform: scale(1.04);
     outline: 1px #fff solid;
   }
 }

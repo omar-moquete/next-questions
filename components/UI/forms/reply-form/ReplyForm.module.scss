@@ -3,22 +3,31 @@
   background-color: #fff;
   border-top: solid 1px #e4e4e4;
   text-align: end;
-
-  button {
-    font-size: 1rem;
-    background-image: none;
-    color: variables.$accent-color-1;
-    background-color: #fff;
-    border: 1px solid variables.$accent-color-1;
-    margin-left: 12px;
-    &:hover {
-      box-shadow: none;
-      outline: 1px solid variables.$accent-color-1;
-    }
-  }
-  // [ ]TODO: Investigate auto grow:https://www.youtube.com/watch?v=87wfMZ56egU
+  padding: 16px 2px;
 }
 
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  button {
+    // overrides
+    color: variables.$accent-color-1;
+    border: 1px solid variables.$accent-color-1;
+    @media (hover: hover) {
+      &:hover {
+        outline: 1px variables.$accent-color-1 solid;
+      }
+    }
+    &:active {
+      outline: 1px variables.$accent-color-1 solid;
+    }
+  }
+}
+
+.spinner {
+  padding-right: 12px;
+}
 .textarea {
   width: 100%;
   padding: 8px;

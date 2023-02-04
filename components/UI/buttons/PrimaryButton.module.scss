@@ -17,7 +17,6 @@
   transition: all 0.1s ease-out;
 
   color: variables.$primary-button-text-color;
-  // box-shadow: none;
 
   // If hovering and pointer. Solves sticky hover problem in touch devices.
   @media (hover: hover) {
