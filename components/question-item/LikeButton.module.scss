@@ -1,6 +1,6 @@
 @use "../../styles/variables";
 
-.icon {
+.wrapper {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -8,22 +8,22 @@
   p {
     color: #8c8c8c;
   }
-  svg {
-    width: 26px;
-    height: 26px;
-    fill: transparent;
-    stroke-width: 1.5;
-    stroke: variables.$accent-color-1;
-    transition: all 0.1s ease-out;
-    cursor: pointer;
-  }
+}
+.icon {
+  width: 26px;
+  height: 26px;
+  fill: #fff;
+  stroke-width: 1.5;
+  stroke: variables.$accent-color-1;
+  transition: all 0.1s ease-out;
+  cursor: pointer;
 }
 
 @media (hover: hover) {
-  .icon > svg:hover {
-    transform: scale(1.1);
+  .wrapper > svg:hover {
+    transform: scale(1.2);
   }
 }
-.icon > svg:active {
+.wrapper > svg:active {
   transform: scale(1.4);
 }

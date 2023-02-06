@@ -37,7 +37,6 @@ const QuestionDetailsPage = function ({
 
   return (
     <QuestionDetails
-      questionAuthorData={questionAuthorData}
       questionData={questionData}
       questionAnswers={questionAnswers}
     />
@@ -190,15 +189,15 @@ export const getStaticProps = async function (context) {
   // NOTE: questionData, imageUrl and questionUid are sent through component props from: getStaticProps -> QuestionDetailsPage -> QuestionDetails -> QuestionItem
 
   const props = {
-    // Extract imageUrl only.
-    questionAuthorData: {
-      imageUrl: questionDetails.questionAuthorData.imageUrl,
-    },
     // Add uid to question data. Used in component.
     questionData: {
       ...questionDetails.questionData,
       uid: context.params.questionId,
       topic: { uid: topicData.uid, title: topicData.title },
+      // Extract imageUrl only.
+      questionAuthorData: {
+        imageUrl: questionDetails.questionAuthorData.imageUrl,
+      },
     },
 
     // An array containing all the answers for the questionUid in path. Each question in the array has an array of replies.

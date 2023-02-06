@@ -62,10 +62,29 @@ export const getStaticProps = async function () {
       };
     });
 
+    // add likes
+    const likes = [];
+    const likesDocsRef = await getDocs(
+      collection(db, `/questions/${latestQuestionsData[i].uid}/likes`)
+    );
+
+    likesDocsRef.forEach((likeDocRef) => {
+      const likesDocRefData = likeDocRef.data();
+      const likeData = {
+        ...likesDocRefData,
+        date: (likesDocRefData.date = new Date(
+          likesDocRefData.date.toDate()
+        ).toISOString()),
+      };
+
+      likes.push(likeData);
+    });
+
     latestQuestionsData[i].topic = topic;
     latestQuestionsData[i].topic.date = new Date(
       latestQuestionsData[i].topic.date.toDate()
     ).toISOString();
+    latestQuestionsData[i].likes = likes;
   }
 
   const props = {

@@ -5,7 +5,6 @@ import PrimaryButton from "../../UI/buttons/PrimaryButton";
 const Introduction = function () {
   return (
     <div className={classes.introduction}>
-      {/* <div className={classes.text}> */}
       <h2>Welcome!</h2>
       <p>
         Are you a curious person? Do you like helping others with their
@@ -16,7 +15,6 @@ const Introduction = function () {
         Here you can ask and answer any questions, follow and create topics,
         like your favorite questions and answers and much more.
       </p>
-      {/* </div> */}
 
       <PrimaryButton href="/login">Get started</PrimaryButton>
     </div>

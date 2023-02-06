@@ -29,6 +29,7 @@ const MyApp = function ({ Component, pageProps }) {
   return (
     <React.StrictMode>
       <Provider store={store}>
+        <div id="portal"></div>
         <Layout>
           {loading && <Loading />}
           {!loading && <Component {...pageProps} />}

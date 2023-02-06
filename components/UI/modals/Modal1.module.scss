@@ -1,0 +1,42 @@
+@use "../../../styles/variables";
+@use "../../../styles/mixins";
+
+.overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  color: #333;
+  z-index: 600;
+
+  button {
+    border-color: variables.$accent-color-1;
+    color: variables.$accent-color-1;
+  }
+}
+
+.modal {
+  height: fit-content;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  gap: 24px;
+  @include mixins.shadow;
+
+  h2 {
+    font-size: 3rem;
+    margin-top: -8px;
+    margin-bottom: -8px;
+    @include mixins.main-font;
+  }
+}

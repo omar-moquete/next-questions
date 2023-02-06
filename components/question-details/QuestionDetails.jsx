@@ -4,11 +4,7 @@ import AnswerItem from "./answer-item/AnswerItem";
 import classes from "./QuestionDetails.module.scss";
 
 // 1) ON PAGE LOAD: The data gets fetched in the server and gets returned through props.
-const QuestionDetails = function ({
-  questionAuthorData,
-  questionData,
-  questionAnswers,
-}) {
+const QuestionDetails = function ({ questionData, questionAnswers }) {
   // hasNoAnswers will be false if questionAnswers is empty.
   const [hasAnswers, setHasAnswers] = useState(
     questionAnswers.length > 0 ? true : false
@@ -27,7 +23,6 @@ const QuestionDetails = function ({
         {/* 3) ON PAGE LOAD: QuestionItem is rendered with the information received from props */}
         <QuestionItem
           className={classes["question-item-override"]}
-          imageUrl={questionAuthorData.imageUrl}
           questionData={questionData}
           initWithForm={!hasAnswers}
           // A) ON ReplyForm Submission: The answersState passed to questionItem gets set by QuestionItem>ReplyForm internally to the data ReplyForm collects from the user. When this data is set, QuestionDetails re-evaluates and outputs a new list of answers.

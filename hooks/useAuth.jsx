@@ -6,7 +6,6 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updatePassword,
-  reauthenticateWithCredential,
 } from "firebase/auth";
 import {
   collection,
@@ -89,11 +88,6 @@ const useAuth = function () {
             userId: usersCollectionDocData.userId,
             imageUrl: usersCollectionDocData.imageUrl,
             memberSince: usersCollectionDocData.memberSince,
-            questionsAsked: questionsCollectionDocData?.questionsAsked || [],
-            questionsAnswered:
-              questionsCollectionDocData?.questionsAnswered || [],
-            // [ ]TODO: Add topic property
-            // REMOVE OR IN ARRAY
           };
           dispatch(authActions.setAuthStatus(authStatusNames.loaded));
           dispatch(authActions._setUser(toSerializable(userData)));
@@ -116,7 +110,7 @@ const useAuth = function () {
 
     logout() {
       signOut(auth);
-      router.replace("/login");
+      router.push("/login");
     },
 
     async createAccount(email, password, username) {
@@ -132,10 +126,7 @@ const useAuth = function () {
         userId,
         // Make image null when creating account.
         imageUrl: null,
-        about: "",
         memberSince: serverTimestamp(),
-        questionsAsked: [],
-        questionsAnswered: [],
       };
 
       const docRef = doc(db, `/users/${userId}`);

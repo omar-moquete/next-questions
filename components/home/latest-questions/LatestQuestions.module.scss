@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+
   overflow-x: hidden;
   margin-top: 24px;
 
@@ -30,9 +30,49 @@
   padding: 16px;
   background-image: variables.$gradient;
   border-radius: 8px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  @include mixins.shadow;
+}
+
+.nothing {
+  padding: 16px;
+  background-color: #fff;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  width: 700px;
+  border-radius: 8px;
+  @include mixins.divider-top;
+  @include mixins.divider-bottom;
+  @include mixins.shadow;
+
+  h2 {
+    @include mixins.main-font;
+    font-size: 3rem;
+  }
+}
+
+.question {
+  @include mixins.shadow;
+}
+
+@media (max-width: 830px) {
+  .nothing {
+    min-width: unset;
+    width: 90vw;
+  }
 }
 
 @media (max-width: 600px) {
+  .nothing {
+    width: 100%;
+    box-shadow: unset;
+    border-radius: unset;
+  }
   .wrapper {
     padding: 0;
     background-image: unset;
@@ -40,6 +80,8 @@
     width: 100%;
     .question {
       width: 100%;
+      box-shadow: unset;
+      border-radius: unset;
       @include mixins.divider-bottom;
       &:first-child {
         @include mixins.divider-top;

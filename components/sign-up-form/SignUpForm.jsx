@@ -15,7 +15,6 @@ import {
 import { EXISTS_ENDPOINT } from "../../api-endpoints";
 import { clearField, scrollToTop } from "../../utils";
 import useAuth from "../../hooks/useAuth";
-import { useRouter } from "next/router";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import EmailIcon from "../UI/svg/EmailIcon";
 import UserIcon from "../UI/svg/UserIcon";
@@ -36,7 +35,6 @@ const SignUpForm = function () {
     passwordsMatch: false,
     data: { email: null, username: null, password1: null, password2: null },
   });
-  const router = useRouter();
   const [isSubmitting, setIssubmitting] = useState(false);
 
   const { createAccount } = useAuth();
@@ -227,8 +225,6 @@ const SignUpForm = function () {
           password1InputRef.current.value,
           usernameInputRef.current.value
         );
-        // Navigate user to profile
-        router.replace("/" + userData.username);
       } catch (e) {
         console.error(e);
         scrollToTop();

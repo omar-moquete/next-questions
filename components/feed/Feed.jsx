@@ -40,7 +40,6 @@ const Feed = function () {
         // [ ]TODO: fix topic search algorithm to "startswith instead of "contains""
         const topicsList = getLoggedInUserTopics();
         const myFeed = await getListOfQuestionsWithListOfTopics(topicsList);
-        console.log("myFeed", myFeed);
         setCurrentFeed(myFeed);
       } else {
         // [ ] Find all questions in db that include the topic uid and setCurrentFeed
@@ -71,6 +70,7 @@ const Feed = function () {
             <MyFeedInfo />
           )}
 
+          {console.log("currentFeed", currentFeed)}
           <ul className={classes.questions}>
             {currentFeed.map((questionItem) => (
               <QuestionItem

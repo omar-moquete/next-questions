@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import classes from "./QuestionItem.module.scss";
 import TimeAgo from "react-timeago";
 import Topic from "../topic/Topic";
@@ -8,9 +8,13 @@ import ReplyButton from "./ReplyButton";
 import useReplyForm from "../../hooks/useReplyForm";
 import { useRouter } from "next/router";
 import { timeAgoFormatter } from "../../utils";
+import useDatabase from "../../hooks/useDatabase";
+import { useSelector } from "react-redux";
+import Portal from "../UI/Portal";
+import Modal1 from "../UI/modals/Modal1";
+import SecondaryButton from "../UI/buttons/SecondaryButton";
 
 const QuestionItem = function ({
-  imageUrl,
   questionData,
   className,
   initWithForm = false,
@@ -35,11 +39,72 @@ const QuestionItem = function ({
     initWithForm && show();
   }, []);
 
+  // Controls likes
+  const database = useDatabase();
+  const user = useSelector((slices) => slices.auth.user);
+  const [likesAmount, setLikesAmount] = useState(questionData.likes.length);
+  const [questionLikes, setQuestionLikes] = useState(questionData.likes);
+  const [likedByUser, setLikedByUser] = useState(null);
+
+  useEffect(() => {
+    // Wait to see if user data loads
+    if (user)
+      setLikedByUser(
+        questionData.likes.some((like) => like.likedBy === user.username)
+      );
+  }, [user]);
+
+  const likeHandler = async () => {
+    // This function does not wait for the like to be posted to the database. Instead it updates the like in the UI and then posts the new data to the database.
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    if (likedByUser) {
+      setLikesAmount((likesAmount) => likesAmount - 1);
+      setLikedByUser(false);
+    } else {
+      setLikesAmount((likesAmount) => likesAmount + 1);
+      setLikedByUser(true);
+    }
+    const likes = await database.like(questionData.uid);
+    setQuestionLikes(likes);
+  };
+
+  // controls modal
+  const [modalVisible, setModalVisible] = useState(false);
   return (
     <li className={`${classes.container} ${className || ""}`}>
+      <Portal show={modalVisible}>
+        <Modal1
+          title="Likes"
+          buttons={[
+            {
+              text: "Close",
+              onClick: () => {
+                setModalVisible(false);
+              },
+            },
+          ]}
+        >
+          <ul className={classes["likes-list"]}>
+            {questionLikes.map((like) => (
+              <li>
+                <Link href={`${like.likedBy}`}>{like.likedBy}</Link>
+                <TimeAgo
+                  date={like.date}
+                  formatter={timeAgoFormatter}
+                  minPeriod={60}
+                />
+              </li>
+            ))}
+          </ul>
+        </Modal1>
+      </Portal>
+
       <div className={classes.info}>
         {/* [ ]TODO: Implement avatar if no imageUrl */}
-        <img src={imageUrl} alt="User image" />
+        <img src={questionData.questionAuthorData.imageUrl} alt="User image" />
         <div className={classes["username-time-topic"]}>
           <div className={classes["username-time"]}>
             <Link
@@ -70,19 +135,38 @@ const QuestionItem = function ({
         <h3>{questionData.title}</h3>
         <p>{questionData.description}</p>
       </div>
+
       <div className={classes.controls}>
-        <div className={classes.icons}>
-          <LikeButton likes={questionData.likes || 0} />
-          <ReplyButton
-            answers={questionData.answers || 0}
-            onClick={
-              router.asPath.split("?")[0] === "/questions/" + questionData.uid
-                ? show
-                : redirectToQuestion
-            }
-          />
+        <div className={classes["controls-wrapper"]}>
+          <p>
+            {/* TODO: Display accordingly */}
+            Liked by me and 100
+            <span
+              onClick={() => {
+                setModalVisible(true);
+              }}
+            >
+              others
+            </span>
+          </p>
+          <div className={classes.icons}>
+            <LikeButton
+              likes={likesAmount}
+              onClick={likeHandler}
+              wrapperClass={likedByUser ? classes.liked : ""}
+            />
+            <ReplyButton
+              answers={questionData.answers || 0}
+              onClick={
+                router.asPath.split("?")[0] === "/questions/" + questionData.uid
+                  ? show
+                  : redirectToQuestion
+              }
+            />
+          </div>
         </div>
       </div>
+
       {/* ANCHOR */}
       <ReplyFormAnchor
         questionUid={questionData.uid}

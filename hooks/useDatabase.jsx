@@ -1,33 +1,30 @@
-import { useState } from "react";
 import { initializeApp } from "firebase/app";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
-  getDoc,
   getDocs,
   getFirestore,
-  query,
   serverTimestamp,
   setDoc,
-  updateDoc,
-  where,
 } from "firebase/firestore";
-import { useCallback } from "react";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { firebaseConfig } from "../api/firebaseApp";
 
+// NOTE: This custom hook controls database POST requests.
 const useDatabase = function () {
+  const router = useRouter();
+  const user = useSelector((state) => state.auth.user);
   // Memoize db
   const init = useCallback(() => {
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     return db;
   }, []);
-
   const db = init();
-
-  const user = useSelector((state) => state.auth.user);
 
   // apis
   async function createTopic(topicData) {
@@ -90,59 +87,59 @@ const useDatabase = function () {
     }
   }
 
-  // TODO: Move get functions to getStaticProps
-  async function getQuestionDetails(questionUid) {
-    // const questionDetails = {
-    //   authorData: {
-    //     imageUrl: "",
-    //   },
-    //   questionData: {
-    //     title: "",
-    //     description: "",
-    //     topic: { uid: "" },
-    //     timestamp: {},
-    //     askedBy: "",
-    //     likes: undefined,
-    //     answers: undefined,
-    //   },
-    // };
+  // [x]TODO: Move get functions to getStaticProps
+  // async function getQuestionDetails(questionUid) {
+  //   // const questionDetails = {
+  //   //   authorData: {
+  //   //     imageUrl: "",
+  //   //   },
+  //   //   questionData: {
+  //   //     title: "",
+  //   //     description: "",
+  //   //     topic: { uid: "" },
+  //   //     timestamp: {},
+  //   //     askedBy: "",
+  //   //     likes: undefined,
+  //   //     answers: undefined,
+  //   //   },
+  //   // };
 
-    // 1) find the question data with the uid
-    const questionDocumentRef = await getDoc(
-      doc(db, `/questions/${questionUid}`)
-    );
+  //   // 1) find the question data with the uid
+  //   const questionDocumentRef = await getDoc(
+  //     doc(db, `/questions/${questionUid}`)
+  //   );
 
-    const questionData = questionDocumentRef.data();
-    // 2) find the user that asked the question and get the imageUrl
-    const authorData = await getUserDataWithUsername(questionData.askedBy);
+  //   const questionData = questionDocumentRef.data();
+  //   // 2) find the user that asked the question and get the imageUrl
+  //   const authorData = await getUserDataWithUsername(questionData.askedBy);
 
-    const questionDetails = {
-      authorData: { imageUrl: authorData.imageUrl },
-      questionData,
-    };
+  //   const questionDetails = {
+  //     authorData: { imageUrl: authorData.imageUrl },
+  //     questionData,
+  //   };
 
-    return questionDetails;
-  }
+  //   return questionDetails;
+  // }
 
-  async function getUserDataWithUsername(username) {
-    // [ ]TODO: reuse collection refs
-    const usersCollectionRef = collection(db, "/users");
-    // find where usernames field in /users === username argument
-    const queryRef = query(
-      usersCollectionRef,
-      where("username", "==", username)
-    );
-    const querySnapshot = await getDocs(queryRef);
-    const match = [];
-    querySnapshot.forEach((user) => match.push(user.data()));
-    const [userData] = match;
-    return userData;
-  }
+  // async function getUserDataWithUsername(username) {
+  //   // [ ]TODO: reuse collection refs
+  //   const usersCollectionRef = collection(db, "/users");
+  //   // find where usernames field in /users === username argument
+  //   const queryRef = query(
+  //     usersCollectionRef,
+  //     where("username", "==", username)
+  //   );
+  //   const querySnapshot = await getDocs(queryRef);
+  //   const match = [];
+  //   querySnapshot.forEach((user) => match.push(user.data()));
+  //   const [userData] = match;
+  //   return userData;
+  // }
 
-  async function getTopicInfoWithTopicUid(topicUid) {
-    const topicDocRef = await getDoc(db, `/topics/${topicUid}`);
-    return topicDocRef.data();
-  }
+  // async function getTopicInfoWithTopicUid(topicUid) {
+  //   const topicDocRef = await getDoc(db, `/topics/${topicUid}`);
+  //   return topicDocRef.data();
+  // }
 
   async function answer(text, questionUid) {
     const data = {
@@ -185,14 +182,70 @@ const useDatabase = function () {
 
     return { ...data, uid: docRef.uid, date: new Date().toISOString() };
   }
+
+  async function like(questionUid) {
+    // 1) To like a question the user must be logged in. If user is not logged in, redirect to login page.
+
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    const likesCollectionRef = collection(
+      db,
+      `/questions/${questionUid}/likes`
+    );
+    // 2) Get likes for the question
+    const likesDocRefs = await getDocs(likesCollectionRef);
+
+    const likes = [];
+    const currentUserLikeForQuestion = {
+      likedByUser: false,
+      likeUid: "",
+      data: null, // used to update the current doc in db.
+    };
+
+    likesDocRefs.forEach((like) => {
+      const docRefData = like.data();
+      const likeData = {
+        ...docRefData,
+        date: (docRefData.date = new Date(
+          docRefData.date.toDate()
+        ).toISOString()),
+      };
+      // 3) Check if user already liked (if username is contained in any of the likes docs).
+      if (likeData.likedBy === user.username) {
+        currentUserLikeForQuestion.likedByUser = true;
+        currentUserLikeForQuestion.likeUid = like.id;
+        currentUserLikeForQuestion.data = likeData;
+      }
+      likes.push(likeData);
+    });
+
+    // 3) Like question if user has not liked
+    if (!currentUserLikeForQuestion.likedByUser) {
+      // If not liked by user, add like
+      await addDoc(likesCollectionRef, {
+        date: serverTimestamp(),
+        likedBy: user.username,
+      });
+    } else {
+      // if liked by user remove like
+      await deleteDoc(
+        doc(
+          db,
+          `/questions/${questionUid}/likes/${currentUserLikeForQuestion.likeUid}`
+        )
+      );
+    }
+
+    return likes;
+  }
   return {
     createTopic,
     createQuestion,
-    getQuestionDetails,
-    getUserDataWithUsername,
-    getTopicInfoWithTopicUid,
     answer,
     reply,
+    like,
   };
 };
 
