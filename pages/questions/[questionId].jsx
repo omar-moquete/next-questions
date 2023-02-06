@@ -87,6 +87,18 @@ export const getStaticProps = async function (context) {
     return topicData;
   };
 
+  const getLikes = async (questionUid) => {
+    const likesCollectionRef = collection(
+      db,
+      `/questions/${questionUid}/likes`
+    );
+
+    const docsRef = await getDocs(likesCollectionRef);
+    const docsData = [];
+    docsRef.forEach((docRef) => docsData.push(docRef.data()));
+    return docsData;
+  };
+
   const getQuestionAnswers = async (questionUid) => {
     // 1) Get all data in questions/questionUid/answers (list of uids of all the answers listed under the question)
     const answersQuerySnapshot = await getDocs(
@@ -171,6 +183,13 @@ export const getStaticProps = async function (context) {
   // question answers
   const questionAnswers = await getQuestionAnswers(questionUidRequested);
 
+  // question likes
+  const likes = await getLikes(questionUidRequested);
+
+  likes.forEach(
+    (like) => (like.date = new Date(like.date.toDate()).toISOString())
+  );
+
   // questionAnswers.map(async (questionAnswer) => {
   //   // const replies = await getAnswerReplies(questionAnswer.uid);
   //   //Get replies
@@ -198,6 +217,8 @@ export const getStaticProps = async function (context) {
       questionAuthorData: {
         imageUrl: questionDetails.questionAuthorData.imageUrl,
       },
+
+      likes,
     },
 
     // An array containing all the answers for the questionUid in path. Each question in the array has an array of replies.

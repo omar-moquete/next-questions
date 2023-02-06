@@ -238,7 +238,24 @@ const useDatabase = function () {
       );
     }
 
-    return likes;
+    const updatedLikes = await getLikes(questionUid);
+    // Convert Firebase timestamp to date object
+    updatedLikes.forEach(
+      (like) => (like.date = new Date(like.date.toDate()).toISOString())
+    );
+    return updatedLikes;
+  }
+
+  async function getLikes(questionUid) {
+    const likesCollectionRef = collection(
+      db,
+      `/questions/${questionUid}/likes`
+    );
+
+    const docsRef = await getDocs(likesCollectionRef);
+    const docsData = [];
+    docsRef.forEach((docRef) => docsData.push(docRef.data()));
+    return docsData;
   }
   return {
     createTopic,
@@ -246,6 +263,7 @@ const useDatabase = function () {
     answer,
     reply,
     like,
+    getLikes,
   };
 };
 
