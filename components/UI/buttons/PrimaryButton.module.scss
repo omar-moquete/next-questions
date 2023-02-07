@@ -21,12 +21,10 @@
   // If hovering and pointer. Solves sticky hover problem in touch devices.
   @media (hover: hover) {
     &:hover {
-      transform: scale(1.04);
-      @include mixins.shadow;
+      transform: scale(1.1);
     }
   }
   &:active {
-    transform: scale(1.04);
-    @include mixins.shadow;
+    transform: scale(1.1);
   }
 }

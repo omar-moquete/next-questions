@@ -261,12 +261,13 @@ const useDatabase = function () {
   }
 
   async function getTopicsWithQuery(query) {
+    if (!query) return [];
     const topicsCollectionRef = collection(db, "/topics");
     const topicsDocsRef = await getDocs(topicsCollectionRef);
     const topics = [];
     topicsDocsRef.forEach((docRef) => {
       const docRefData = docRef.data();
-      if (docRefData.title.toLowerCase().startsWith(query)) {
+      if (docRefData.title.toLowerCase().startsWith(query.toLowerCase())) {
         // add uid
         docRefData.uid = docRef.id;
         docRefData.date = new Date(docRefData.date.toDate()).toISOString();

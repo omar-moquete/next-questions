@@ -102,7 +102,8 @@ const NewQuestion = function () {
   };
 
   useEffect(() => {
-    if (!router.query.query) return setNewTopicText(router.query.query);
+    if (!router.query.query) return;
+    setNewTopicText(router.query.query);
     setIsNewTopic(true);
     setBlocked(false);
   }, []);

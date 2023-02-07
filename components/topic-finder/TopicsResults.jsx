@@ -17,19 +17,23 @@ const TopicResults = function ({
   onNewTopic,
   inputRef,
   setQuery,
+  searchingTopic,
 }) {
   const router = useRouter();
-
   // 1) set selected topic to state
   const handleSelectedTopic = (topicUid, topicTitle) => {
     // Set input to selected topic
 
     inputRef.current.value = topicTitle;
     setQuery(topicTitle);
-    onSelect && onSelect(topicUid);
+    onSelect && onSelect(topicUid, topicTitle);
     // Dismount this element after a selection was made
     unmount();
   };
+
+  // Can forward topic if /feed or /. This prevents topic suggestion message from appearing in pages where it's not wanted.
+  const path = router.asPath.split("?")[0];
+  const canForwardTopic = path === "/feed" || path === "/";
 
   return (
     <ul className={classes.results}>
@@ -51,7 +55,7 @@ const TopicResults = function ({
           </li>
         )}
 
-      {topics.length === 0 && router.asPath.split("?")[0] === "/feed" && (
+      {canForwardTopic && topics.length === 0 && !searchingTopic && (
         <li className={classes["no-questions"]}>
           <Link
             href={{

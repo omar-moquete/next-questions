@@ -27,6 +27,7 @@ const TopicFinder = function ({
   // User is considered typing if a truthy value is inserted in the input field and if an option is selected from the dropdown
   const [isTyping, setIsTyping] = useState(false);
   const [topicResults, setTopicResults] = useState([]);
+  const [searchingTopic, setSearchingTopic] = useState(false);
   const database = useDatabase();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -40,18 +41,31 @@ const TopicFinder = function ({
     setIsTyping(false);
   };
 
+  const [lastQueryWithResults, setLastQueryWithResults] = useState();
+  const [firstTimeExecution, setFirstTimeExecution] = useState(true);
   useEffect(() => {
-    // if topic query is set search topics and set results
-    if (!topicQuery) {
-      setTopicResults([]);
+    if (firstTimeExecution) {
+      setFirstTimeExecution(false);
       return;
     }
-
     (async () => {
-      // if topic query is set search topics and set results
-      // const topics
+      // If there are no results, the query is not empty, the query is not equal to the last query with results, but the query includes part of the last questions with results, then search.
+      // This assessment will prevent unnecessary database reads.
+      if (
+        topicResults.length === 0 &&
+        topicQuery !== "" &&
+        topicQuery !== lastQueryWithResults &&
+        topicQuery.startsWith(lastQueryWithResults)
+      ) {
+        return;
+      }
+      setSearchingTopic(true);
       const results = await database.getTopicsWithQuery(topicQuery);
+      if (results.length > 0) {
+        setLastQueryWithResults(topicQuery);
+      }
       setTopicResults(results);
+      setSearchingTopic(false);
     })();
   }, [topicQuery]);
 
@@ -91,22 +105,15 @@ const TopicFinder = function ({
     const currentQuery = topicInputRef.current.value;
 
     // if no query user is not typing
-    if (!currentQuery) {
-      setIsTyping(false);
-      setTopicQuery("");
-    } else {
-      setTopicQuery(currentQuery);
-      setIsTyping(true);
-    }
+    if (!currentQuery) setIsTyping(false);
+    else setIsTyping(true);
+    setTopicQuery(currentQuery);
   };
 
   useEffect(() => {
     if (topicInputRef.current && router.query.query)
       topicInputRef.current.value = router.query.query;
   }, [topicInputRef]);
-
-  // if user leaves focus and did not select, clear input.
-  // if user presses esc and did not select, clear.
 
   return (
     <div className={`${classes.topics} ${className}`}>
@@ -141,6 +148,7 @@ const TopicFinder = function ({
           onSelect={onSelect}
           onNewTopic={onNewTopic}
           inputRef={topicInputRef}
+          searchingTopic={searchingTopic}
         />
       )}
     </div>
