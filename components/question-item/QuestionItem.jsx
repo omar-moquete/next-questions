@@ -20,13 +20,6 @@ const QuestionItem = function ({
   initWithForm = false,
   answersState,
 }) {
-  // [x] Add question title
-  // [x] Redirect to user profile page on user click
-  // [ ] Add time ago instead of date if short time
-  // [ ] Redirect to question detail page on question click
-  // [x] Add topic for question
-  // [ ]TODO: create a get topic function that takes a topic uid and returns the topic data from the db, maybe a custom hook
-
   const { ReplyFormAnchor, show } = useReplyForm();
 
   const router = useRouter();

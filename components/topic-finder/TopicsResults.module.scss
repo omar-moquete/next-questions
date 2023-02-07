@@ -15,16 +15,25 @@
   max-height: 380px;
   overflow-y: auto;
 
-  li:not(.no-questions) {
+  li:not(.no-questions, .loading) {
     justify-content: space-between;
   }
 
+  .loading {
+    position: absolute;
+    background-color: #fff;
+    z-index: 10;
+    height: 4rem;
+  }
   li {
     padding: 16px;
+    min-height: 4rem;
     width: 100%;
     border-bottom: 1px solid #eee;
     display: flex;
-    cursor: pointer;
+    &:not(.loa) {
+      cursor: pointer;
+    }
 
     h3 {
       color: #444;
@@ -35,14 +44,14 @@
     }
 
     @media (hover: hover) {
-      &:hover {
+      &:hover:not(.loading) {
         background-color: #eee;
         h3 {
           text-decoration: underline solid 1px #444;
         }
       }
     }
-    &:active {
+    &:active:not(.loading) {
       background-color: #eee;
       h3 {
         text-decoration: underline solid 1px #333;
@@ -109,5 +118,16 @@
   justify-content: space-around;
   a {
     white-space: unset;
+  }
+}
+
+.loading {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  svg {
+    width: 42px;
+    height: 42px;
   }
 }

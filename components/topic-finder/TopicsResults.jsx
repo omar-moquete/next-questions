@@ -1,13 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import classes from "./TopicsResults.module.scss";
 import QuestionIcon from "../UI/svg/QuestionIcon";
 import { bindArgs } from "../../utils";
-
 import Highlight from "./Highlight";
 import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
-import { globalActions } from "../../redux-store/globalSlice";
 import Link from "next/link";
+import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 
 // [ ]TODO: Add author to topic results
 
@@ -28,7 +26,7 @@ const TopicResults = function ({
 
     inputRef.current.value = topicTitle;
     setQuery(topicTitle);
-    onSelect(topicUid);
+    onSelect && onSelect(topicUid);
     // Dismount this element after a selection was made
     unmount();
   };
@@ -53,7 +51,7 @@ const TopicResults = function ({
           </li>
         )}
 
-      {topics.length < 1 && router.asPath.split("?")[0] === "/feed" && (
+      {topics.length === 0 && router.asPath.split("?")[0] === "/feed" && (
         <li className={classes["no-questions"]}>
           <Link
             href={{

@@ -4,6 +4,7 @@
   position: relative;
   height: fit-content;
   width: fit-content;
+  outline: 1px #fff solid;
 }
 @media (hover: hover) {
   .topic:hover {
@@ -28,13 +29,15 @@
 
 .topic,
 .unfollow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   user-select: none;
   border-radius: 25px;
   font-size: inherit;
   padding: 8px;
-  min-width: inherit;
-  text-align: center;
+  min-width: 6rem;
 }
 
 @media (max-width: 500px) {

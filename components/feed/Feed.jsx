@@ -2,21 +2,13 @@ import React, { useEffect, useState } from "react";
 import {
   getListOfQuestionsWithListOfTopics,
   getLoggedInUserTopics,
-  getQuestionsWithTopicName,
   getQuestionsWithTopicUid,
   getUserImageUrlWithUsername,
-  questions,
-  QUESTIONS_TEST_DATA,
-  USER_QUESTION_TEST_DATA,
 } from "../../_TEST_DATA";
 import QuestionItem from "../question-item/QuestionItem";
 import classes from "./Feed.module.scss";
-import SearchIcon from "../UI/svg/SearchIcon";
-import HashIcon from "../UI/svg/HashIcon";
 import FeedControlBar from "./feed-control-bar/FeedControlBar";
-import { useDispatch, useSelector } from "react-redux";
-import { globalActions } from "../../redux-store/globalSlice";
-import Loading from "../loading/Loading";
+import { useSelector } from "react-redux";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import FeedInfo from "./feed-info/FeedInfo";
 import MyFeedInfo from "./my-feed-info/MyFeedInfo";

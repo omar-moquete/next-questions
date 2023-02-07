@@ -4,8 +4,10 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
+  query,
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
@@ -257,6 +259,36 @@ const useDatabase = function () {
     docsRef.forEach((docRef) => docsData.push(docRef.data()));
     return docsData;
   }
+
+  async function getTopicsWithQuery(query) {
+    const topicsCollectionRef = collection(db, "/topics");
+    const topicsDocsRef = await getDocs(topicsCollectionRef);
+    const topics = [];
+    topicsDocsRef.forEach((docRef) => {
+      const docRefData = docRef.data();
+      if (docRefData.title.toLowerCase().startsWith(query)) {
+        // add uid
+        docRefData.uid = docRef.id;
+        docRefData.date = new Date(docRefData.date.toDate()).toISOString();
+        topics.push(docRefData);
+      }
+    });
+
+    // add questionsAsked
+    for (let i = 0; i < topics.length; i++) {
+      // add questionsAsked
+      const questionsAsked = [];
+      const questionsAskedQueryRef = await getDocs(
+        collection(db, `/topics/${topics[i].uid}/questionsAsked`)
+      );
+      questionsAskedQueryRef.forEach((docRef) =>
+        questionsAsked.push(docRef.data())
+      );
+      topics[i].questionsAsked = questionsAsked;
+    }
+
+    return topics;
+  }
   return {
     createTopic,
     createQuestion,
@@ -264,6 +296,7 @@ const useDatabase = function () {
     reply,
     like,
     getLikes,
+    getTopicsWithQuery,
   };
 };
 

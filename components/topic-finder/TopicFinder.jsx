@@ -10,6 +10,7 @@ import classes from "./TopicFinder.module.scss";
 import TopicResults from "./TopicsResults";
 import { globalActions } from "../../redux-store/globalSlice";
 import { useRouter } from "next/router";
+import useDatabase from "../../hooks/useDatabase";
 
 const TopicFinder = function ({
   onSelect,
@@ -26,7 +27,10 @@ const TopicFinder = function ({
   // User is considered typing if a truthy value is inserted in the input field and if an option is selected from the dropdown
   const [isTyping, setIsTyping] = useState(false);
   const [topicResults, setTopicResults] = useState([]);
+  const database = useDatabase();
   const dispatch = useDispatch();
+  const router = useRouter();
+
   // Used to show/hide my feed button depending on the selected feed.
   const selectedTopicUid = useSelector(
     (state) => state.global.selectedTopicUid
@@ -38,9 +42,17 @@ const TopicFinder = function ({
 
   useEffect(() => {
     // if topic query is set search topics and set results
-    if (!topicQuery) return;
-    const results = getTopicsWithTopicText(topicQuery);
-    setTopicResults(results);
+    if (!topicQuery) {
+      setTopicResults([]);
+      return;
+    }
+
+    (async () => {
+      // if topic query is set search topics and set results
+      // const topics
+      const results = await database.getTopicsWithQuery(topicQuery);
+      setTopicResults(results);
+    })();
   }, [topicQuery]);
 
   useEffect(() => {
@@ -53,7 +65,6 @@ const TopicFinder = function ({
     };
 
     document.addEventListener("click", handleOutsideClick);
-
     document.addEventListener("keyup", handleEscKeyPress);
 
     return () => {
@@ -89,7 +100,6 @@ const TopicFinder = function ({
     }
   };
 
-  const router = useRouter();
   useEffect(() => {
     if (topicInputRef.current && router.query.query)
       topicInputRef.current.value = router.query.query;
@@ -111,7 +121,7 @@ const TopicFinder = function ({
           value={value}
           required={required}
         />
-        {selectedTopicUid && (
+        {selectedTopicUid && router.asPath.split("?")[0] === "/feed" && (
           <PrimaryButton
             className={classes["my-feed-button"]}
             onClick={resetCurrentTopic}
@@ -121,6 +131,7 @@ const TopicFinder = function ({
           </PrimaryButton>
         )}
       </div>
+
       {isTyping && (
         <TopicResults
           topics={topicResults}
