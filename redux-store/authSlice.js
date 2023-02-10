@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   // A user object constructed from the logged in user firebase data. Stores displayable user data.
   user: null,
-  // Allows for a more accurate authentiation state check. Possible values: NOT_INITIALIZED, LOADED, LOADING
+  // Allows for a more accurate authentiation state check. Possible values: NOT_INITIALIZED, LOADING, LOADED, NOT_LOADED,ERROR
   authStatus: "NOT_INITIALIZED",
   authStatusNames: {
     notInitialized: "NOT_INITIALIZED",

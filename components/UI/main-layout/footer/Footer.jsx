@@ -5,7 +5,7 @@ import PrimaryButton from "../../../UI/buttons/PrimaryButton";
 
 const Footer = function () {
   return (
-    <div className={classes.footer}>
+    <footer id="footer" className={classes.footer}>
       <div className={classes.link}>
         <h3>Liked my page? Visit my portfolio!</h3>
         <PrimaryButton href="https://www.omarmoquete.dev" target="_blank">
@@ -19,7 +19,7 @@ const Footer = function () {
           In NY, USA. &#174; 2022 by Omar Moquete. All rights reserved.
         </p>
       </div>
-    </div>
+    </footer>
   );
 };
 

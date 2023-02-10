@@ -4,19 +4,30 @@ import {
   collection,
   deleteDoc,
   doc,
+  endAt,
   getDoc,
   getDocs,
   getFirestore,
   query,
   serverTimestamp,
   setDoc,
+  startAt,
+  where,
+  limit,
+  startAfter,
 } from "firebase/firestore";
+import { orderBy } from "lodash";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { batch, useSelector } from "react-redux";
 import { firebaseConfig } from "../api/firebaseApp";
+import { getTopicInfoWithTopicUid } from "../_TEST_DATA";
 
 // NOTE: This custom hook controls database POST requests.
+// let lastFetchedBatch = null;
+let noAuthCurrentBatchSize = 0;
+let selectedTopicCurrentBatchSize = 0;
+
 const useDatabase = function () {
   const router = useRouter();
   const user = useSelector((state) => state.auth.user);
@@ -113,7 +124,7 @@ const useDatabase = function () {
 
   //   const questionData = questionDocumentRef.data();
   //   // 2) find the user that asked the question and get the imageUrl
-  //   const authorData = await getUserDataWithUsername(questionData.askedBy);
+  //   const authorData = await _getUserDataWithUsername(questionData.askedBy);
 
   //   const questionDetails = {
   //     authorData: { imageUrl: authorData.imageUrl },
@@ -123,25 +134,41 @@ const useDatabase = function () {
   //   return questionDetails;
   // }
 
-  // async function getUserDataWithUsername(username) {
-  //   // [ ]TODO: reuse collection refs
-  //   const usersCollectionRef = collection(db, "/users");
-  //   // find where usernames field in /users === username argument
-  //   const queryRef = query(
-  //     usersCollectionRef,
-  //     where("username", "==", username)
-  //   );
-  //   const querySnapshot = await getDocs(queryRef);
-  //   const match = [];
-  //   querySnapshot.forEach((user) => match.push(user.data()));
-  //   const [userData] = match;
-  //   return userData;
-  // }
+  async function _getUserDataWithUsername(username) {
+    const usersCollectionRef = collection(db, "/users");
+    // find where usernames field in /users === username argument
+    const queryRef = query(
+      usersCollectionRef,
+      where("username", "==", username)
+    );
+    const querySnapshot = await getDocs(queryRef);
+    const match = [];
+    querySnapshot.forEach((user) => match.push(user.data()));
+    const [userData] = match;
+    return userData;
+  }
 
-  // async function getTopicInfoWithTopicUid(topicUid) {
-  //   const topicDocRef = await getDoc(db, `/topics/${topicUid}`);
-  //   return topicDocRef.data();
-  // }
+  async function getTopicInfoWithTopicUid(topicUid) {
+    const topicDocRef = await getDoc(doc(db, `/topics/${topicUid}`));
+    const topicDocRefData = topicDocRef.data();
+
+    // Add questionsAsked
+    const questionsAskedQueryRef = query(
+      collection(db, `/topics/${topicUid}/questionsAsked`)
+    );
+
+    const questionsAsked = [];
+    (await getDocs(questionsAskedQueryRef)).forEach((docRef) =>
+      questionsAsked.push(docRef.data())
+    );
+
+    return {
+      ...topicDocRefData,
+      uid: topicDocRef.id,
+      date: new Date(topicDocRefData.date.toDate()).toISOString(),
+      questionsAsked,
+    };
+  }
 
   async function answer(text, questionUid) {
     const data = {
@@ -290,6 +317,252 @@ const useDatabase = function () {
 
     return topics;
   }
+
+  async function getQuestionDetails(questionUid) {
+    const questionDocumentRef = await getDoc(
+      doc(db, `/questions/${questionUid}`)
+    );
+
+    const questionData = questionDocumentRef.data();
+    // 2) find the user that asked the question and get the imageUrl
+    const questionAuthor = await _getUserDataWithUsername(questionData.askedBy);
+
+    const questionDetails = {
+      questionAuthorData: { imageUrl: questionAuthor.imageUrl },
+      questionData,
+    };
+
+    return questionDetails;
+  }
+
+  async function getQuestionAnswers(questionUid) {
+    // 1) Get all data in questions/questionUid/answers (list of uids of all the answers listed under the question)
+    const answersQuerySnapshot = await getDocs(
+      collection(db, `/questions/${questionUid}/answers`)
+    );
+
+    const questionAnswers = [];
+    answersQuerySnapshot.forEach((document) =>
+      questionAnswers.push({ ...document.data() })
+    );
+
+    // This is an array of promises because array.map does not await its callback function..
+    const allQuestionAnswersRefsPromises = questionAnswers.map(
+      async (answer) => {
+        // Get /answers/answerUid for each answerUid
+        const answerDocRef = await getDoc(doc(db, `/answers/${answer.uid}`));
+
+        // Get /answers/answerUid/replies for each answerUid
+        const repliesDocRefs = await getDocs(
+          collection(db, `/answers/${answer.uid}/replies`)
+        );
+
+        return {
+          answerDocRef,
+          repliesDocRefs,
+        };
+      }
+    );
+
+    const allQuestionAnswersRefs = await Promise.all(
+      allQuestionAnswersRefsPromises
+    );
+
+    const docsData = allQuestionAnswersRefs.map(
+      ({ answerDocRef, repliesDocRefs }) => {
+        const answersDocRefData = answerDocRef.data();
+        const repliesDocRefsData = [];
+
+        repliesDocRefs.forEach((repliesDocRef) => {
+          repliesDocRefsData.push(repliesDocRef.data());
+        });
+
+        // Convert to date string each firebase timestamp for current answer
+        answersDocRefData.date = new Date(
+          answersDocRefData.date.toDate()
+        ).toISOString();
+        // Must add answerUid in order to post a reply to it.
+        answersDocRefData.uid = answerDocRef.id;
+
+        // Convert to date string each firebase timestamp for replies in current answer
+        repliesDocRefsData.forEach(
+          (replyDocRefData) =>
+            (replyDocRefData.date = new Date(
+              replyDocRefData.date.toDate()
+            ).toISOString())
+        );
+
+        const result = {
+          ...answersDocRefData,
+          replies: repliesDocRefsData.reverse(),
+        };
+
+        return result;
+      }
+    );
+
+    return docsData;
+  }
+
+  async function getQuestionsWithTopicUid(topicUid) {
+    const queryRef = query(
+      collection(db, `/questions`),
+      where("topic.uid", "==", topicUid)
+    );
+
+    const querySnapshot = await getDocs(queryRef);
+    const questions = [];
+    querySnapshot.forEach((docRef) => {
+      const docRefData = docRef.data();
+      const question = {
+        ...docRefData,
+        uid: docRef.id,
+        date: new Date(docRefData.date.toDate()).toISOString(),
+      };
+      questions.push(question);
+    });
+
+    for (let i = 0; i < questions.length; i++) {
+      // Add likes
+      const likes = await getLikes(questions[i].uid);
+      questions[i].likes = likes;
+
+      // Add author information
+      const askedByUserData = await _getUserDataWithUsername(
+        questions[i].askedBy
+      );
+      questions[i].questionAuthorData = {
+        imageUrl: askedByUserData.imageUrl,
+      };
+
+      // Add topic information
+      const newTopicData = await getTopicInfoWithTopicUid(
+        questions[i].topic.uid
+      );
+
+      questions[i].topic = newTopicData;
+    }
+    return questions;
+  }
+
+  async function getQuestionsWithTopicUids(topicUids) {
+    const results = [];
+
+    for (let i = 0; i < topicUids.length; i++) {
+      const questions = await getQuestionsWithTopicUid(topicUids[i]);
+
+      results.push(questions);
+      return results.flat();
+    }
+  }
+
+  async function getUserFollowedTopics(userId) {
+    const followedTopicsRef = await getDocs(
+      collection(db, `/users/${userId}/followedTopics`)
+    );
+    const followedTopicsRefsData = [];
+    followedTopicsRef.forEach((docRef) =>
+      followedTopicsRefsData.push(docRef.data())
+    );
+
+    const followedTopicsData = [];
+    for (let i = 0; i < followedTopicsRefsData.length; i++) {
+      const followedTopicData = await getTopicInfoWithTopicUid(
+        followedTopicsRefsData[i].uid
+      );
+      followedTopicsData.push(followedTopicData);
+    }
+
+    return followedTopicsData;
+  }
+
+  async function getAllQuestions() {
+    const queryRef = query(collection(db, `/questions`));
+    const querySnapshot = await getDocs(queryRef);
+    const questions = [];
+
+    querySnapshot.forEach((docRef) => {
+      const docRefData = docRef.data();
+      const questionData = {
+        ...docRefData,
+        uid: docRef.id,
+        date: new Date(docRefData.date.toDate()).toISOString(),
+      };
+      questions.push(questionData);
+    });
+
+    for (let i = 0; i < questions.length; i++) {
+      // Add user data
+      const userData = await _getUserDataWithUsername(questions[i].askedBy);
+      const questionAuthorData = {
+        imageUrl: userData.imageUrl,
+      };
+
+      // Add topic data
+      const topic = await getTopicInfoWithTopicUid(questions[i].topic.uid);
+
+      // add likes
+      const likes = await getLikes(questions[i].uid);
+
+      questions[i].questionAuthorData = questionAuthorData;
+      questions[i].topic = topic;
+      questions[i].likes = likes;
+    }
+
+    return questions;
+  }
+
+  // async function getAuthNextQuestionsWithTopicUids(topicUids) {
+  //   const results = [];
+  //   for (let i = 0; i < topicUids.length; i++) {
+  //     const questions = await getQuestionsWithTopicUid(topicUids[i]);
+  //     results.push(questions);
+  //   }
+  //   return results.flat();
+  // }
+
+  // async function getNextSelectedTopicUidQuestions(topicUid, batchSize = 10) {
+  //   const collectionRef = collection(db, `/questions`);
+  //   const queryRef = query(
+  //     collectionRef,
+  //     where("topic.uid", "==", topicUid),
+  //     limit(selectedTopicCurrentBatchSize + batchSize)
+  //   );
+  //   const querySnapshot = await getDocs(queryRef);
+  //   const questions = [];
+
+  //   querySnapshot.forEach((docRef) => {
+  //     const docRefData = docRef.data();
+  //     const questionData = {
+  //       ...docRefData,
+  //       uid: docRef.id,
+  //       date: new Date(docRefData.date.toDate()).toISOString(),
+  //     };
+  //     questions.push(questionData);
+  //   });
+
+  //   for (let i = 0; i < questions.length; i++) {
+  //     // Add user data
+  //     const userData = await _getUserDataWithUsername(questions[i].askedBy);
+  //     const questionAuthorData = {
+  //       imageUrl: userData.imageUrl,
+  //     };
+
+  //     // Add topic data
+  //     const topic = await getTopicInfoWithTopicUid(questions[i].topic.uid);
+
+  //     // add likes
+  //     const likes = await getLikes(questions[i].uid);
+
+  //     questions[i].questionAuthorData = questionAuthorData;
+  //     questions[i].topic = topic;
+  //     questions[i].likes = likes;
+  //   }
+
+  //   selectedTopicCurrentBatchSize += batchSize;
+
+  //   return questions;
+  // }
   return {
     createTopic,
     createQuestion,
@@ -298,7 +571,13 @@ const useDatabase = function () {
     like,
     getLikes,
     getTopicsWithQuery,
+    getQuestionsWithTopicUid,
+    getQuestionsWithTopicUids,
+    getUserFollowedTopics,
+    getAllQuestions,
+    getTopicInfoWithTopicUid,
   };
 };
 
 export default useDatabase;
+// [ ]TODO: Convert to class

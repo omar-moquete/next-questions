@@ -12,84 +12,100 @@ import { useSelector } from "react-redux";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import FeedInfo from "./feed-info/FeedInfo";
 import MyFeedInfo from "./my-feed-info/MyFeedInfo";
+import useDatabase from "../../hooks/useDatabase";
+import { useRouter } from "next/router";
 
 const Feed = function () {
   // is null initially
   const selectedTopicUid = useSelector(
     (state) => state.global.selectedTopicUid
   );
+  const [selectedTopicInfo, setSelectedTopicInfo] = useState(null);
 
+  const [currentFeed, setCurrentFeed] = useState(null);
+  const database = useDatabase();
+  const { user, authStatus, authStatusNames } = useSelector(
+    (slices) => slices.auth
+  );
+  const [userTopics, setUserTopics] = useState(null);
+
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [currentFeed, setCurrentFeed] = useState();
 
-  // useEffect re-runs when a topic is clicked from the dropdown (selectedTopicUid gets updated)
+  // Topic selection changes
   useEffect(() => {
-    const renderFeed = async () => {
-      // NOTE: My feed is active if selectedTopicUid === null.
-      !loading && setLoading(true);
-      if (selectedTopicUid === null) {
-        // [ ] Find all questions with all fav topics and setCurrentFeed to it
-        // [ ]TODO: fix topic search algorithm to "startswith instead of "contains""
-        const topicsList = getLoggedInUserTopics();
-        const myFeed = await getListOfQuestionsWithListOfTopics(topicsList);
-        setCurrentFeed(myFeed);
-      } else {
-        // [ ] Find all questions in db that include the topic uid and setCurrentFeed
-        const feed = await getQuestionsWithTopicUid(selectedTopicUid);
-        setCurrentFeed(feed);
-      }
+    if (!selectedTopicUid) return;
+    setLoading(true);
+    (async () => {
+      const feed = await database.getQuestionsWithTopicUid(selectedTopicUid);
+      const topicInfo = await database.getTopicInfoWithTopicUid(
+        selectedTopicUid
+      );
+      setSelectedTopicInfo(topicInfo);
+      setCurrentFeed(feed);
       setLoading(false);
-    };
-
-    renderFeed();
+    })();
   }, [selectedTopicUid]);
 
+  // No user logged in
+  useEffect(() => {
+    if (authStatus !== authStatusNames.notLoaded) return;
+    setLoading(true);
+    (async () => {
+      const allQuestions = await database.getAllQuestions();
+      setCurrentFeed(allQuestions);
+      setLoading(false);
+    })();
+  }, [authStatus]);
+
+  // MyFeed
+  useEffect(() => {
+    if (selectedTopicUid !== null) return;
+    if (!user) return;
+    setLoading(true);
+    (async () => {
+      const userFollowedTopics = await database.getUserFollowedTopics(
+        user.userId
+      );
+      setUserTopics(userFollowedTopics);
+      const userTopics = userFollowedTopics.map(
+        (userFollowedTopic) => userFollowedTopic.uid
+      );
+
+      const myFeed = await database.getQuestionsWithTopicUids(userTopics);
+      setCurrentFeed(myFeed);
+      setLoading(false);
+
+      return;
+    })();
+  }, [user, selectedTopicUid]);
+
   return (
-    // [x] Create "currently viewing" element
     <div className={classes.feed}>
       <FeedControlBar />
-
       {/* <FeedInfo/> outputs information about the currently selected topic */}
       {/* <MyFeeedInfo/> outputs the questions that belong to the user topics */}
+      {loading && <InlineSpinner className={classes.spinner} color="#fff" />}
 
-      {loading ? (
-        <InlineSpinner className={classes.spinner} color="#fff" />
-      ) : (
-        <>
-          {selectedTopicUid ? (
-            <FeedInfo topicUid={selectedTopicUid} />
-          ) : (
-            <MyFeedInfo />
-          )}
+      {!selectedTopicUid && !loading && <MyFeedInfo userTopics={userTopics} />}
+      {selectedTopicInfo && selectedTopicUid && !loading && (
+        <FeedInfo topicInfo={selectedTopicInfo} />
+      )}
 
-          {console.log("currentFeed", currentFeed)}
-          <ul className={classes.questions}>
-            {currentFeed.map((questionItem) => (
-              <QuestionItem
-                key={questionItem.uid}
-                className={classes["question-item"]}
-                username={questionItem.askedBy}
-                imageUrl={getUserImageUrlWithUsername(questionItem.askedBy)}
-                question={questionItem}
-              />
-            ))}
-          </ul>
-        </>
+      {/* [ ]TODO: Add No questions component */}
+      {currentFeed && !loading && (
+        <ul className={classes.questions}>
+          {currentFeed.map((question) => (
+            <QuestionItem
+              key={question.uid}
+              className={classes["question-item"]}
+              questionData={question}
+            />
+          ))}
+        </ul>
       )}
     </div>
   );
 };
 
 export default Feed;
-
-// feed / feedControlBar / topicsResults
-// ---- sends topics results ->
-// ----      ---------    sets selected topic to state
-
-// TO GET MY FEED: db --> users.favoriteTopics <--from, get--> questions with those favoriteTopics
-// TO GET OTHER FEEDS: selected topic <---find in db, then get questions with the selected topic
-
-// state: currentTopic, currentFeedData <--- where data is pushed from favtopic questions or currentTopicQuestions
-// currentTopic is a topic if no topic selected, show myfeed
-
-// a topic looks like: {uid, text, description, questionsAsked}

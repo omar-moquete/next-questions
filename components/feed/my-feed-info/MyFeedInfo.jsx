@@ -1,25 +1,16 @@
 import React, { useState } from "react";
 import classes from "./MyFeedInfo.module.scss";
-import QuestionIcon from "../../UI/svg/QuestionIcon";
 import HashIcon from "../../UI/svg/HashIcon";
-import {
-  getListOfQuestionsWithListOfTopics,
-  getLoggedInUserTopics,
-  getTopicInfoWithTopicUid,
-  getUserAnsweredQuestions,
-  getUserAnsweredQuestionsWithListOfTopics,
-  isUserFollowngTopic,
-} from "../../../_TEST_DATA";
 import Topic from "../../topic/Topic";
 
-const MyFeedInfo = function () {
+const MyFeedInfo = function ({ userTopics }) {
   // Total amount of topics saved
-  const [userTopics, setUserTopics] = useState(getLoggedInUserTopics());
 
   const moreHandler = () => {
     // [ ]Todo: Show all favorite topics on click
   };
 
+  if (!userTopics) return null;
   return (
     <div className={classes.main}>
       <div className={classes.info}>
@@ -37,19 +28,15 @@ const MyFeedInfo = function () {
         {/* [ ]TODO: Limit results */}
         {/* [ ]TODO: Make sure component updates when topic is removed */}
 
-        {userTopics.map((topic) => {
-          const topicInfo = getTopicInfoWithTopicUid(topic.uid);
-
-          return (
-            <div key={topicInfo.uid} className={classes["topic-wrapper"]}>
-              <Topic
-                className={classes.topic}
-                uid={topicInfo.uid}
-                title={topicInfo.title}
-              />
-            </div>
-          );
-        })}
+        {userTopics.map((topic) => (
+          <div key={topic.uid} className={classes["topic-wrapper"]}>
+            <Topic
+              className={classes.topic}
+              uid={topic.uid}
+              title={topic.title}
+            />
+          </div>
+        ))}
       </div>
       <label className={classes.more} onClick={moreHandler}>
         See all

@@ -14,6 +14,7 @@ import Portal from "../UI/Portal";
 import Modal1 from "../UI/modals/Modal1";
 import LikesList from "./LikesList";
 
+// BUG: Fix likes text when there are no likes. Fix Likes losing position when there is no like text on the left.
 const QuestionItem = function ({
   questionData,
   className,

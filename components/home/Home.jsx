@@ -5,14 +5,12 @@ import Introduction from "./introduction/Introduction";
 import LatestQuestions from "./latest-questions/LatestQuestions";
 import FeedControlBar from "../feed/feed-control-bar/FeedControlBar";
 import { useRouter } from "next/router";
-import useDatabase from "../../hooks/useDatabase";
 
 const Home = function ({ latestQuestionsData }) {
   const router = useRouter();
-  const database = useDatabase();
   const selectionInHomeComponentHandler = async (_, topicTitle) => {
     // route to feed with topic
-    router.push(`/feed?query=${topicTitle}`);
+    router.push(`/feed?topic=${topicTitle}`);
   };
 
   return (

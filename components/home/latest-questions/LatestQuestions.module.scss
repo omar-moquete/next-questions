@@ -24,15 +24,13 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 32px;
   width: fit-content;
   height: fit-content;
-  padding: 16px;
-  background-image: variables.$gradient;
   border-radius: 8px;
   margin-top: 16px;
   margin-bottom: 16px;
-  @include mixins.shadow;
 }
 
 .nothing {
@@ -61,31 +59,35 @@
 }
 
 @media (max-width: 830px) {
-  .nothing {
-    min-width: unset;
-    width: 90vw;
-  }
-}
-
-@media (max-width: 600px) {
-  .nothing {
-    width: 100%;
-    box-shadow: unset;
-    border-radius: unset;
-  }
   .wrapper {
-    padding: 0;
-    background-image: unset;
-    box-shadow: unset;
     width: 100%;
+    gap: 0;
+    .nothing {
+      min-width: unset;
+      width: 90vw;
+      box-shadow: unset;
+      border-radius: unset;
+    }
     .question {
-      width: 100%;
+      width: 90vw;
       box-shadow: unset;
       border-radius: unset;
       @include mixins.divider-bottom;
       &:first-child {
         @include mixins.divider-top;
       }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .wrapper {
+    .nothing {
+      width: 100%;
+    }
+
+    .question {
+      width: 100%;
     }
   }
 }

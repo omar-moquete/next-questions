@@ -11,6 +11,7 @@ import TopicResults from "./TopicsResults";
 import { globalActions } from "../../redux-store/globalSlice";
 import { useRouter } from "next/router";
 import useDatabase from "../../hooks/useDatabase";
+import SecondaryButton from "../UI/buttons/SecondaryButton";
 
 const TopicFinder = function ({
   onSelect,
@@ -129,13 +130,13 @@ const TopicFinder = function ({
           required={required}
         />
         {selectedTopicUid && router.asPath.split("?")[0] === "/feed" && (
-          <PrimaryButton
+          <button
             className={classes["my-feed-button"]}
             onClick={resetCurrentTopic}
           >
             <FeedIcon />
             My feed
-          </PrimaryButton>
+          </button>
         )}
       </div>
 
