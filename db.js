@@ -4,58 +4,38 @@ import {
   collection,
   deleteDoc,
   doc,
-  endAt,
   getDoc,
   getDocs,
   getFirestore,
   query,
   serverTimestamp,
-  setDoc,
-  startAt,
   where,
-  limit,
-  startAfter,
 } from "firebase/firestore";
-import { orderBy } from "lodash";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
-import { batch, useSelector } from "react-redux";
-import { firebaseConfig } from "../api/firebaseApp";
-import { getTopicInfoWithTopicUid } from "../_TEST_DATA";
+import { firebaseConfig } from "./api/firebaseApp";
+import store from "./redux-store/store";
 
-// NOTE: This custom hook controls database POST requests.
-// let lastFetchedBatch = null;
-let noAuthCurrentBatchSize = 0;
-let selectedTopicCurrentBatchSize = 0;
+// NOTE: These functions control database requests.
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const user = store.getState().auth.user;
 
-const useDatabase = function () {
-  const router = useRouter();
-  const user = useSelector((state) => state.auth.user);
-  // Memoize db
-  const init = useCallback(() => {
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    return db;
-  }, []);
-  const db = init();
-
-  // apis
-  async function createTopic(topicData) {
-    try {
-      const improvedTopicData = {
-        ...topicData,
-        author: user.username,
-        date: serverTimestamp(),
-      };
-      const topicsCollectionRef = collection(db, "/topics");
-      const docRef = await addDoc(topicsCollectionRef, improvedTopicData);
-      return docRef.id;
-    } catch (error) {
-      console.error(`useDatabase@createTopic()🚨${error}`);
-    }
+export const createTopic = async function (topicData) {
+  try {
+    const improvedTopicData = {
+      ...topicData,
+      author: user.username,
+      date: serverTimestamp(),
+    };
+    const topicsCollectionRef = collection(db, "/topics");
+    const docRef = await addDoc(topicsCollectionRef, improvedTopicData);
+    return docRef.id;
+  } catch (error) {
+    console.error(`@createTopic()🚨${error}`);
   }
+};
 
-  async function createQuestion(questionData) {
+export const createQuestion = async function (questionData) {
+  try {
     const improvedQuestionData = {
       ...questionData,
       askedBy: user.username,
@@ -63,78 +43,44 @@ const useDatabase = function () {
       unixTimestamp: +new Date(),
     };
 
-    try {
-      // 1) get a collection reference to /questions
-      const questionsCollectionRef = collection(db, "/questions");
+    // 1) get a collection reference to /questions
+    const questionsCollectionRef = collection(db, "/questions");
 
-      // 2) add document to collection
-      const questionDocRef = await addDoc(
-        questionsCollectionRef,
-        improvedQuestionData
-      );
+    // 2) add document to collection
+    const questionDocRef = await addDoc(
+      questionsCollectionRef,
+      improvedQuestionData
+    );
 
-      // 3) get a collection reference to /users/loggedInUserId/questionsAsked
-      const userQuestionsCollectioRef = collection(
+    // 3) get a collection reference to /users/loggedInUserId/questionsAsked
+    const userQuestionsCollectioRef = collection(
+      db,
+      `/users/${user.userId}/questionsAsked`
+    );
+
+    // 4) add a database reference for the user: {uid: questionUid} to the previous reference
+    await addDoc(userQuestionsCollectioRef, {
+      uid: questionDocRef.id,
+    });
+
+    // 5) add a questionUid reference: {uid: questionUid} to the question topic in /topics
+    await addDoc(
+      collection(
         db,
-        `/users/${user.userId}/questionsAsked`
-      );
+        `/topics/${improvedQuestionData.topic.uid}/questionsAsked`
+      ),
+      { uid: questionDocRef.id }
+    );
 
-      // 4) add a database reference for the user: {uid: questionUid} to the previous reference
-      await addDoc(userQuestionsCollectioRef, {
-        uid: questionDocRef.id,
-      });
-
-      // 5) add a questionUid reference: {uid: questionUid} to the question topic in /topics
-      await addDoc(
-        collection(
-          db,
-          `/topics/${improvedQuestionData.topic.uid}/questionsAsked`
-        ),
-        { uid: questionDocRef.id }
-      );
-
-      // Allows for imperative navigation to questions/questionId
-      return questionDocRef.id;
-    } catch (error) {
-      console.error(`useDatabase@createQuestion()🚨${error}`);
-    }
+    // Allows for imperative navigation to questions/questionId
+    return questionDocRef.id;
+  } catch (error) {
+    console.error(`@createQuestion()🚨${error}`);
   }
+};
 
-  // [x]TODO: Move get functions to getStaticProps
-  // async function getQuestionDetails(questionUid) {
-  //   // const questionDetails = {
-  //   //   authorData: {
-  //   //     imageUrl: "",
-  //   //   },
-  //   //   questionData: {
-  //   //     title: "",
-  //   //     description: "",
-  //   //     topic: { uid: "" },
-  //   //     timestamp: {},
-  //   //     askedBy: "",
-  //   //     likes: undefined,
-  //   //     answers: undefined,
-  //   //   },
-  //   // };
-
-  //   // 1) find the question data with the uid
-  //   const questionDocumentRef = await getDoc(
-  //     doc(db, `/questions/${questionUid}`)
-  //   );
-
-  //   const questionData = questionDocumentRef.data();
-  //   // 2) find the user that asked the question and get the imageUrl
-  //   const authorData = await _getUserDataWithUsername(questionData.askedBy);
-
-  //   const questionDetails = {
-  //     authorData: { imageUrl: authorData.imageUrl },
-  //     questionData,
-  //   };
-
-  //   return questionDetails;
-  // }
-
-  async function _getUserDataWithUsername(username) {
+export const getUserDataWithUsername = async function (username) {
+  try {
     const usersCollectionRef = collection(db, "/users");
     // find where usernames field in /users === username argument
     const queryRef = query(
@@ -146,9 +92,13 @@ const useDatabase = function () {
     querySnapshot.forEach((user) => match.push(user.data()));
     const [userData] = match;
     return userData;
+  } catch (error) {
+    console.error(`@getUserDataWithUsername()🚨${error}`);
   }
+};
 
-  async function getTopicInfoWithTopicUid(topicUid) {
+export const getTopicInfoWithTopicUid = async function (topicUid) {
+  try {
     const topicDocRef = await getDoc(doc(db, `/topics/${topicUid}`));
     const topicDocRefData = topicDocRef.data();
 
@@ -168,9 +118,13 @@ const useDatabase = function () {
       date: new Date(topicDocRefData.date.toDate()).toISOString(),
       questionsAsked,
     };
+  } catch (error) {
+    console.error(`@getTopicInfoWithTopicUid()🚨${error}`);
   }
+};
 
-  async function answer(text, questionUid) {
+export const answer = async function (text, questionUid) {
+  try {
     const data = {
       answeredBy: user.username,
       text,
@@ -187,16 +141,13 @@ const useDatabase = function () {
     addDoc(questionsCollection, { uid: answerRef.id });
 
     return { ...data, date: new Date().toISOString(), uid: answerRef.id };
+  } catch (error) {
+    console.error(`@answer()🚨${error}`);
   }
+};
 
-  // questionUid -> answers[
-  // answer1,
-  // answer2: [
-  // replies: [answerRef2] <- keep ref to answer
-  // ],
-  // ]
-
-  async function reply(text, answerUid) {
+export const reply = async function (text, answerUid) {
+  try {
     const data = {
       answer: answerUid,
       repliedBy: user.username,
@@ -210,15 +161,14 @@ const useDatabase = function () {
     );
 
     return { ...data, uid: docRef.uid, date: new Date().toISOString() };
+  } catch (error) {
+    console.error(`@reply()🚨${error}`);
   }
+};
 
-  async function like(questionUid) {
+export const like = async function (questionUid) {
+  try {
     // 1) To like a question the user must be logged in. If user is not logged in, redirect to login page.
-
-    if (!user) {
-      router.push("/login");
-      return;
-    }
     const likesCollectionRef = collection(
       db,
       `/questions/${questionUid}/likes`
@@ -273,9 +223,13 @@ const useDatabase = function () {
       (like) => (like.date = new Date(like.date.toDate()).toISOString())
     );
     return updatedLikes;
+  } catch (error) {
+    console.error(`@like()🚨${error}`);
   }
+};
 
-  async function getLikes(questionUid) {
+export const getLikes = async function (questionUid) {
+  try {
     const likesCollectionRef = collection(
       db,
       `/questions/${questionUid}/likes`
@@ -285,9 +239,13 @@ const useDatabase = function () {
     const docsData = [];
     docsRef.forEach((docRef) => docsData.push(docRef.data()));
     return docsData;
+  } catch (error) {
+    console.error(`@getLikes()🚨${error}`);
   }
+};
 
-  async function getTopicsWithQuery(query) {
+export const getTopicsWithQuery = async function (query) {
+  try {
     if (!query) return [];
     const topicsCollectionRef = collection(db, "/topics");
     const topicsDocsRef = await getDocs(topicsCollectionRef);
@@ -316,16 +274,20 @@ const useDatabase = function () {
     }
 
     return topics;
+  } catch (error) {
+    console.error(`@getTopicsWithQuery()🚨${error}`);
   }
+};
 
-  async function getQuestionDetails(questionUid) {
+export const getQuestionDetails = async function (questionUid) {
+  try {
     const questionDocumentRef = await getDoc(
       doc(db, `/questions/${questionUid}`)
     );
 
     const questionData = questionDocumentRef.data();
     // 2) find the user that asked the question and get the imageUrl
-    const questionAuthor = await _getUserDataWithUsername(questionData.askedBy);
+    const questionAuthor = await getUserDataWithUsername(questionData.askedBy);
 
     const questionDetails = {
       questionAuthorData: { imageUrl: questionAuthor.imageUrl },
@@ -333,9 +295,13 @@ const useDatabase = function () {
     };
 
     return questionDetails;
+  } catch (error) {
+    console.error(`@getQuestionDetails()🚨${error}`);
   }
+};
 
-  async function getQuestionAnswers(questionUid) {
+export const getQuestionAnswers = async function (questionUid) {
+  try {
     // 1) Get all data in questions/questionUid/answers (list of uids of all the answers listed under the question)
     const answersQuerySnapshot = await getDocs(
       collection(db, `/questions/${questionUid}/answers`)
@@ -402,9 +368,13 @@ const useDatabase = function () {
     );
 
     return docsData;
+  } catch (error) {
+    console.error(`@getQuestionAnswers()🚨${error}`);
   }
+};
 
-  async function getQuestionsWithTopicUid(topicUid) {
+export const getQuestionsWithTopicUid = async function (topicUid) {
+  try {
     const queryRef = query(
       collection(db, `/questions`),
       where("topic.uid", "==", topicUid)
@@ -428,7 +398,7 @@ const useDatabase = function () {
       questions[i].likes = likes;
 
       // Add author information
-      const askedByUserData = await _getUserDataWithUsername(
+      const askedByUserData = await getUserDataWithUsername(
         questions[i].askedBy
       );
       questions[i].questionAuthorData = {
@@ -443,9 +413,13 @@ const useDatabase = function () {
       questions[i].topic = newTopicData;
     }
     return questions;
+  } catch (error) {
+    console.error(`@getQuestionsWithTopicUid()🚨${error}`);
   }
+};
 
-  async function getQuestionsWithTopicUids(topicUids) {
+export const getQuestionsWithTopicUids = async function (topicUids) {
+  try {
     const results = [];
 
     for (let i = 0; i < topicUids.length; i++) {
@@ -454,9 +428,13 @@ const useDatabase = function () {
       results.push(questions);
       return results.flat();
     }
+  } catch (error) {
+    console.error(`@getQuestionsWithTopicUids()🚨${error}`);
   }
+};
 
-  async function getUserFollowedTopics(userId) {
+export const getUserFollowedTopics = async function (userId) {
+  try {
     const followedTopicsRef = await getDocs(
       collection(db, `/users/${userId}/followedTopics`)
     );
@@ -474,9 +452,13 @@ const useDatabase = function () {
     }
 
     return followedTopicsData;
+  } catch (error) {
+    console.error(`@getUserFollowedTopics()🚨${error}`);
   }
+};
 
-  async function getAllQuestions() {
+export const getAllQuestions = async function () {
+  try {
     const queryRef = query(collection(db, `/questions`));
     const querySnapshot = await getDocs(queryRef);
     const questions = [];
@@ -493,7 +475,7 @@ const useDatabase = function () {
 
     for (let i = 0; i < questions.length; i++) {
       // Add user data
-      const userData = await _getUserDataWithUsername(questions[i].askedBy);
+      const userData = await getUserDataWithUsername(questions[i].askedBy);
       const questionAuthorData = {
         imageUrl: userData.imageUrl,
       };
@@ -510,74 +492,7 @@ const useDatabase = function () {
     }
 
     return questions;
+  } catch (error) {
+    console.error(`@getAllQuestions()🚨${error}`);
   }
-
-  // async function getAuthNextQuestionsWithTopicUids(topicUids) {
-  //   const results = [];
-  //   for (let i = 0; i < topicUids.length; i++) {
-  //     const questions = await getQuestionsWithTopicUid(topicUids[i]);
-  //     results.push(questions);
-  //   }
-  //   return results.flat();
-  // }
-
-  // async function getNextSelectedTopicUidQuestions(topicUid, batchSize = 10) {
-  //   const collectionRef = collection(db, `/questions`);
-  //   const queryRef = query(
-  //     collectionRef,
-  //     where("topic.uid", "==", topicUid),
-  //     limit(selectedTopicCurrentBatchSize + batchSize)
-  //   );
-  //   const querySnapshot = await getDocs(queryRef);
-  //   const questions = [];
-
-  //   querySnapshot.forEach((docRef) => {
-  //     const docRefData = docRef.data();
-  //     const questionData = {
-  //       ...docRefData,
-  //       uid: docRef.id,
-  //       date: new Date(docRefData.date.toDate()).toISOString(),
-  //     };
-  //     questions.push(questionData);
-  //   });
-
-  //   for (let i = 0; i < questions.length; i++) {
-  //     // Add user data
-  //     const userData = await _getUserDataWithUsername(questions[i].askedBy);
-  //     const questionAuthorData = {
-  //       imageUrl: userData.imageUrl,
-  //     };
-
-  //     // Add topic data
-  //     const topic = await getTopicInfoWithTopicUid(questions[i].topic.uid);
-
-  //     // add likes
-  //     const likes = await getLikes(questions[i].uid);
-
-  //     questions[i].questionAuthorData = questionAuthorData;
-  //     questions[i].topic = topic;
-  //     questions[i].likes = likes;
-  //   }
-
-  //   selectedTopicCurrentBatchSize += batchSize;
-
-  //   return questions;
-  // }
-  return {
-    createTopic,
-    createQuestion,
-    answer,
-    reply,
-    like,
-    getLikes,
-    getTopicsWithQuery,
-    getQuestionsWithTopicUid,
-    getQuestionsWithTopicUids,
-    getUserFollowedTopics,
-    getAllQuestions,
-    getTopicInfoWithTopicUid,
-  };
 };
-
-export default useDatabase;
-// [ ]TODO: Convert to class

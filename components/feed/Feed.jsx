@@ -1,10 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {
-  getListOfQuestionsWithListOfTopics,
-  getLoggedInUserTopics,
-  getQuestionsWithTopicUid,
-  getUserImageUrlWithUsername,
-} from "../../_TEST_DATA";
 import QuestionItem from "../question-item/QuestionItem";
 import classes from "./Feed.module.scss";
 import FeedControlBar from "./feed-control-bar/FeedControlBar";
@@ -12,8 +6,14 @@ import { useSelector } from "react-redux";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import FeedInfo from "./feed-info/FeedInfo";
 import MyFeedInfo from "./my-feed-info/MyFeedInfo";
-import useDatabase from "../../hooks/useDatabase";
 import { useRouter } from "next/router";
+import {
+  getAllQuestions,
+  getQuestionsWithTopicUid,
+  getQuestionsWithTopicUids,
+  getTopicInfoWithTopicUid,
+  getUserFollowedTopics,
+} from "../../db";
 
 const Feed = function () {
   // is null initially
@@ -23,7 +23,6 @@ const Feed = function () {
   const [selectedTopicInfo, setSelectedTopicInfo] = useState(null);
 
   const [currentFeed, setCurrentFeed] = useState(null);
-  const database = useDatabase();
   const { user, authStatus, authStatusNames } = useSelector(
     (slices) => slices.auth
   );
@@ -37,10 +36,8 @@ const Feed = function () {
     if (!selectedTopicUid) return;
     setLoading(true);
     (async () => {
-      const feed = await database.getQuestionsWithTopicUid(selectedTopicUid);
-      const topicInfo = await database.getTopicInfoWithTopicUid(
-        selectedTopicUid
-      );
+      const feed = await getQuestionsWithTopicUid(selectedTopicUid);
+      const topicInfo = await getTopicInfoWithTopicUid(selectedTopicUid);
       setSelectedTopicInfo(topicInfo);
       setCurrentFeed(feed);
       setLoading(false);
@@ -52,7 +49,7 @@ const Feed = function () {
     if (authStatus !== authStatusNames.notLoaded) return;
     setLoading(true);
     (async () => {
-      const allQuestions = await database.getAllQuestions();
+      const allQuestions = await getAllQuestions();
       setCurrentFeed(allQuestions);
       setLoading(false);
     })();
@@ -64,15 +61,13 @@ const Feed = function () {
     if (!user) return;
     setLoading(true);
     (async () => {
-      const userFollowedTopics = await database.getUserFollowedTopics(
-        user.userId
-      );
+      const userFollowedTopics = await getUserFollowedTopics(user.userId);
       setUserTopics(userFollowedTopics);
       const userTopics = userFollowedTopics.map(
         (userFollowedTopic) => userFollowedTopic.uid
       );
 
-      const myFeed = await database.getQuestionsWithTopicUids(userTopics);
+      const myFeed = await getQuestionsWithTopicUids(userTopics);
       setCurrentFeed(myFeed);
       setLoading(false);
 

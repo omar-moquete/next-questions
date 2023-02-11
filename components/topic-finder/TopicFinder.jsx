@@ -10,8 +10,7 @@ import classes from "./TopicFinder.module.scss";
 import TopicResults from "./TopicsResults";
 import { globalActions } from "../../redux-store/globalSlice";
 import { useRouter } from "next/router";
-import useDatabase from "../../hooks/useDatabase";
-import SecondaryButton from "../UI/buttons/SecondaryButton";
+import { getTopicsWithQuery } from "../../db";
 
 const TopicFinder = function ({
   onSelect,
@@ -29,7 +28,6 @@ const TopicFinder = function ({
   const [isTyping, setIsTyping] = useState(false);
   const [topicResults, setTopicResults] = useState([]);
   const [searchingTopic, setSearchingTopic] = useState(false);
-  const database = useDatabase();
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -61,7 +59,7 @@ const TopicFinder = function ({
         return;
       }
       setSearchingTopic(true);
-      const results = await database.getTopicsWithQuery(topicQuery);
+      const results = await getTopicsWithQuery(topicQuery);
       if (results.length > 0) {
         setLastQueryWithResults(topicQuery);
       }

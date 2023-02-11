@@ -2,10 +2,10 @@ import React from "react";
 import classes from "./ReplyForm.module.scss";
 import TextareaAutosize from "react-textarea-autosize";
 import SecondaryButton from "../../buttons/SecondaryButton";
-import useDatabase from "../../../../hooks/useDatabase";
 import { useRef } from "react";
 import { useState } from "react";
 import InlineSpinner from "../../inline-spinner/InlineSpinner";
+import { answer, reply } from "../../../../db";
 
 const ReplyForm = function ({
   unmounter,
@@ -15,7 +15,6 @@ const ReplyForm = function ({
   answerUid = null,
 }) {
   const inputRef = useRef();
-  const database = useDatabase();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (e) => {
@@ -26,7 +25,7 @@ const ReplyForm = function ({
 
     // If answerUid is not passed but questionUid is, this means that the replyForm is opened in an answer and it's going to post an answer. The logic is that only questionUid needed to post an answer.
     if (questionUid && !answerUid) {
-      const postedAnswer = await database.answer(text, questionUid);
+      const postedAnswer = await answer(text, questionUid);
       setData([postedAnswer, ...data]);
       unmounter();
     }
@@ -35,7 +34,7 @@ const ReplyForm = function ({
     if (questionUid && answerUid) {
       const text = inputRef.current.value;
       // post a new reply to questions/questionUid/answers/answerUid/replies
-      const postedReply = await database.reply(text, answerUid);
+      const postedReply = await reply(text, answerUid);
       setData([postedReply, ...data]);
       unmounter();
     }

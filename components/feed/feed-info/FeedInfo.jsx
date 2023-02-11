@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import classes from "./FeedInfo.module.scss";
 import QuestionIcon from "../../UI/svg/QuestionIcon";
-import useDatabase from "../../../hooks/useDatabase";
+
+import Link from "next/link";
 
 const FeedInfo = function ({ topicInfo }) {
   return (
@@ -18,7 +19,9 @@ const FeedInfo = function ({ topicInfo }) {
       </div>
 
       <p>{topicInfo.description}</p>
-      <p className={classes.author}>Created by: {topicInfo.authorUsername}</p>
+      <Link href={`/${topicInfo.author}`} className={classes.author}>
+        created by: <span>{topicInfo.author}</span>
+      </Link>
     </div>
   );
 };

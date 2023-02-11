@@ -8,8 +8,8 @@ import Link from "next/link";
 import TimeAgo from "react-timeago";
 import { timeAgoFormatter } from "../../../utils";
 import { useEffect } from "react";
-import useDatabase from "../../../hooks/useDatabase";
 import InlineSpinner from "../../UI/inline-spinner/InlineSpinner";
+import { getUserDataWithUsername } from "../../../db";
 
 const ReplyItem = function ({
   repliedBy,
@@ -23,11 +23,10 @@ const ReplyItem = function ({
   const { show, ReplyFormAnchor } = useReplyForm();
 
   const [imageUrl, setImageUrl] = useState("");
-  const database = useDatabase();
   useEffect(() => {
-    database
-      .getUserDataWithUsername(repliedBy)
-      .then((userData) => setImageUrl(userData.imageUrl));
+    getUserDataWithUsername(repliedBy).then((userData) =>
+      setImageUrl(userData.imageUrl)
+    );
   });
 
   return (

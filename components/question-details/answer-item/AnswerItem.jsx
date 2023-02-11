@@ -10,10 +10,10 @@ import ReplyButton from "../../question-item/ReplyButton";
 import { timeAgoFormatter } from "../../../utils";
 import Link from "next/link";
 import TimeAgo from "react-timeago";
-import useDatabase from "../../../hooks/useDatabase";
 import { useEffect } from "react";
 import { useState } from "react";
 import InlineSpinner from "../../UI/inline-spinner/InlineSpinner";
+import { getUserDataWithUsername } from "../../../db";
 
 // [ ] TODO: ------> MAKE AnswerItemITEM
 const AnswerItem = function ({
@@ -25,7 +25,6 @@ const AnswerItem = function ({
   text,
   likes = 0,
 }) {
-  const database = useDatabase();
   const [imageUrl, setImageUrl] = useState("");
   // The difference between <QuestionDetails/> displaying <AnswerItem/> and <AnswerItem/> displaying <ReplyItem/> is:
   // From <QuestionDetails/> to <AnswerItem/>, the Answer rendered list is passed in the following order: getStaticProps() -> <QuestionPage/> -> <QuestionItem/> -> answers.map => <AnswerItem/>.
@@ -37,9 +36,9 @@ const AnswerItem = function ({
 
   useEffect(() => {
     // TODO: Make API for get requests
-    database
-      .getUserDataWithUsername(answeredBy)
-      .then((userData) => setImageUrl(userData.imageUrl));
+    getUserDataWithUsername(answeredBy).then((userData) =>
+      setImageUrl(userData.imageUrl)
+    );
   });
 
   const { ReplyFormAnchor, show } = useReplyForm();

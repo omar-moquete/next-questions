@@ -6,8 +6,8 @@ import { useRef } from "react";
 import { useSelector } from "react-redux";
 import CustomField2 from "../UI/custom-fields/CustomField2";
 import { useRouter } from "next/router";
-import useDatabase from "../../hooks/useDatabase";
 import { useEffect } from "react";
+import { createQuestion, createTopic } from "../../db";
 
 const NewQuestion = function () {
   // 1) user types topic. Topics result shows
@@ -56,7 +56,6 @@ const NewQuestion = function () {
     router.back();
   };
 
-  const database = useDatabase();
   const onSubmit = async (e) => {
     e.preventDefault();
 
@@ -77,7 +76,7 @@ const NewQuestion = function () {
           author: user.username,
         };
 
-        currentTopic.uid = await database.createTopic(topicData);
+        currentTopic.uid = await createTopic(topicData);
       }
 
       const questionData = {
@@ -86,7 +85,7 @@ const NewQuestion = function () {
         topic: currentTopic,
       };
 
-      const questionUid = await database.createQuestion(questionData);
+      const questionUid = await createQuestion(questionData);
 
       router.replace(`/questions/${questionUid}`);
     } catch (e) {

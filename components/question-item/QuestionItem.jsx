@@ -8,11 +8,11 @@ import ReplyButton from "./ReplyButton";
 import useReplyForm from "../../hooks/useReplyForm";
 import { useRouter } from "next/router";
 import { timeAgoFormatter } from "../../utils";
-import useDatabase from "../../hooks/useDatabase";
 import { useSelector } from "react-redux";
 import Portal from "../UI/Portal";
 import Modal1 from "../UI/modals/Modal1";
 import LikesList from "./LikesList";
+import { like } from "../../db";
 
 // BUG: Fix likes text when there are no likes. Fix Likes losing position when there is no like text on the left.
 const QuestionItem = function ({
@@ -34,7 +34,6 @@ const QuestionItem = function ({
   }, []);
 
   // Controls likes
-  const database = useDatabase();
   const user = useSelector((slices) => slices.auth.user);
   const [likesAmount, setLikesAmount] = useState(questionData.likes.length);
   const [questionLikes, setQuestionLikes] = useState(questionData.likes);
@@ -63,7 +62,7 @@ const QuestionItem = function ({
       setLikedByUser(true);
     }
 
-    const likes = await database.like(questionData.uid);
+    const likes = await like(questionData.uid);
     setQuestionLikes(likes);
   };
 

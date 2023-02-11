@@ -8,6 +8,28 @@
   border: 2px solid #fff;
   color: #fff;
   user-select: none;
+  a {
+    color: #fff;
+    text-decoration: none;
+    cursor: default;
+
+    &:visited {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    span {
+      cursor: pointer;
+    }
+    @media (hover: hover) {
+      & > span:hover {
+        text-decoration: underline;
+      }
+      & > span:active {
+        text-decoration: underline;
+      }
+    }
+  }
 
   .info {
     display: flex;
