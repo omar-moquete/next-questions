@@ -45,7 +45,7 @@
 
     @media (hover: hover) {
       &:hover:not(.loading) {
-        background-color: #eee;
+        background-color: rgba(238, 238, 238, 0.6);
         h3 {
           text-decoration: underline solid 1px #444;
         }

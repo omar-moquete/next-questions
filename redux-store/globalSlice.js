@@ -5,6 +5,7 @@ const initialState = {
   visitedUser: null,
   // When selected topic is null, there is no selected topic and questions with about user's favorite topics will be displayed
   selectedTopicUid: null,
+  activeMentionUsername: null,
   questionUI: {
     replyFormUnmounters: [],
   },
@@ -22,6 +23,10 @@ const globalSlice = createSlice({
     },
     setReplyFormUnmounter(state, { payload }) {
       state.questionUI.replyFormUnmounters.push(payload);
+    },
+
+    setActiveMentionUsername(state, { payload }) {
+      state.activeMentionUsername = payload;
     },
   },
 });

@@ -19,7 +19,8 @@
   display: flex;
   gap: 8px;
   user-select: none;
-  img {
+  img,
+  .avatarIllustration {
     width: 48px;
     height: 48px;
     border-radius: 50%;
@@ -99,10 +100,12 @@
 }
 
 .controls-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 70% auto;
+  grid-template-rows: 1fr;
   p {
+    align-self: center;
+    justify-self: start;
     font-size: 0.8rem;
     color: #8c8c8c;
     user-select: none;
@@ -129,8 +132,12 @@
 .icons {
   display: flex;
   justify-content: flex-end;
+  grid-column: 2 / -1;
+  width: fit-content;
   align-items: center;
   gap: 12px;
+  align-self: center;
+  justify-self: end;
   p {
     font-size: 1rem;
   }

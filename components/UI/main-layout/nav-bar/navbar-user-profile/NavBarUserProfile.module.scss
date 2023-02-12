@@ -23,9 +23,13 @@
     transition: all 0.5s cubic-bezier(0.25, 0.75, 0.5, 1.25) 0.1s;
   }
 
-  .avatar {
+  .avatarIllustration {
     width: 95%;
     height: 95%;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: all 0.5s cubic-bezier(0.25, 0.75, 0.5, 1.25) 0.1s;
+    outline: 0px #fff solid;
   }
 }
 
@@ -33,11 +37,16 @@
   border: none;
   background-color: transparent;
   transition-delay: 0s;
-  img {
+  img,
+  .avatarIllustration {
     transform: translate(-240%, 80%) scale(2);
     // outline: 6px solid variables.$accent-color-2;
     transition-delay: 0s;
     @include mixins.shadow;
+  }
+
+  .avatarIllustration {
+    outline: 2px #fff solid;
   }
 }
 .menu {

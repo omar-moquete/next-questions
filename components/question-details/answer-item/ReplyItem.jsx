@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import classes from "./ReplyItem.module.scss";
 import MentionIcon from "../../UI/svg/MentionIcon";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LikeButton from "../../question-item/LikeButton";
 import useReplyForm from "../../../hooks/useReplyForm";
 import Link from "next/link";
 import TimeAgo from "react-timeago";
 import { timeAgoFormatter } from "../../../utils";
-import { useEffect } from "react";
-import InlineSpinner from "../../UI/inline-spinner/InlineSpinner";
-import { getUserDataWithUsername } from "../../../db";
+import AvatarIllustration from "../../UI/svg/AvatarIllustration";
 
 const ReplyItem = function ({
   repliedBy,
@@ -19,31 +17,25 @@ const ReplyItem = function ({
   date,
   likes = 0,
   dataState,
+  mention,
+  imageUrl,
 }) {
   const { show, ReplyFormAnchor } = useReplyForm();
-
-  const [imageUrl, setImageUrl] = useState("");
-  useEffect(() => {
-    getUserDataWithUsername(repliedBy).then((userData) =>
-      setImageUrl(userData.imageUrl)
-    );
-  });
-
   return (
     <li className={classes.container}>
       <div className={classes["user-container"]}>
         {/* Flex 100% ,  */}
         <div className={classes.user}>
           {imageUrl && <img src={imageUrl} alt="user image" />}
-          {!imageUrl && (
-            <InlineSpinner color="#005c97" width="24px" height="24px" />
-          )}
 
+          {!imageUrl && (
+            <AvatarIllustration className={classes.avatarIllustration} />
+          )}
           <div className={classes["username-and-datetime"]}>
             <Link href={`/${repliedBy}`}>{repliedBy}</Link>
             <span>•</span>
             <div className={classes.username}>
-              <Link href={repliedBy}>{repliedBy}</Link>
+              <Link href={mention}>{mention}</Link>
               <MentionIcon className={classes["mention-icon"]} />
             </div>
             <span>•</span>
@@ -64,8 +56,10 @@ const ReplyItem = function ({
       <ReplyFormAnchor
         questionUid={questionUid}
         answerUid={answerUid}
-        placeholder={`@${repliedBy}`}
         dataState={dataState}
+        placeholder={`@${repliedBy}`}
+        mention={repliedBy}
+        postReversed
       />
     </li>
   );

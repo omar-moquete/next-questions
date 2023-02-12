@@ -4,14 +4,18 @@ import AnswerItem from "./answer-item/AnswerItem";
 import classes from "./QuestionDetails.module.scss";
 
 // 1) ON PAGE LOAD: The data gets fetched in the server and gets returned through props.
-const QuestionDetails = function ({ questionData, questionAnswers }) {
+const QuestionDetails = function ({ questionData }) {
   // hasNoAnswers will be false if questionAnswers is empty.
+
   const [hasAnswers, setHasAnswers] = useState(
-    questionAnswers.length > 0 ? true : false
+    questionData.questionAnswers.length > 0 ? true : false
   );
 
   // 2) ON PAGE LOAD: answers is initialized with the data received from props. This allows for the question answers to be loaded server-side. See step 4.
-  const [answersState, setAnswersState] = useState(questionAnswers);
+
+  const [answersState, setAnswersState] = useState(
+    questionData.questionAnswers
+  );
 
   useEffect(() => {
     if (answersState.length > 0) setHasAnswers(true);
@@ -41,6 +45,7 @@ const QuestionDetails = function ({ questionData, questionAnswers }) {
           )}
 
           {/* 4) A list of answers is generated using the answers state (step 2) which is loaded by getStaticProps for the questionUid in the path*/}
+
           {answersState.map((answer) => (
             <AnswerItem
               key={answer.uid}
@@ -49,8 +54,10 @@ const QuestionDetails = function ({ questionData, questionAnswers }) {
               text={answer.text}
               answerUid={answer.uid}
               questionUid={questionData.uid}
+              imageUrl={answer.answerAuthorData.imageUrl}
               // Each answer hold its own replies data.
               answerReplies={answer.replies}
+              likes={answer.likes}
             />
           ))}
         </ul>

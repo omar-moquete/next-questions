@@ -12,9 +12,9 @@ import { useSelector } from "react-redux";
 import Portal from "../UI/Portal";
 import Modal1 from "../UI/modals/Modal1";
 import LikesList from "./LikesList";
-import { like } from "../../db";
+import { like, likeQuestion } from "../../db";
+import AvatarIllustration from "../UI/svg/AvatarIllustration";
 
-// BUG: Fix likes text when there are no likes. Fix Likes losing position when there is no like text on the left.
 const QuestionItem = function ({
   questionData,
   className,
@@ -40,7 +40,7 @@ const QuestionItem = function ({
   const [likedByUser, setLikedByUser] = useState(null);
 
   useEffect(() => {
-    // Wait to see if user data loads
+    // Wait to see if user data loads. Sets liked class on liked button
     if (user)
       setLikedByUser(
         questionData.likes.some((like) => like.likedBy === user.username)
@@ -62,7 +62,7 @@ const QuestionItem = function ({
       setLikedByUser(true);
     }
 
-    const likes = await like(questionData.uid);
+    const likes = await likeQuestion(questionData.uid);
     setQuestionLikes(likes);
   };
 
@@ -71,6 +71,10 @@ const QuestionItem = function ({
   const [likedByText, setLikedByText] = useState(``);
 
   useEffect(() => {
+    if (questionLikes.length === 0) {
+      setLikedByText("");
+      return;
+    }
     if (!user) {
       // liked by username.
       if (questionLikes.length === 1) {
@@ -142,7 +146,10 @@ const QuestionItem = function ({
         setLikedByText(
           <p>
             Liked by{" "}
-            <Link href={`/${likes[0].likedBy}`}>{likes[0].likedBy}</Link>.
+            <Link href={`/${questionLikes[0].likedBy}`}>
+              {questionLikes[0].likedBy}
+            </Link>
+            .
           </p>
         );
         return;
@@ -159,9 +166,7 @@ const QuestionItem = function ({
         ).likedBy;
         setLikedByText(
           <p>
-            Liked by
-            <Link href={`/${byUsername}`}>{byUsername}</Link>
-            and me.
+            Liked by <Link href={`/${byUsername}`}>{byUsername}</Link> and me.
           </p>
         );
         return;
@@ -239,8 +244,15 @@ const QuestionItem = function ({
   return (
     <li className={`${classes.container} ${className || ""}`}>
       <div className={classes.info}>
-        {/* [ ]TODO: Implement avatar if no imageUrl */}
-        <img src={questionData.questionAuthorData.imageUrl} alt="User image" />
+        {questionData.questionAuthorData.imageUrl && (
+          <img
+            src={questionData.questionAuthorData.imageUrl}
+            alt="User image"
+          />
+        )}
+        {!questionData.questionAuthorData.imageUrl && (
+          <AvatarIllustration className={classes.avatarIllustration} />
+        )}
         <div className={classes["username-time-topic"]}>
           <div className={classes["username-time"]}>
             <Link

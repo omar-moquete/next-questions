@@ -27,8 +27,6 @@ const Feed = function () {
     (slices) => slices.auth
   );
   const [userTopics, setUserTopics] = useState(null);
-
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
 
   // Topic selection changes

@@ -4,10 +4,13 @@ import classes from "./NavBarUserProfile.module.scss";
 import useAuth from "../../../../../hooks/useAuth";
 import AvatarIllustration from "../../../svg/AvatarIllustration";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/router";
 
 const NavBarUserProfile = function (props) {
   const { logout } = useAuth();
-  const logoutHandler = () => logout();
+  const logoutHandler = () => {
+    logout();
+  };
 
   const [isHovering, setIsHovering] = useState(false);
   const hoverEnterHandler = () => {
@@ -26,7 +29,9 @@ const NavBarUserProfile = function (props) {
     >
       {props.imageUrl && <img src={props.imageUrl} alt="Profile picture" />}
 
-      {!props.imageUrl && <AvatarIllustration className={classes.avatar} />}
+      {!props.imageUrl && (
+        <AvatarIllustration className={classes.avatarIllustration} />
+      )}
       <div
         className={classes.menu}
         onMouseEnter={hoverEnterHandler}

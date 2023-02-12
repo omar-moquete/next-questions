@@ -19,6 +19,7 @@ import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import EmailIcon from "../UI/svg/EmailIcon";
 import UserIcon from "../UI/svg/UserIcon";
 import PasswordIcon from "../UI/svg/PasswordIcon";
+import { useRouter } from "next/router";
 
 const SignUpForm = function () {
   const emailInputRef = useRef();
@@ -36,6 +37,7 @@ const SignUpForm = function () {
     data: { email: null, username: null, password1: null, password2: null },
   });
   const [isSubmitting, setIssubmitting] = useState(false);
+  const router = useRouter();
 
   const { createAccount } = useAuth();
   const clearMessage = () => {
@@ -194,7 +196,7 @@ const SignUpForm = function () {
         return { ...latestState, passwordsMatch: true };
       });
 
-    // If all checks are done, set data in state to be handled by usedEffect later.
+    // If all checks are done, set data in state to be handled by useEffect later.
     setFormState((latestState) => {
       return {
         ...latestState,
@@ -225,6 +227,7 @@ const SignUpForm = function () {
           password1InputRef.current.value,
           usernameInputRef.current.value
         );
+        router.replace(`/${userData.username}`);
       } catch (e) {
         console.error(e);
         scrollToTop();

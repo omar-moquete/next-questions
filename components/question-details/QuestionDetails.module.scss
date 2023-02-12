@@ -48,7 +48,6 @@
 
   .border {
     box-shadow: unset;
-    @include mixins.divider-bottom;
   }
   .question-item-override,
   .border {

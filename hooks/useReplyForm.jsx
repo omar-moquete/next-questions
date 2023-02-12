@@ -2,7 +2,7 @@ import { useState } from "react";
 import ReplyForm from "../components/UI/forms/reply-form/ReplyForm";
 
 const unmounters = [];
-const useReplyForm = function (placeholder) {
+const useReplyForm = function () {
   // [ ]TODO: Ensure only one unmounter gets added to the array per ReplyItem component rendered in the dom
   const [isVisible, setIsVisible] = useState();
   const unmounter = () => setIsVisible(false);

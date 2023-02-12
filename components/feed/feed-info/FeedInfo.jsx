@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import classes from "./FeedInfo.module.scss";
 import QuestionIcon from "../../UI/svg/QuestionIcon";
 
@@ -19,9 +19,10 @@ const FeedInfo = function ({ topicInfo }) {
       </div>
 
       <p>{topicInfo.description}</p>
-      <Link href={`/${topicInfo.author}`} className={classes.author}>
-        created by: <span>{topicInfo.author}</span>
-      </Link>
+      <p className={classes.author}>
+        Created by:{" "}
+        <Link href={`/${topicInfo.author}`}>{topicInfo.author}</Link>
+      </p>
     </div>
   );
 };

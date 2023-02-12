@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import classes from "./UserProfile.module.scss";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
-import QuestionGroup from "../questions-group/QuestionsGroup";
 import QuestionIcon from "../UI/svg/QuestionIcon";
 import ReplyIcon from "../UI/svg/ReplyIcon";
 import AvatarIllustration from "../UI/svg/AvatarIllustration";
@@ -10,7 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import About from "./about/About";
 import { useRouter } from "next/router";
 import { globalActions } from "../../redux-store/globalSlice";
-import { getAllQuestions } from "../../_TEST_DATA";
 const UserProfile = function ({ publicUserData }) {
   // [ ]Todo: Update view and add followed topics with the hability to unfollow.
   const router = useRouter();
@@ -35,9 +33,10 @@ const UserProfile = function ({ publicUserData }) {
       <div className={classes["user-information"]}>
         <div className={classes.picture}>
           <div className={classes["user-image"]}>
-            {publicUserData.imageUrl ? (
+            {publicUserData.imageUrl && (
               <img src={publicUserData.imageUrl} alt="User picture" />
-            ) : (
+            )}
+            {!publicUserData.imageUrl && (
               <AvatarIllustration className={classes.avatar} />
             )}
           </div>

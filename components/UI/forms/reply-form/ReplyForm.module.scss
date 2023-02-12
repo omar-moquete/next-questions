@@ -11,7 +11,8 @@
 .controls {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 12px;
+  margin-right: 5px;
   button {
     // overrides
     color: variables.$accent-color-1;

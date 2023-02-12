@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getTopicsWithTopicText } from "../../_TEST_DATA";
-import PrimaryButton from "../UI/buttons/PrimaryButton";
 import HashIcon from "../UI/svg/HashIcon";
 import FeedIcon from "../UI/svg/FeedIcon";
 import classes from "./TopicFinder.module.scss";
@@ -69,6 +67,16 @@ const TopicFinder = function ({
   }, [topicQuery]);
 
   useEffect(() => {
+    // Adds text to topicInput if passed through a url query
+    (async () => {
+      if (router.asPath.includes("?topic=")) {
+        const query = router.asPath.split("?topic=")[1];
+        const topicData = (await getTopicsWithQuery(query))[0];
+        topicInputRef.current.value = topicData.title;
+        onSelect(topicData.uid, topicData.title);
+      }
+    })();
+    // Controls outside click
     const handleOutsideClick = (e) => {
       if (!topicInputRef.current.contains(e.target)) unmount();
     };

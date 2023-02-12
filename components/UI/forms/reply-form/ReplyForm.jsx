@@ -13,6 +13,8 @@ const ReplyForm = function ({
   dataState,
   questionUid = null,
   answerUid = null,
+  mention,
+  postReversed = false,
 }) {
   const inputRef = useRef();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,17 +28,36 @@ const ReplyForm = function ({
     // If answerUid is not passed but questionUid is, this means that the replyForm is opened in an answer and it's going to post an answer. The logic is that only questionUid needed to post an answer.
     if (questionUid && !answerUid) {
       const postedAnswer = await answer(text, questionUid);
-      setData([postedAnswer, ...data]);
-      unmounter();
+
+      // TODO: Sort by likes here. Answer state is set here, therefore when it's set, answers will render.
+      if (postReversed) {
+        const copy = [...data];
+        copy.push(postedAnswer);
+        console.log(copy);
+        setData(copy);
+      } else {
+        setData([postedAnswer, ...data]);
+        unmounter();
+      }
     }
 
     // If questionUid is not passed but answerUid is, this means that the replyForm is opened in an answer and it's going to post an answer. The logic is that only answerUid needed to post an answer, because answers is a separate collection in the db
     if (questionUid && answerUid) {
       const text = inputRef.current.value;
       // post a new reply to questions/questionUid/answers/answerUid/replies
-      const postedReply = await reply(text, answerUid);
-      setData([postedReply, ...data]);
-      unmounter();
+
+      // TODO: Sort replies by here.
+      const postedReply = await reply(text, answerUid, mention);
+
+      if (postReversed) {
+        const copy = [...data];
+        copy.push(postedReply);
+        setData(copy);
+        unmounter();
+      } else {
+        setData([postedReply, ...data]);
+        unmounter();
+      }
     }
   };
 

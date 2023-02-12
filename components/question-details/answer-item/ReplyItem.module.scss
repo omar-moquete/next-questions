@@ -8,6 +8,7 @@
   background-color: #fff;
   width: 100%;
   padding-left: 16px;
+  padding-bottom: 16px;
   position: relative;
   &::before {
     content: "";
@@ -30,7 +31,8 @@
   font-weight: 500;
   align-items: center;
 
-  img {
+  img,
+  .avatarIllustration {
     width: 36px;
     height: 36px;
     border-radius: 50%;
