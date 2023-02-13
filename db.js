@@ -530,9 +530,16 @@ export const getLatestQuestions = async function (daysAgo, resultsLimit = 15) {
     });
 
     for (let i = 0; i < latestQuestionsData.length; i++) {
-      const topic = (
-        await getDoc(doc(db, `/topics/${latestQuestionsData[i].topic.uid}`))
-      ).data();
+      // add topic
+      const topicRef = await getDoc(
+        doc(db, `/topics/${latestQuestionsData[i].topic.uid}`)
+      );
+      const topicRefData = topicRef.data();
+      latestQuestionsData[i].topic = topicRefData;
+      latestQuestionsData[i].topic.uid = topicRef.id;
+      latestQuestionsData[i].topic.date = new Date(
+        latestQuestionsData[i].topic.date.toDate()
+      ).toISOString();
 
       // add questionAuthorData
       const userDataQuerySnapshot = await getDocs(
@@ -550,16 +557,14 @@ export const getLatestQuestions = async function (daysAgo, resultsLimit = 15) {
       });
 
       // add answers (light version. Only QuestionDetails page needs the full version)
-      for (let i = 0; i < latestQuestionsData.length; i++) {
-        const queryRef = query(
-          collection(db, `/questions/${latestQuestionsData[i].uid}/answers`)
-        );
+      const queryRef = query(
+        collection(db, `/questions/${latestQuestionsData[i].uid}/answers`)
+      );
 
-        const querySnapshot = await getDocs(queryRef);
-        const answers = [];
-        querySnapshot.forEach((docRef) => answers.push(docRef.data()));
-        latestQuestionsData[i].questionAnswers = answers;
-      }
+      const querySnapshot = await getDocs(queryRef);
+      const answers = [];
+      querySnapshot.forEach((docRef) => answers.push(docRef.data()));
+      latestQuestionsData[i].questionAnswers = answers;
 
       // add likes
       const likes = [];
@@ -579,10 +584,6 @@ export const getLatestQuestions = async function (daysAgo, resultsLimit = 15) {
         likes.push(likeData);
       });
 
-      latestQuestionsData[i].topic = topic;
-      latestQuestionsData[i].topic.date = new Date(
-        latestQuestionsData[i].topic.date.toDate()
-      ).toISOString();
       latestQuestionsData[i].likes = likes;
     }
 
@@ -715,10 +716,8 @@ export const getQuestionsWithTopicUid = async function (topicUid) {
 export const getQuestionsWithTopicUids = async function (topicUids) {
   try {
     const results = [];
-
     for (let i = 0; i < topicUids.length; i++) {
       const questions = await getQuestionsWithTopicUid(topicUids[i]);
-
       results.push(questions);
       return results.flat();
     }
@@ -732,21 +731,22 @@ export const getUserFollowedTopics = async function (userId) {
     const followedTopicsRef = await getDocs(
       collection(db, `/users/${userId}/followedTopics`)
     );
+
     const followedTopicsRefsData = [];
-    if (followedTopicsRef.empty) return followedTopicsData;
     followedTopicsRef.forEach((docRef) =>
       followedTopicsRefsData.push(docRef.data())
     );
 
+    if (followedTopicsRefsData.length === 0) return [];
+
     const followedTopicsData = [];
-    if (followedTopicsData.length === 0) return [];
     for (let i = 0; i < followedTopicsRefsData.length; i++) {
       const followedTopicData = await getTopicInfoWithTopicUid(
         followedTopicsRefsData[i].uid
       );
+
       followedTopicsData.push(followedTopicData);
     }
-
     return followedTopicsData;
   } catch (error) {
     console.error(`@getUserFollowedTopics()🚨${error}`);
@@ -924,4 +924,43 @@ export const getQuestionsWithSearchParam = async function (searchParam) {
   );
 
   return results;
+};
+
+export const isUserFollowngTopic = async function (topicUid) {
+  try {
+    if (!topicUid) throw new Error("Invalid topic uid.");
+    const user = store.getState().auth.user;
+    if (!user) throw new Error("No user found in state");
+
+    const queryRef = query(
+      collection(db, `/users/${user.userId}/followedTopics`),
+      where("uid", "==", topicUid)
+    );
+
+    const querySnapshot = await getDocs(queryRef);
+    console.log("querySnapshot.empty", querySnapshot.empty);
+    return !querySnapshot.empty;
+  } catch (error) {
+    console.error(`@isUserFollowingTopic()🚨${error}`);
+  }
+};
+
+export const followTopic = async function (topicUid) {
+  try {
+    const user = store.getState().auth.user;
+    if (!user) throw new Error("No user found in state");
+    // TODO: Work on this function
+  } catch (error) {
+    console.error(`@followTopic()🚨${error}`);
+  }
+};
+
+export const unfollowTopic = async function (topicUid) {
+  try {
+    // TODO: Work on this function
+    const user = store.getState().auth.user;
+    if (!user) throw new Error("No user found in state");
+  } catch (error) {
+    console.error(`@unfollowTopic()🚨${error}`);
+  }
 };

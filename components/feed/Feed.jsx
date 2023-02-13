@@ -2,18 +2,14 @@ import React, { useEffect, useState } from "react";
 import QuestionItem from "../question-item/QuestionItem";
 import classes from "./Feed.module.scss";
 import FeedControlBar from "./feed-control-bar/FeedControlBar";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import FeedInfo from "./feed-info/FeedInfo";
-import MyFeedInfo from "./my-feed-info/MyFeedInfo";
 import { useRouter } from "next/router";
 import {
-  getAllQuestions,
   getQuestionsWithSearchParam,
   getQuestionsWithTopicUid,
-  getQuestionsWithTopicUids,
   getTopicInfoWithTopicUid,
-  getUserFollowedTopics,
 } from "../../db";
 import SearchFeedInfo from "./search-feed-info/SearchFeedInfo";
 

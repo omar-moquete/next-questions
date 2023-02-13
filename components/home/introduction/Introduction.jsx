@@ -16,7 +16,7 @@ const Introduction = function () {
         like your favorite questions and answers and much more.
       </p>
 
-      <PrimaryButton href="/login">Get started</PrimaryButton>
+      <PrimaryButton href="/feed">Get started</PrimaryButton>
     </div>
   );
 };

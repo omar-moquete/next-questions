@@ -37,10 +37,6 @@
   display: inline-block;
 }
 
-.topic {
-  border: 2px solid #fff;
-}
-
 .stats {
   display: flex;
   gap: 12px;
@@ -82,5 +78,12 @@
     font-size: 3rem;
     font-weight: 500;
     @include mixins.main-font;
+  }
+}
+
+@media (max-width: 830px) {
+  .main {
+    min-width: none;
+    width: 90vw;
   }
 }

@@ -276,7 +276,7 @@ const QuestionItem = function ({
           </div>
           <Topic
             className={classes["topic-style-override"]}
-            uid={questionData.topic.uid}
+            topicUid={questionData.topic.uid}
             title={questionData.topic.title}
           />
         </div>

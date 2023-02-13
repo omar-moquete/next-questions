@@ -26,10 +26,12 @@
     border-radius: 50%;
   }
 }
-.topic-style-override {
+
+.username-time-topic > .topic-style-override {
   border-color: variables.$accent-color-1;
   color: variables.$accent-color-1;
   border: 1px solid variables.$accent-color-1;
+  outline: 0px solid variables.$accent-color-1;
 
   div {
     background-color: variables.$accent-color-1;
@@ -45,6 +47,9 @@
     &:hover {
       outline: 1px solid variables.$accent-color-1;
     }
+  }
+  &:active {
+    outline: 1px solid variables.$accent-color-1;
   }
 }
 

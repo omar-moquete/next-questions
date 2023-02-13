@@ -1,17 +1,26 @@
-import React, { useState } from "react";
-import {
-  followTopic,
-  isUserFollowngTopic,
-  unfollowTopic,
-} from "../../_TEST_DATA";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { isUserFollowngTopic } from "../../db";
+import { followTopic, unfollowTopic } from "../../_TEST_DATA";
 import classes from "./Topic.module.scss";
 
-const Topic = function (props) {
+const Topic = function ({ topicUid, className, title }) {
+  const user = useSelector((slices) => slices.auth.user);
   const [isRemoving, setIsRemoving] = useState(false);
-  const [topicUid, setTopicUid] = useState(props.uid);
-  const [isFollowing, setIsFollowing] = useState(isUserFollowngTopic(topicUid));
+  const [isFollowing, setIsFollowing] = useState();
+  const router = useRouter();
 
-  const handleTopicSubscription = () => {
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      isUserFollowngTopic(topicUid);
+    })();
+  }, [user]);
+
+  const handleTopicSubscription = async () => {
+    if (!user) router.push("/login");
+
     if (isFollowing) {
       // If a click event happens and isFollowing === true, then unfollow and setIsFollowing to false
       unfollowTopic(topicUid);
@@ -33,22 +42,23 @@ const Topic = function (props) {
     if (!isRemoving) return;
     setIsRemoving(false);
   };
+
   return (
     <div
       onClick={showRemove}
       onMouseLeave={cancelRemove}
-      className={`${classes.topic} ${props.className || ""}`}
+      className={`${className || ""} ${classes.topic}`}
     >
       {isRemoving && (
         <div
-          className={`${classes.unfollow} ${props.className || ""}`}
+          className={`${classes.unfollow} ${className || ""}`}
           onClick={handleTopicSubscription}
         >
           {isFollowing && "unfollow"}
           {!isFollowing && "follow"}
         </div>
       )}
-      #{props.title}
+      #{title}
     </div>
   );
 };
