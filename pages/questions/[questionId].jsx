@@ -2,12 +2,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import Loading from "../../components/loading/Loading";
 import QuestionDetails from "../../components/question-details/QuestionDetails";
-import {
-  getLikes,
-  getQuestionAnswers,
-  getQuestionDetails,
-  getTopicInfoWithTopicUidLite,
-} from "../../db";
+import { getQuestionDetails } from "../../db";
 
 const QuestionDetailsPage = function ({ questionData }) {
   const router = useRouter();

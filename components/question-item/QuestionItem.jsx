@@ -38,6 +38,9 @@ const QuestionItem = function ({
   const [likesAmount, setLikesAmount] = useState(questionData.likes.length);
   const [questionLikes, setQuestionLikes] = useState(questionData.likes);
   const [likedByUser, setLikedByUser] = useState(null);
+  const [questionAnswersQuantity, setQuestionAnswersQuantity] = useState(
+    questionData.questionAnswers.length
+  );
 
   useEffect(() => {
     // Wait to see if user data loads. Sets liked class on liked button
@@ -92,7 +95,7 @@ const QuestionItem = function ({
 
       // liked by username and username.
       if (questionLikes.length === 2) {
-        const byUsernames = questionLikes.map((like) => questionLikes.likedBy);
+        const byUsernames = questionLikes.map((like) => like.likedBy);
         setLikedByText(
           <p>
             Liked by <Link href={`/${byUsernames[0]}`}>{byUsernames[0]}</Link>{" "}
@@ -310,7 +313,7 @@ const QuestionItem = function ({
               wrapperClass={likedByUser ? classes.liked : ""}
             />
             <ReplyButton
-              answers={questionData.answers || 0}
+              answers={questionAnswersQuantity}
               onClick={
                 router.asPath.split("?")[0] === "/questions/" + questionData.uid
                   ? show
@@ -325,6 +328,9 @@ const QuestionItem = function ({
       <ReplyFormAnchor
         questionUid={questionData.uid}
         dataState={answersState}
+        updateAnswersQuantity={() => {
+          setQuestionAnswersQuantity((prevState) => prevState + 1);
+        }}
       />
     </li>
   );

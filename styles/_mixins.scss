@@ -1,3 +1,5 @@
+@use "../styles/variables";
+
 @mixin shadow {
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
@@ -16,4 +18,42 @@
 
 @mixin divider-left {
   border-left: solid 1px #e4e4e4;
+}
+
+@mixin feed-input-button {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 0;
+  height: 104%;
+  background-color: variables.$accent-color-1;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  transform: translateX(2px);
+  gap: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  cursor: pointer;
+
+  svg {
+    stroke: #fff;
+    transition: all 0.1s ease-in-out;
+    fill: none;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      svg {
+        transform: scale(1.2);
+      }
+    }
+  }
+  &:active {
+    svg {
+      transform: scale(1.2);
+    }
+  }
 }

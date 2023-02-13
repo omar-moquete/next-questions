@@ -3,7 +3,7 @@ import classes from "./CustomField.module.scss";
 
 const CustomField = function (props) {
   // formats a string to url-friendly
-  const format = (string) => string.toLowerCase().split(" ").join("-");
+  const format = (string) => string.trim().toLowerCase().split(" ").join("-");
 
   const inputClassWithIcon = classes["input-with-icon"];
   const inputClassWithoutIcon = classes["input-without-icon"];

@@ -1,0 +1,45 @@
+@use "../../../styles/mixins";
+
+.container {
+  display: grid;
+  width: 700px;
+  gap: 18px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  margin-top: 26px;
+  color: #fff;
+  user-select: none;
+
+  a {
+    text-decoration: none;
+    color: #fff;
+    cursor: pointer;
+
+    &:visited {
+      color: #fff;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    &:active {
+      text-decoration: underline;
+    }
+  }
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  height: 2.4rem;
+  justify-content: space-between;
+  border-bottom: solid 1px #fff;
+  h3 {
+    @include mixins.main-font;
+    font-size: 3rem;
+    font-weight: 500;
+  }
+}

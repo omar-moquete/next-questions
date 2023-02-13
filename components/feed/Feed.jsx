@@ -2,35 +2,47 @@ import React, { useEffect, useState } from "react";
 import QuestionItem from "../question-item/QuestionItem";
 import classes from "./Feed.module.scss";
 import FeedControlBar from "./feed-control-bar/FeedControlBar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import FeedInfo from "./feed-info/FeedInfo";
 import MyFeedInfo from "./my-feed-info/MyFeedInfo";
 import { useRouter } from "next/router";
 import {
   getAllQuestions,
+  getQuestionsWithSearchParam,
   getQuestionsWithTopicUid,
   getQuestionsWithTopicUids,
   getTopicInfoWithTopicUid,
   getUserFollowedTopics,
 } from "../../db";
+import SearchFeedInfo from "./search-feed-info/SearchFeedInfo";
 
 const Feed = function () {
-  // is null initially
   const selectedTopicUid = useSelector(
     (state) => state.global.selectedTopicUid
   );
   const [selectedTopicInfo, setSelectedTopicInfo] = useState(null);
+  const searchParam = useSelector((slices) => slices.global.searchParam);
 
   const [currentFeed, setCurrentFeed] = useState(null);
-  const { user, authStatus, authStatusNames } = useSelector(
-    (slices) => slices.auth
-  );
-  const [userTopics, setUserTopics] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  // Topic selection changes
+  // When searchParam changes
   useEffect(() => {
+    (async () => {
+      if (!searchParam) return;
+      setLoading(true);
+      const results = await getQuestionsWithSearchParam(searchParam);
+      setSelectedTopicInfo(null);
+      setCurrentFeed(results);
+      setLoading(false);
+    })();
+  }, [searchParam]);
+
+  // When topic selection changes
+  useEffect(() => {
+    if (searchParam) return;
     if (!selectedTopicUid) return;
     setLoading(true);
     (async () => {
@@ -43,46 +55,58 @@ const Feed = function () {
   }, [selectedTopicUid]);
 
   // No user logged in
-  useEffect(() => {
-    if (authStatus !== authStatusNames.notLoaded) return;
-    setLoading(true);
-    (async () => {
-      const allQuestions = await getAllQuestions();
-      setCurrentFeed(allQuestions);
-      setLoading(false);
-    })();
-  }, [authStatus]);
+  // useEffect(() => {
+  //   if (searchParam) return;
+  //   if (authStatus !== authStatusNames.notLoaded) return;
+  //   setLoading(true);
+  //   (async () => {
+  //     const allQuestions = await getAllQuestions();
+  //     setCurrentFeed(allQuestions);
+  //     setLoading(false);
+  //   })();
+  // }, [authStatus, searchParam]);
 
   // MyFeed
-  useEffect(() => {
-    if (selectedTopicUid !== null) return;
-    if (!user) return;
-    setLoading(true);
-    (async () => {
-      const userFollowedTopics = await getUserFollowedTopics(user.userId);
-      setUserTopics(userFollowedTopics);
-      const userTopics = userFollowedTopics.map(
-        (userFollowedTopic) => userFollowedTopic.uid
-      );
+  // useEffect(() => {
+  //   if (!user) return;
 
-      const myFeed = await getQuestionsWithTopicUids(userTopics);
-      setCurrentFeed(myFeed);
-      setLoading(false);
+  //   setLoading(true);
+  //   (async () => {
+  //     const userFollowedTopics = await getUserFollowedTopics(user.userId);
+  //     setUserTopics(userFollowedTopics);
+  //     const userTopics = userFollowedTopics.map(
+  //       (userFollowedTopic) => userFollowedTopic.uid
+  //     );
 
-      return;
-    })();
-  }, [user, selectedTopicUid]);
+  //     const myFeed = await getQuestionsWithTopicUids(userTopics);
+  //     setCurrentFeed(myFeed);
+  //     setLoading(false);
+
+  //     return;
+  //   })();
+  // }, [user, selectedTopicUid, searchParam]);
 
   return (
     <div className={classes.feed}>
       <FeedControlBar />
-      {/* <FeedInfo/> outputs information about the currently selected topic */}
-      {/* <MyFeeedInfo/> outputs the questions that belong to the user topics */}
       {loading && <InlineSpinner className={classes.spinner} color="#fff" />}
 
-      {!selectedTopicUid && !loading && <MyFeedInfo userTopics={userTopics} />}
-      {selectedTopicInfo && selectedTopicUid && !loading && (
+      {selectedTopicUid && selectedTopicInfo && !loading && currentFeed && (
         <FeedInfo topicInfo={selectedTopicInfo} />
+      )}
+
+      {!loading && searchParam && currentFeed && (
+        <SearchFeedInfo results={currentFeed} />
+      )}
+
+      {!currentFeed && (
+        <div className={classes.nothing}>
+          <div className={classes.title}>
+            <h3>Find questions</h3>
+          </div>
+
+          <p>Start by searching for a question or a topic.</p>
+        </div>
       )}
 
       {/* [ ]TODO: Add No questions component */}

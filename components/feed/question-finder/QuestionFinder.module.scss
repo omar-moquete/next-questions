@@ -1,11 +1,4 @@
-@use "../../styles/variables";
-@use "../../styles/mixins";
-
-.topics {
-  font-size: 1.2rem;
-  background-color: #fff;
-  border-radius: 8px;
-}
+@use "../../../styles/mixins";
 
 .input-wrapper {
   display: flex;
@@ -36,13 +29,6 @@
   }
 }
 
-.topics {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  position: relative;
-}
-
-.my-feed-button {
+.find {
   @include mixins.feed-input-button;
 }

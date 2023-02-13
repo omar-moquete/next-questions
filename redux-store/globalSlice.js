@@ -5,10 +5,10 @@ const initialState = {
   visitedUser: null,
   // When selected topic is null, there is no selected topic and questions with about user's favorite topics will be displayed
   selectedTopicUid: null,
-  activeMentionUsername: null,
   questionUI: {
     replyFormUnmounters: [],
   },
+  searchParam: "",
 };
 const globalSlice = createSlice({
   name: "global",
@@ -25,8 +25,11 @@ const globalSlice = createSlice({
       state.questionUI.replyFormUnmounters.push(payload);
     },
 
-    setActiveMentionUsername(state, { payload }) {
-      state.activeMentionUsername = payload;
+    setSearchParam(state, { payload }) {
+      state.searchParam = payload;
+    },
+    resetSearchParam(state) {
+      state.searchParam = "";
     },
   },
 });

@@ -6,6 +6,8 @@ import Highlight from "./Highlight";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
+import { useDispatch } from "react-redux";
+import { globalActions } from "../../redux-store/globalSlice";
 
 // [ ]TODO: Add author to topic results
 
@@ -18,15 +20,20 @@ const TopicResults = function ({
   inputRef,
   setQuery,
   searchingTopic,
+  resetSearchBar,
 }) {
   const router = useRouter();
+  const dispatch = useDispatch();
   // 1) set selected topic to state
   const handleSelectedTopic = (topicUid, topicTitle) => {
     // Set input to selected topic
 
+    dispatch(globalActions.resetSearchParam());
+    resetSearchBar();
     inputRef.current.value = topicTitle;
     setQuery(topicTitle);
     onSelect && onSelect(topicUid, topicTitle);
+
     // Dismount this element after a selection was made
     unmount();
   };
@@ -39,7 +46,8 @@ const TopicResults = function ({
     <ul className={classes.results}>
       {router.asPath.split("?")[0] === "/new-question" &&
         topics.every(
-          (topic) => topic.title.toLowerCase() !== query.toLowerCase()
+          (topic) =>
+            topic.title.trim().toLowerCase() !== query.trim().toLowerCase()
         ) && (
           <li
             className={classes["new-topic"]}

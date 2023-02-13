@@ -28,19 +28,28 @@ const MyFeedInfo = function ({ userTopics }) {
         {/* [ ]TODO: Limit results */}
         {/* [ ]TODO: Make sure component updates when topic is removed */}
 
-        {userTopics.map((topic) => (
-          <div key={topic.uid} className={classes["topic-wrapper"]}>
-            <Topic
-              className={classes.topic}
-              uid={topic.uid}
-              title={topic.title}
-            />
+        {userTopics.length === 0 && (
+          <div className={classes.nothing}>
+            <h2>No topics</h2>
+            <p>To follow a topic just tap on the topic of any question.</p>
           </div>
-        ))}
+        )}
+        {userTopics.length !== 0 &&
+          userTopics.map((topic) => (
+            <div key={topic.uid} className={classes["topic-wrapper"]}>
+              <Topic
+                className={classes.topic}
+                uid={topic.uid}
+                title={topic.title}
+              />
+            </div>
+          ))}
       </div>
-      <label className={classes.more} onClick={moreHandler}>
-        See all
-      </label>
+      {userTopics.length > 0 && (
+        <label className={classes.more} onClick={moreHandler}>
+          See all
+        </label>
+      )}
     </div>
   );
 };

@@ -355,7 +355,12 @@ export const getTopicsWithQuery = async function (query) {
     const topics = [];
     topicsDocsRef.forEach((docRef) => {
       const docRefData = docRef.data();
-      if (docRefData.title.toLowerCase().startsWith(query.toLowerCase())) {
+      if (
+        docRefData.title
+          .trim()
+          .toLowerCase()
+          .startsWith(query.trim().toLowerCase())
+      ) {
         // add uid
         docRefData.uid = docRef.id;
         docRefData.date = new Date(docRefData.date.toDate()).toISOString();
@@ -544,6 +549,18 @@ export const getLatestQuestions = async function (daysAgo, resultsLimit = 15) {
         };
       });
 
+      // add answers (light version. Only QuestionDetails page needs the full version)
+      for (let i = 0; i < latestQuestionsData.length; i++) {
+        const queryRef = query(
+          collection(db, `/questions/${latestQuestionsData[i].uid}/answers`)
+        );
+
+        const querySnapshot = await getDocs(queryRef);
+        const answers = [];
+        querySnapshot.forEach((docRef) => answers.push(docRef.data()));
+        latestQuestionsData[i].questionAnswers = answers;
+      }
+
       // add likes
       const likes = [];
       const likesDocsRef = await getDocs(
@@ -672,6 +689,15 @@ export const getQuestionsWithTopicUid = async function (topicUid) {
       questions[i].questionAuthorData = {
         imageUrl: askedByUserData.imageUrl,
       };
+      // add answers (light version. Only QuestionDetails page needs the full version)
+      const queryRef = query(
+        collection(db, `/questions/${questions[i].uid}/answers`)
+      );
+
+      const querySnapshot = await getDocs(queryRef);
+      const answers = [];
+      querySnapshot.forEach((docRef) => answers.push(docRef.data()));
+      questions[i].questionAnswers = answers;
 
       // Add topic information
       const newTopicData = await getTopicInfoWithTopicUid(
@@ -707,11 +733,13 @@ export const getUserFollowedTopics = async function (userId) {
       collection(db, `/users/${userId}/followedTopics`)
     );
     const followedTopicsRefsData = [];
+    if (followedTopicsRef.empty) return followedTopicsData;
     followedTopicsRef.forEach((docRef) =>
       followedTopicsRefsData.push(docRef.data())
     );
 
     const followedTopicsData = [];
+    if (followedTopicsData.length === 0) return [];
     for (let i = 0; i < followedTopicsRefsData.length; i++) {
       const followedTopicData = await getTopicInfoWithTopicUid(
         followedTopicsRefsData[i].uid
@@ -747,6 +775,18 @@ export const getAllQuestions = async function () {
       const questionAuthorData = {
         imageUrl: userData.imageUrl,
       };
+
+      // add answers (light version. Only QuestionDetails page needs the full version)
+      for (let i = 0; i < questions.length; i++) {
+        const queryRef = query(
+          collection(db, `/questions/${questions[i].uid}/answers`)
+        );
+
+        const querySnapshot = await getDocs(queryRef);
+        const answers = [];
+        querySnapshot.forEach((docRef) => answers.push(docRef.data()));
+        questions[i].questionAnswers = answers;
+      }
 
       // Add topic data
       const topic = await getTopicInfoWithTopicUid(questions[i].topic.uid);
@@ -872,4 +912,16 @@ export const uploadProfilePicture = async function () {
   } catch (error) {
     console.error(`@uploadProfilePicture()🚨${error}`);
   }
+};
+
+export const getQuestionsWithSearchParam = async function (searchParam) {
+  const allQuestions = await getAllQuestions();
+  const results = allQuestions.filter((question) =>
+    question.title
+      .trim()
+      .toLowerCase()
+      .includes(searchParam.trim().toLowerCase())
+  );
+
+  return results;
 };

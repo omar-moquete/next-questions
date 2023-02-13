@@ -18,6 +18,7 @@ const TopicFinder = function ({
   placeholder,
   value,
   required = false,
+  resetSearchBar,
 }) {
   // Controls typed data
   const topicInputRef = useRef();
@@ -122,6 +123,13 @@ const TopicFinder = function ({
       topicInputRef.current.value = router.query.query;
   }, [topicInputRef]);
 
+  // Will clear topic input field if a search is occurring.
+  const searchParam = useSelector((slices) => slices.global.searchParam);
+  useEffect(() => {
+    if (searchParam) topicInputRef.current.value = "";
+  }, [searchParam]);
+
+  const user = useSelector((slices) => slices.auth.user);
   return (
     <div className={`${classes.topics} ${className}`}>
       <div className={classes["input-wrapper"]}>
@@ -135,13 +143,12 @@ const TopicFinder = function ({
           value={value}
           required={required}
         />
-        {selectedTopicUid && router.asPath.split("?")[0] === "/feed" && (
+        {router.asPath.split("?")[0] === "/feed" && user && (
           <button
             className={classes["my-feed-button"]}
             onClick={resetCurrentTopic}
           >
             <FeedIcon />
-            My feed
           </button>
         )}
       </div>
@@ -156,6 +163,7 @@ const TopicFinder = function ({
           onNewTopic={onNewTopic}
           inputRef={topicInputRef}
           searchingTopic={searchingTopic}
+          resetSearchBar={resetSearchBar}
         />
       )}
     </div>

@@ -1,13 +1,13 @@
-import React from "react";
-import SearchIcon from "../../UI/svg/SearchIcon";
+import React, { useEffect, useState } from "react";
 import classes from "./FeedControlBar.module.scss";
 import TopicFinder from "../../topic-finder/TopicFinder";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { globalActions } from "../../../redux-store/globalSlice";
+import QuestionFinder from "../question-finder/QuestionFinder";
 
 const FeedControlBar = function ({ onSelect }) {
   const dispatch = useDispatch();
-
+  const [searchBarInputValue, setSearchBarInputValue] = useState("");
   const topicHandler = (topicUid, topicTitle) => {
     dispatch(globalActions.setSelectedTopic(topicUid));
     onSelect && onSelect(topicUid, topicTitle);
@@ -15,11 +15,16 @@ const FeedControlBar = function ({ onSelect }) {
 
   return (
     <div className={classes["feed-control-bar"]}>
-      <div className={classes["input-wrapper"]}>
-        <SearchIcon />
-        <input type="text" placeholder="Search..." />
-      </div>
-      <TopicFinder onSelect={topicHandler} placeholder="Topics..." />
+      <QuestionFinder
+        searchBarValueState={[searchBarInputValue, setSearchBarInputValue]}
+      />
+      <TopicFinder
+        onSelect={topicHandler}
+        placeholder="Topics..."
+        resetSearchBar={() => {
+          setSearchBarInputValue("");
+        }}
+      />
     </div>
   );
 };
