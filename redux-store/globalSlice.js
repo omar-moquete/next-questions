@@ -7,6 +7,7 @@ const initialState = {
   selectedTopicUid: null,
   questionUI: {
     replyFormUnmounters: [],
+    currentFollowedTopics: [],
   },
   searchParam: "",
 };
@@ -30,6 +31,18 @@ const globalSlice = createSlice({
     },
     resetSearchParam(state) {
       state.searchParam = "";
+    },
+
+    setCurrentFollowedTopic(state, { payload }) {
+      if (state.questionUI.currentFollowedTopics.includes(payload)) return;
+      state.questionUI.currentFollowedTopics.push(payload);
+    },
+
+    removeCurrentFollowedTopic(state, { payload }) {
+      const indexOfItemToDelete =
+        state.questionUI.currentFollowedTopics.indexOf(payload);
+
+      state.questionUI.currentFollowedTopics.splice(indexOfItemToDelete, 1);
     },
   },
 });

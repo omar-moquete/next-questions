@@ -1,26 +1,65 @@
-.topic {
+@use "../../styles/variables";
+
+.topic,
+.topicFollowed {
   display: inline-block;
   transition: all 0.1s ease-out;
   position: relative;
   height: fit-content;
   width: fit-content;
-  border: 1px #fff solid;
-  outline: 0px #fff solid;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 25px;
+  font-size: inherit;
   text-align: center;
+  padding: 8px;
+  min-width: 6rem;
+}
+
+.topic {
+  border: 1px variables.$accent-color-1 solid;
+  outline: 0px variables.$accent-color-1 solid;
+  color: variables.$accent-color-1;
+}
+
+.topicFollowed {
+  border: 1px #35d74d solid;
+  outline: 0px #35d74d solid;
+  color: #35d74d;
 }
 @media (hover: hover) {
-  .topic:hover {
+  .topic:hover,
+  .topicFollowed:hover {
     transform: scale(1.1);
-    outline: 1px #fff solid;
   }
-
-  .topic:active {
-    transform: scale(1.1);
-    outline: 1px #fff solid;
+  .topic:hover {
+    outline: 1px variables.$accent-color-1 solid;
+  }
+  .topicFollowed:hover {
+    outline: 1px #35d74d solid;
   }
 }
 
-.unfollow {
+.topic:active,
+.topicFollowed:active {
+  transform: scale(1.1);
+}
+.topic:active {
+  outline: 1px variables.$accent-color-1 solid;
+}
+.topicFollowed:active {
+  outline: 1px #35d74d solid;
+}
+
+.unfollow,
+.unfollowFollowed {
+  cursor: pointer;
+  user-select: none;
+  border-radius: 25px;
+  font-size: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   width: calc(100% + 4px);
   height: calc(100% + 4px);
@@ -30,25 +69,22 @@
   z-index: 10;
   right: 0;
   bottom: 0;
-  background-color: #fff;
-  color: #333;
-}
-
-.topic,
-.unfollow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  border-radius: 25px;
-  font-size: inherit;
   padding: 8px;
   min-width: 6rem;
+  color: #fff;
+}
+
+.unfollow {
+  background-color: variables.$accent-color-1;
+}
+
+.unfollowFollowed {
+  background-color: #35d74d;
 }
 
 @media (max-width: 500px) {
-  .topic {
+  .topic,
+  .topicFollowed {
     font-size: 12px;
     min-width: 60px;
   }

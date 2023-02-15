@@ -1,4 +1,6 @@
+@use "../../../styles/variables";
 @use "../../../styles/mixins";
+
 .main {
   display: grid;
   width: 700px;
@@ -31,7 +33,7 @@
 }
 
 .topic-wrapper {
-  margin: 5px;
+  margin: 6px;
   width: fit-content;
   height: fit-content;
   display: inline-block;
@@ -56,18 +58,29 @@
   }
 }
 
+.topicContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  @include mixins.shadow;
+}
+
 .more {
-  border-top: solid 1px #fff;
+  border-top: solid 1px variables.$accent-color-1;
   text-align: center;
   padding-top: 12px;
+  color: variables.$accent-color-1;
   cursor: pointer;
   @media (hover: hover) {
     &:hover {
-      text-decoration: underline 1px #fff;
+      text-decoration: underline 1px variables.$accent-color-1;
     }
   }
   &:active {
-    text-decoration: underline 1px #fff;
+    text-decoration: underline 1px variables.$accent-color-1;
   }
 }
 

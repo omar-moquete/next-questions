@@ -8,9 +8,10 @@ import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import MyFeedInfo from "./my-feed-info/MyFeedInfo";
 import classes from "./MyFeed.module.scss";
 
+// TODO: If topic is removed, see if can set a countdown to delete the topic from my-topics and update the topics shown.
+
 const MyFeed = function () {
   const user = useSelector((slices) => slices.auth.user);
-  const router = useRouter();
   const [userTopics, setUserTopics] = useState(); // data for myFeedInfo
   const [myFeed, setMyFeed] = useState();
   const [loading, setLoading] = useState(false);

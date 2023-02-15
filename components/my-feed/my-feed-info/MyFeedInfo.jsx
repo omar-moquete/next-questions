@@ -20,7 +20,7 @@ const MyFeedInfo = function ({ userTopics }) {
         </div>
       </div>
 
-      <div className={`${classes.topics} ${classes.small}`}>
+      <div className={`${classes.topics}`}>
         {/* [ ]TODO: Limit results */}
         {/* [ ]TODO: Make sure component updates when topic is removed */}
         {userTopics.length === 0 && (
@@ -30,24 +30,29 @@ const MyFeedInfo = function ({ userTopics }) {
           </div>
         )}
 
-        <ul>
-          {userTopics.length > 0 &&
-            userTopics.map((topic) => (
-              <li key={topic.uid} className={classes["topic-wrapper"]}>
-                <Topic
-                  className={classes.topic}
-                  uid={topic.uid}
-                  title={topic.title}
-                />
-              </li>
-            ))}
-        </ul>
+        {userTopics.length > 0 && (
+          <div className={classes.topicContainer}>
+            <ul>
+              {userTopics.length > 0 &&
+                userTopics.map((topic) => (
+                  <li key={topic.uid} className={classes["topic-wrapper"]}>
+                    <Topic
+                      className={classes.topic}
+                      topicUid={topic.uid}
+                      title={topic.title}
+                    />
+                  </li>
+                ))}
+            </ul>
+
+            {userTopics.length > 20 && (
+              <label className={classes.more} onClick={moreHandler}>
+                See all
+              </label>
+            )}
+          </div>
+        )}
       </div>
-      {userTopics.length > 20 && (
-        <label className={classes.more} onClick={moreHandler}>
-          See all
-        </label>
-      )}
     </div>
   );
 };

@@ -1,34 +1,50 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { isUserFollowngTopic } from "../../db";
-import { followTopic, unfollowTopic } from "../../_TEST_DATA";
+import { useDispatch, useSelector } from "react-redux";
+import { followTopic, isUserFollowngTopic, unfollowTopic } from "../../db";
+import { globalActions } from "../../redux-store/globalSlice";
+import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import classes from "./Topic.module.scss";
 
 const Topic = function ({ topicUid, className, title }) {
   const user = useSelector((slices) => slices.auth.user);
   const [isRemoving, setIsRemoving] = useState(false);
-  const [isFollowing, setIsFollowing] = useState();
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch();
+  // Allows the useEffect to re-run "setIsFollowing" when it changes.
+  const currentFollowedTopics = useSelector(
+    (slices) => slices.global.questionUI.currentFollowedTopics
+  );
 
   useEffect(() => {
     if (!user) return;
     (async () => {
-      isUserFollowngTopic(topicUid);
+      const isFollowing = await isUserFollowngTopic(topicUid);
+      if (isFollowing)
+        dispatch(globalActions.setCurrentFollowedTopic(topicUid));
+      setIsFollowing(isFollowing);
     })();
-  }, [user]);
+  }, [user, currentFollowedTopics]);
 
   const handleTopicSubscription = async () => {
     if (!user) router.push("/login");
 
     if (isFollowing) {
       // If a click event happens and isFollowing === true, then unfollow and setIsFollowing to false
-      unfollowTopic(topicUid);
+      setLoading(true);
+      await unfollowTopic(topicUid);
+      dispatch(globalActions.removeCurrentFollowedTopic(topicUid));
       setIsFollowing(false);
+      setLoading(false);
     } else {
       // Else If a click event happens and isFollowing === false, then follow and setIsFollowing to true
+      setLoading(true);
+      await followTopic(topicUid);
+      dispatch(globalActions.setCurrentFollowedTopic(topicUid));
       setIsFollowing(true);
-      followTopic(topicUid);
+      setLoading(false);
     }
     // [ ] Remove topic item from db (users.topics).
     // [ ] Update view accordingly.
@@ -47,15 +63,20 @@ const Topic = function ({ topicUid, className, title }) {
     <div
       onClick={showRemove}
       onMouseLeave={cancelRemove}
-      className={`${className || ""} ${classes.topic}`}
+      className={`${className || ""} ${
+        isFollowing ? classes.topicFollowed : classes.topic
+      }`}
     >
       {isRemoving && (
         <div
-          className={`${classes.unfollow} ${className || ""}`}
+          className={`${
+            isFollowing ? classes.unfollowFollowed : classes.unfollow
+          } ${className || ""}`}
           onClick={handleTopicSubscription}
         >
-          {isFollowing && "unfollow"}
-          {!isFollowing && "follow"}
+          {loading && <InlineSpinner width="24px" height="24px" />}
+          {isFollowing && !loading && "unfollow"}
+          {!isFollowing && !loading && "follow"}
         </div>
       )}
       #{title}

@@ -931,14 +931,11 @@ export const isUserFollowngTopic = async function (topicUid) {
     if (!topicUid) throw new Error("Invalid topic uid.");
     const user = store.getState().auth.user;
     if (!user) throw new Error("No user found in state");
-
     const queryRef = query(
       collection(db, `/users/${user.userId}/followedTopics`),
       where("uid", "==", topicUid)
     );
-
     const querySnapshot = await getDocs(queryRef);
-    console.log("querySnapshot.empty", querySnapshot.empty);
     return !querySnapshot.empty;
   } catch (error) {
     console.error(`@isUserFollowingTopic()🚨${error}`);
@@ -947,9 +944,13 @@ export const isUserFollowngTopic = async function (topicUid) {
 
 export const followTopic = async function (topicUid) {
   try {
+    if (!topicUid) throw new Error("Invalid topic uid.");
     const user = store.getState().auth.user;
     if (!user) throw new Error("No user found in state");
-    // TODO: Work on this function
+
+    await addDoc(collection(db, `/users/${user.userId}/followedTopics/`), {
+      uid: topicUid,
+    });
   } catch (error) {
     console.error(`@followTopic()🚨${error}`);
   }
@@ -957,9 +958,22 @@ export const followTopic = async function (topicUid) {
 
 export const unfollowTopic = async function (topicUid) {
   try {
-    // TODO: Work on this function
+    if (!topicUid) throw new Error("Invalid topic uid.");
     const user = store.getState().auth.user;
     if (!user) throw new Error("No user found in state");
+
+    // This function queries for a document A that contains a document B where document field "uid" is equal to topicUid. This is because document A unique ID is created by firebase in followTopic() and this uid is untracked.
+    const queryRef = query(
+      collection(db, `/users/${user.userId}/followedTopics`),
+      where("uid", "==", topicUid)
+    );
+
+    const querySnapshot = await getDocs(queryRef);
+    let docRefToDelete = null;
+    querySnapshot.forEach((docRef) => (docRefToDelete = docRef));
+    await deleteDoc(
+      doc(db, `/users/${user.userId}/followedTopics/${docRefToDelete.id}`)
+    );
   } catch (error) {
     console.error(`@unfollowTopic()🚨${error}`);
   }
