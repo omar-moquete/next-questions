@@ -43,3 +43,9 @@
     font-weight: 500;
   }
 }
+
+@media (max-width: 830px) {
+  .container {
+    width: 90vw;
+  }
+}

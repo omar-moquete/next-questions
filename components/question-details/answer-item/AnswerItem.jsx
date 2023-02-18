@@ -1,7 +1,7 @@
 import React from "react";
 import { getUserImageUrlWithUsername } from "../../../_TEST_DATA";
 import classes from "./AnswerItem.module.scss";
-import LikeIcon from "../../UI/svg/LikeIcon";
+import Chevron from "../../UI/svg/chevron";
 import ReplyItem from "./ReplyItem";
 import { useSelector } from "react-redux";
 import LikeButton from "../../question-item/LikeButton";
@@ -47,6 +47,7 @@ const AnswerItem = function ({
   const [likesAmount, setLikesAmount] = useState(likes.length);
   const [likedByUser, setLikedByUser] = useState(null);
   const user = useSelector((slices) => slices.auth.user);
+  const [showReplies, setShowReplies] = useState(false);
 
   useEffect(() => {
     // Wait to see if user data loads. Sets liked class on liked button
@@ -115,26 +116,42 @@ const AnswerItem = function ({
         mention={answeredBy}
       />
 
-      {repliesState.length > 0 && (
+      {repliesState.length > 0 && showReplies && (
         <ul className={classes.replies}>
           {/* The order of the replies is last reply, last place. */}
           {repliesState.map((reply) => (
             <ReplyItem
-              // Using date as key. Cannot use answerUid since it's the same uid for all replies under the same answer.
-              key={reply.date}
+              key={reply.uid}
               repliedBy={reply.repliedBy}
               imageUrl={reply.replyAuthorData.imageUrl}
               text={reply.text}
               // Needed to post to reply to /answers/answerUid/replies in db
               mention={reply.mention}
-              answerUid={answerUid}
               questionUid={questionUid}
+              answerUid={answerUid}
+              replyUid={reply.uid}
               date={reply.date}
               likes={reply.likes}
               dataState={[repliesState, setRepliesState]}
             />
           ))}
         </ul>
+      )}
+      {repliesState.length > 0 && (
+        <div
+          className={`${classes.showReplies} ${
+            showReplies && classes.showRepliesActive
+          }`}
+          onClick={() => {
+            setShowReplies((prev) => !prev);
+          }}
+        >
+          <Chevron />
+          <p>
+            {showReplies ? "Hide" : "Show"} {repliesState.length} repl
+            {repliesState.length > 1 ? "ies" : "y"}
+          </p>
+        </div>
       )}
     </li>
   );

@@ -2,6 +2,7 @@ import React from "react";
 import classes from "./Footer.module.scss";
 import HeartIcon from "../../svg/HeartIcon";
 import PrimaryButton from "../../../UI/buttons/PrimaryButton";
+import MadeWith from "../made-with/MadeWith";
 
 const Footer = function () {
   return (
@@ -12,6 +13,9 @@ const Footer = function () {
           omarmoquete.dev
         </PrimaryButton>
       </div>
+      <div className={classes.technologies}>
+        <MadeWith />
+      </div>
       <div className={classes.cr}>
         <p>
           Handcrafted with
@@ -19,7 +23,6 @@ const Footer = function () {
           In NY, USA. &#174; 2022 by Omar Moquete. All rights reserved.
         </p>
       </div>
-      <div className={classes.technologies}>{/* NOTE: Add icons here */}</div>
     </footer>
   );
 };

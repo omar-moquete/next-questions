@@ -100,12 +100,8 @@ const TopicFinder = function ({
     if (topicInputRef.current.value) setIsTyping(true);
   };
 
-  // set currentTopic to null (null is the default of my feed)
-  const resetCurrentTopic = () => {
-    // Clear topic input field
-    topicInputRef.current.value = "";
-    // Reset topic to null (null is default for My Feed)
-    dispatch(globalActions.setSelectedTopic(null));
+  const handleFeedIconClick = () => {
+    router.push("/my-feed");
   };
 
   const handleResults = () => {
@@ -146,7 +142,7 @@ const TopicFinder = function ({
         {router.asPath.split("?")[0] === "/feed" && user && (
           <button
             className={classes["my-feed-button"]}
-            onClick={resetCurrentTopic}
+            onClick={handleFeedIconClick}
           >
             <FeedIcon />
           </button>

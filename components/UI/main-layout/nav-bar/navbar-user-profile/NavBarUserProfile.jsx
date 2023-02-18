@@ -41,7 +41,7 @@ const NavBarUserProfile = function (props) {
           <Link href={"/" + username}>
             <p>My profile</p>
           </Link>
-          <Link href={"/feed"}>
+          <Link href={"/my-feed"}>
             <p>My feed</p>
           </Link>
           <button onClick={logoutHandler}>

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import classes from "./FeedControlBar.module.scss";
-import TopicFinder from "../../topic-finder/TopicFinder";
-import { useDispatch, useSelector } from "react-redux";
-import { globalActions } from "../../../redux-store/globalSlice";
+import { useDispatch } from "react-redux";
+import { globalActions } from "../../redux-store/globalSlice";
+import TopicFinder from "../topic-finder/TopicFinder";
 import QuestionFinder from "../question-finder/QuestionFinder";
 
 const FeedControlBar = function ({ onSelect }) {

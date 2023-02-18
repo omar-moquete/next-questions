@@ -6,13 +6,17 @@ import { globalActions } from "../../redux-store/globalSlice";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import classes from "./Topic.module.scss";
 
-const Topic = function ({ topicUid, className, title }) {
+const Topic = function ({ topicUid, className, title, userTopicsState }) {
   const user = useSelector((slices) => slices.auth.user);
   const [isRemoving, setIsRemoving] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
+  const [timeoutId, setTimeoutId] = useState();
+  const [intervalId, setIntervalId] = useState();
+  const [countdown, setCountdown] = useState(5);
+  const [showCountdown, setShowCountdown] = useState(false);
   // Allows the useEffect to re-run "setIsFollowing" when it changes.
   const currentFollowedTopics = useSelector(
     (slices) => slices.global.questionUI.currentFollowedTopics
@@ -34,20 +38,51 @@ const Topic = function ({ topicUid, className, title }) {
     if (isFollowing) {
       // If a click event happens and isFollowing === true, then unfollow and setIsFollowing to false
       setLoading(true);
+      if (userTopicsState) {
+        // This condition controls the inmidiate removal of the topic from my-feed if the topic is removed. This allows the topic to be removed from the UI right away without waiting for the backend to remove the post.
+
+        // This is achieved by passing the topicsState from which a list of topics is rendered and passing this state to each topic in that list. When the topic is removed, the state can be set.
+
+        // If the topic component is not being used as intended in my feed, this condition will not pass, preventing further errors. (Only if the state is passed down to topic.)
+
+        // Timeout allows for topicState to be set when the timeout calls its callback function. In the meantime this 5 seconds timeout runs, the interval will control the output of a counter in the topic button.
+        const intervalId = setInterval(() => {
+          setCountdown((prev) => prev - 1);
+        }, 1000);
+        const timeoutId = setTimeout(() => {
+          const [userTopics, setUserTopics] = userTopicsState;
+          const excludedSelf = userTopics.filter(
+            (topic) => topic.uid !== topicUid
+          );
+          setUserTopics(excludedSelf);
+          dispatch(globalActions.removeCurrentFollowedTopic(topicUid));
+        }, 5000);
+
+        setTimeoutId(timeoutId);
+        setIntervalId(intervalId);
+        setShowCountdown(true);
+      }
       await unfollowTopic(topicUid);
-      dispatch(globalActions.removeCurrentFollowedTopic(topicUid));
+      !userTopicsState &&
+        dispatch(globalActions.removeCurrentFollowedTopic(topicUid));
       setIsFollowing(false);
       setLoading(false);
     } else {
       // Else If a click event happens and isFollowing === false, then follow and setIsFollowing to true
+
+      if (intervalId) {
+        timeoutId && clearTimeout(timeoutId);
+        intervalId && clearInterval(intervalId);
+        setCountdown(5);
+        setShowCountdown(false);
+      }
+
       setLoading(true);
       await followTopic(topicUid);
       dispatch(globalActions.setCurrentFollowedTopic(topicUid));
       setIsFollowing(true);
       setLoading(false);
     }
-    // [ ] Remove topic item from db (users.topics).
-    // [ ] Update view accordingly.
   };
 
   const showRemove = () => {
@@ -75,8 +110,9 @@ const Topic = function ({ topicUid, className, title }) {
           onClick={handleTopicSubscription}
         >
           {loading && <InlineSpinner width="24px" height="24px" />}
-          {isFollowing && !loading && "unfollow"}
-          {!isFollowing && !loading && "follow"}
+          {isFollowing && !loading && !showCountdown && "unfollow"}
+          {!isFollowing && !loading && !showCountdown && "follow"}
+          {showCountdown && !loading && countdown}
         </div>
       )}
       #{title}

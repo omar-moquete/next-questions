@@ -5,12 +5,13 @@ import useAuth from "../../../hooks/useAuth";
 import FloatingActionButton from "./floating-action-button/FloatingActionButton";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
+import BackUp from "./back-up/BackUp";
 
 const Layout = function (props) {
   useAuth();
   const user = useSelector((state) => state.auth.user);
   const router = useRouter();
-  // [ ]TODO: Add "back to top" button (maybe an arrow up bottom-centered)
+
   return (
     <>
       <NavBar />
@@ -18,6 +19,7 @@ const Layout = function (props) {
       {router.asPath.split("?")[0] !== "/new-question" && user && (
         <FloatingActionButton />
       )}
+      <BackUp />
       <Footer />
     </>
   );

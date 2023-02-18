@@ -3,7 +3,8 @@ import classes from "./MyFeedInfo.module.scss";
 import HashIcon from "../../UI/svg/HashIcon";
 import Topic from "../../topic/Topic";
 
-const MyFeedInfo = function ({ userTopics }) {
+const MyFeedInfo = function ({ userTopicsState }) {
+  const [userTopics] = userTopicsState;
   const moreHandler = () => {
     // [ ]Todo: Show all favorite topics on click
   };
@@ -40,6 +41,7 @@ const MyFeedInfo = function ({ userTopics }) {
                       className={classes.topic}
                       topicUid={topic.uid}
                       title={topic.title}
+                      userTopicsState={userTopicsState}
                     />
                   </li>
                 ))}

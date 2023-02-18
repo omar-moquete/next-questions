@@ -9,7 +9,7 @@ const HomePage = function ({ latestQuestions }) {
 export default HomePage;
 
 export const getStaticProps = async function () {
-  const latestQuestions = await getLatestQuestions(5);
+  const latestQuestions = await getLatestQuestions(7);
   const props = {
     latestQuestions,
   };

@@ -30,11 +30,9 @@ const ReplyForm = function ({
     if (questionUid && !answerUid) {
       const postedAnswer = await answer(text, questionUid);
 
-      // TODO: Sort by likes here. Answer state is set here, therefore when it's set, answers will render.
       setData([postedAnswer, ...data]);
       unmounter();
       updateAnswersQuantity();
-      console.log("postReversed", postReversed);
     }
 
     // If questionUid is not passed but answerUid is, this means that the replyForm is opened in an answer and it's going to post an answer. The logic is that only answerUid needed to post an answer, because answers is a separate collection in the db
@@ -42,7 +40,6 @@ const ReplyForm = function ({
       const text = inputRef.current.value;
       // post a new reply to questions/questionUid/answers/answerUid/replies
 
-      // TODO: Sort replies by here.
       const postedReply = await reply(text, answerUid, mention);
 
       if (postReversed) {

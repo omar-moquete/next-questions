@@ -6,7 +6,6 @@ const LatestQuestions = function ({ latestQuestionsData }) {
   return (
     <div className={classes.container}>
       <h2>See what's new</h2>
-
       <div className={classes.wrapper}>
         {latestQuestionsData.length === 0 && (
           <div className={classes.nothing}>

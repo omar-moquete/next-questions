@@ -10,8 +10,6 @@ const PasswordResetForm = function () {
   const passwordInputRef = useRef();
 
   const submitHandler = function (e) {
-    console.log(usernameInputRef.current.value);
-    console.log(passwordInputRef.current.value);
     e.preventDefault();
   };
   return (

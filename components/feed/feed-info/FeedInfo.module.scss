@@ -39,7 +39,7 @@
   svg {
     width: 26px;
     height: 26px;
-    stroke-width: 2;
+    stroke-width: 1.5;
   }
 }
 
@@ -80,5 +80,11 @@
         text-decoration: underline;
       }
     }
+  }
+}
+
+@media (max-width: 830px) {
+  .main {
+    width: 90vw;
   }
 }

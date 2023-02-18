@@ -28,7 +28,6 @@
   display: flex;
   gap: 8px;
   color: #8c8c8c;
-  font-weight: 500;
   align-items: center;
 
   img,
@@ -45,9 +44,11 @@
   height: fit-content;
   flex-wrap: wrap;
 
-  a {
-    font-size: 1rem;
+  .username {
     font-weight: 500;
+  }
+
+  a {
     text-decoration: none;
     color: #333;
     cursor: pointer;
@@ -65,18 +66,19 @@
 }
 
 @media (hover: hover) {
-  .username:hover {
+  .mention:hover {
     text-decoration: underline 1px;
   }
 }
-.username:active {
+.mention:active {
   text-decoration: underline 1px;
 }
 
-.username {
+.mention {
   display: flex;
   align-items: center;
   gap: 4px;
+  font-weight: 400;
 
   a {
     color: #8c8c8c;
@@ -107,7 +109,6 @@
   gap: 4px;
   align-items: center;
   color: #8c8c8c;
-  font-weight: 500;
 }
 .reply:active {
   text-decoration: underline 1px;
@@ -156,4 +157,10 @@
 .replies,
 .container {
   list-style-type: none;
+}
+
+.liked {
+  svg {
+    fill: variables.$accent-color-1;
+  }
 }

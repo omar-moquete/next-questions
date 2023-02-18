@@ -1,0 +1,48 @@
+.container {
+  width: 100%;
+  font-family: monospace;
+  font-size: 1.1rem;
+  width: 100%;
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  ul {
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 60px;
+  }
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #333;
+    border-radius: 8px;
+    padding: 10px;
+  }
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 830px) {
+  .container {
+    font-size: 1rem;
+
+    h3 {
+      font-size: 1.2rem;
+    }
+
+    svg {
+      height: 24px;
+      width: 24px;
+    }
+  }
+}

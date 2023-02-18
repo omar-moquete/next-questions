@@ -3,9 +3,9 @@ import React, { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { globalActions } from "../../../redux-store/globalSlice";
-import SearchIcon from "../../UI/svg/SearchIcon";
-import SendIcon from "../../UI/svg/SendIcon";
+import { globalActions } from "../../redux-store/globalSlice";
+import SearchIcon from "../UI/svg/SearchIcon";
+import SendIcon from "../UI/svg/SendIcon";
 import classes from "./QuestionFinder.module.scss";
 
 const QuestionFinder = function ({ searchBarValueState }) {

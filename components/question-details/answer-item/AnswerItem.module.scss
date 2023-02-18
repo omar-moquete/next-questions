@@ -53,9 +53,9 @@
 
 .username-and-datetime > p,
 .username-and-datetime > span,
-.reply {
+.reply,
+.showReplies {
   color: #8c8c8c;
-  font-weight: 500;
 }
 
 .reply {
@@ -102,6 +102,40 @@
   @include mixins.divider-left;
 }
 
+.showReplies {
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.1s ease-in-out;
+  gap: 2px;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+    transition: transform 0.3s ease-in-out 0.1s;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      text-decoration: underline;
+      color: variables.$accent-color-1;
+    }
+  }
+  &:active {
+    text-decoration: underline;
+    color: variables.$accent-color-1;
+  }
+}
+
+.showRepliesActive {
+  svg {
+    transform: rotate(-90deg);
+  }
+}
 @media (max-width: 830px) {
   .container {
     width: 90vw;

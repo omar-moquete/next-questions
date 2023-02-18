@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import QuestionItem from "../question-item/QuestionItem";
 import classes from "./Feed.module.scss";
-import FeedControlBar from "./feed-control-bar/FeedControlBar";
 import { useSelector } from "react-redux";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import FeedInfo from "./feed-info/FeedInfo";
@@ -12,6 +11,7 @@ import {
   getTopicInfoWithTopicUid,
 } from "../../db";
 import SearchFeedInfo from "./search-feed-info/SearchFeedInfo";
+import FeedControlBar from "../feed-control-bar/FeedControlBar";
 
 const Feed = function () {
   const selectedTopicUid = useSelector(
@@ -50,38 +50,6 @@ const Feed = function () {
     })();
   }, [selectedTopicUid]);
 
-  // No user logged in
-  // useEffect(() => {
-  //   if (searchParam) return;
-  //   if (authStatus !== authStatusNames.notLoaded) return;
-  //   setLoading(true);
-  //   (async () => {
-  //     const allQuestions = await getAllQuestions();
-  //     setCurrentFeed(allQuestions);
-  //     setLoading(false);
-  //   })();
-  // }, [authStatus, searchParam]);
-
-  // MyFeed
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   setLoading(true);
-  //   (async () => {
-  //     const userFollowedTopics = await getUserFollowedTopics(user.userId);
-  //     setUserTopics(userFollowedTopics);
-  //     const userTopics = userFollowedTopics.map(
-  //       (userFollowedTopic) => userFollowedTopic.uid
-  //     );
-
-  //     const myFeed = await getQuestionsWithTopicUids(userTopics);
-  //     setCurrentFeed(myFeed);
-  //     setLoading(false);
-
-  //     return;
-  //   })();
-  // }, [user, selectedTopicUid, searchParam]);
-
   return (
     <div className={classes.feed}>
       <FeedControlBar />
@@ -95,12 +63,11 @@ const Feed = function () {
         <SearchFeedInfo results={currentFeed} />
       )}
 
-      {!currentFeed && (
+      {!loading && !currentFeed && !searchParam && (
         <div className={classes.nothing}>
           <div className={classes.title}>
             <h3>Find questions</h3>
           </div>
-
           <p>Start by searching for a question or a topic.</p>
         </div>
       )}

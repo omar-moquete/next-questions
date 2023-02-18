@@ -2,41 +2,53 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getQuestionsWithTopicUids, getUserFollowedTopics } from "../../db";
-import FeedControlBar from "../feed/feed-control-bar/FeedControlBar";
+import FeedControlBar from "../feed-control-bar/FeedControlBar";
 import QuestionItem from "../question-item/QuestionItem";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import MyFeedInfo from "./my-feed-info/MyFeedInfo";
 import classes from "./MyFeed.module.scss";
 
-// TODO: If topic is removed, see if can set a countdown to delete the topic from my-topics and update the topics shown.
-
 const MyFeed = function () {
   const user = useSelector((slices) => slices.auth.user);
   const [userTopics, setUserTopics] = useState(); // data for myFeedInfo
   const [myFeed, setMyFeed] = useState();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const currentFollowedTopics = useSelector(
+    (slices) => slices.global.questionUI.currentFollowedTopics
+  );
+
+  const loadData = async function () {
+    if (!user) return;
+    const userTopics = await getUserFollowedTopics(user.userId); // good
+    setUserTopics(userTopics); // data for myFeedInfo
+    const userTopicUids = userTopics.map(
+      (userFollowedTopic) => userFollowedTopic.uid
+    );
+
+    const myFeed = await getQuestionsWithTopicUids(userTopicUids);
+    const myFeedSorted = myFeed.sort((a, b) => {
+      if (+new Date(a.date) <= +new Date(b.date)) return 1;
+      else return -1;
+    });
+    setMyFeed(myFeedSorted);
+    loading && setLoading(false);
+  };
 
   useEffect(() => {
-    if (!user) return;
-    setLoading(true);
-    (async () => {
-      const userTopics = await getUserFollowedTopics(user.userId); // good
-      setUserTopics(userTopics); // data for myFeedInfo
+    loadData();
+  }, [user, currentFollowedTopics]);
 
-      const userTopicUids = userTopics.map(
-        (userFollowedTopic) => userFollowedTopic.uid
-      );
-
-      const myFeed = await getQuestionsWithTopicUids([userTopicUids]);
-      setMyFeed(myFeed);
-      setLoading(false);
-    })();
-  }, [user]);
+  const onTopicSelection = (_, topicTitle) => {
+    router.push(`/feed?topic=${topicTitle}`);
+  };
   return (
     <div className={classes.feed}>
-      <FeedControlBar />
+      <FeedControlBar onSelect={onTopicSelection} />
       {loading && <InlineSpinner className={classes.spinner} color="#fff" />}
-      {userTopics && !loading && <MyFeedInfo userTopics={userTopics} />}
+      {userTopics && !loading && (
+        <MyFeedInfo userTopicsState={[userTopics, setUserTopics]} />
+      )}
 
       {myFeed && myFeed.length > 0 && !loading && (
         <ul className={classes.questions}>

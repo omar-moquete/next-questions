@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classes from "./ReplyItem.module.scss";
 import MentionIcon from "../../UI/svg/MentionIcon";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,19 +8,52 @@ import Link from "next/link";
 import TimeAgo from "react-timeago";
 import { timeAgoFormatter } from "../../../utils";
 import AvatarIllustration from "../../UI/svg/AvatarIllustration";
+import { useRouter } from "next/router";
+import { likeReply } from "../../../db";
 
 const ReplyItem = function ({
   repliedBy,
   text,
-  answerUid,
   questionUid,
+  answerUid,
+  replyUid,
   date,
-  likes = 0,
+  likes,
   dataState,
   mention,
   imageUrl,
 }) {
   const { show, ReplyFormAnchor } = useReplyForm();
+  const router = useRouter();
+
+  // Likes
+  const [likesAmount, setLikesAmount] = useState(likes.length);
+  const [likedByUser, setLikedByUser] = useState(null);
+  const user = useSelector((slices) => slices.auth.user);
+  useEffect(() => {
+    // Wait to see if user data loads. Sets liked class on liked button
+    if (user)
+      setLikedByUser(likes.some((like) => like.likedBy === user.username));
+  }, [user]);
+  const likeHandler = async () => {
+    // This function does not wait for the like to be posted to the database. Instead it updates the like in the UI and then posts the new data to the database.
+
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    if (likedByUser) {
+      setLikesAmount((likesAmount) => likesAmount - 1);
+      setLikedByUser(false);
+    } else {
+      setLikesAmount((likesAmount) => likesAmount + 1);
+      setLikedByUser(true);
+    }
+
+    await likeReply(answerUid, replyUid);
+  };
+
   return (
     <li className={classes.container}>
       <div className={classes["user-container"]}>
@@ -32,9 +65,11 @@ const ReplyItem = function ({
             <AvatarIllustration className={classes.avatarIllustration} />
           )}
           <div className={classes["username-and-datetime"]}>
-            <Link href={`/${repliedBy}`}>{repliedBy}</Link>
+            <Link href={`/${repliedBy}`} className={classes.username}>
+              {repliedBy}
+            </Link>
             <span>•</span>
-            <div className={classes.username}>
+            <div className={classes.mention}>
               <Link href={mention}>{mention}</Link>
               <MentionIcon className={classes["mention-icon"]} />
             </div>
@@ -49,7 +84,11 @@ const ReplyItem = function ({
           <label>Mention</label>
           <MentionIcon className={classes["mention-icon"]} />
         </div>
-        <LikeButton likes={likes} />
+        <LikeButton
+          wrapperClass={likedByUser ? classes.liked : ""}
+          likes={likesAmount}
+          onClick={likeHandler}
+        />
       </div>
 
       {/* ANCHOR */}

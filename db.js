@@ -257,19 +257,6 @@ export const likeQuestion = async function (questionUid) {
   }
 };
 
-export const getAnswerLikes = async function (answerUid) {
-  try {
-    const likesCollectionRef = collection(db, `/answers/${answerUid}/likes`);
-
-    const docsRef = await getDocs(likesCollectionRef);
-    const docsData = [];
-    docsRef.forEach((docRef) => docsData.push(docRef.data()));
-    return docsData;
-  } catch (error) {
-    console.error(`@getAnswerLikes()🚨${error}`);
-  }
-};
-
 export const likeAnswer = async function (answerUid) {
   try {
     const user = store.getState().auth.user;
@@ -331,6 +318,70 @@ export const likeAnswer = async function (answerUid) {
   }
 };
 
+export const likeReply = async function (answerUid, replyUid) {
+  try {
+    const user = store.getState().auth.user;
+    // 1) Get collection reference
+    const likesCollectionRef = collection(
+      db,
+      `/answers/${answerUid}/replies/${replyUid}/likes`
+    );
+    // 2) Get likes for the reply
+    const likesDocRefs = await getDocs(likesCollectionRef);
+
+    const likes = [];
+    const currentUserLikeForReply = {
+      likedByUser: false,
+      likeUid: "",
+      data: null, // used to update the current doc in db.
+    };
+
+    likesDocRefs.forEach((like) => {
+      const docRefData = like.data();
+      const likeData = {
+        ...docRefData,
+        date: (docRefData.date = new Date(
+          docRefData.date.toDate()
+        ).toISOString()),
+      };
+
+      // 3) Check if user already liked (if username is contained in any of the likes docs).
+      if (likeData.likedBy === user.username) {
+        currentUserLikeForReply.likedByUser = true;
+        currentUserLikeForReply.likeUid = like.id;
+        currentUserLikeForReply.data = likeData;
+      }
+      likes.push(likeData);
+    });
+
+    // 3) Like question if user has not liked
+    if (!currentUserLikeForReply.likedByUser) {
+      // If not liked by user, add like
+      await addDoc(likesCollectionRef, {
+        date: serverTimestamp(),
+        likedBy: user.username,
+      });
+    } else {
+      // if liked by user remove like
+      await deleteDoc(
+        doc(
+          db,
+          `/answers/${answerUid}/replies/${replyUid}/likes/${currentUserLikeForReply.likeUid}`
+        )
+      );
+    }
+
+    const updatedLikes = await getAnswerLikes(answerUid);
+    // Convert Firebase timestamp to date object
+    updatedLikes.forEach(
+      (like) => (like.date = new Date(like.date.toDate()).toISOString())
+    );
+    return updatedLikes;
+  } catch (error) {
+    console.error(`@likeReply()🚨${error}`);
+  }
+};
+
 export const getQuestionLikes = async function (questionUid) {
   try {
     const likesCollectionRef = collection(
@@ -344,6 +395,21 @@ export const getQuestionLikes = async function (questionUid) {
     return docsData;
   } catch (error) {
     console.error(`@getQuestionLikes()🚨${error}`);
+  }
+};
+
+export const getAnswerLikes = async function (answerUid) {
+  try {
+    const likesCollectionRef = collection(db, `/answers/${answerUid}/likes`);
+    const docsRef = await getDocs(likesCollectionRef);
+    const docsData = [];
+    docsRef.forEach((docRef) => {
+      const data = docRef.data();
+      docsData.push({ ...data, uid: docRef.id });
+    });
+    return docsData;
+  } catch (error) {
+    console.error(`@getAnswerLikes()🚨${error}`);
   }
 };
 
@@ -472,33 +538,39 @@ export const getQuestionDetails = async function (questionUid) {
 
     preparedData.questionAnswers = sortedAnswers;
 
-    // NOTE: Needs work. Enable replies to get likes.
-    // for (let i = 0; i < sortedAnswers.length; i++) {
-    //   console.log("sortedAnswers[i].replies", sortedAnswers[i].replies);
-    //   const repliesWithLikes = sortedAnswers[i].replies.filter(
-    //     (reply) => reply.likes?.length > 0
-    //   );
+    // get replies likes
+    for (let i1 = 0; i1 < preparedData.questionAnswers.length; i1++) {
+      // const replyRefs = [];
+      // const replyLikesDocRefs = await getDocs(
+      //   collection(db, `/answers/${preparedData.questionAnswers[i1].uid}/replies/`)
+      // );
 
-    // const repliesWithoutLikes = sortedAnswers[i].replies.filter(
-    //   (reply) => reply.likes?.length === 0
-    // );
+      // replyLikesDocRefs.forEach((docRef) => replyRefs.push(docRef));
 
-    // repliesWithLikes.sort((a, b) => {
-    //   if (a.likes.length > b.likes.length) return -1;
-    //   else if (a.likes.length < b.likes.length) return 1;
-    //   else return 0;
-    // });
+      for (
+        let i2 = 0;
+        i2 < preparedData.questionAnswers[i1].replies.length;
+        i2++
+      ) {
+        const replyLikeRefs = await getDocs(
+          collection(
+            db,
+            `/answers/${preparedData.questionAnswers[i1].uid}/replies/${preparedData.questionAnswers[i1].replies[i2].uid}/likes`
+          )
+        );
 
-    // repliesWithoutLikes.sort((a, b) => {
-    //   if (+new Date(a.date) > +new Date(b.date)) return 1;
-    //   else if (+new Date(a.date) < +new Date(b.date)) return -1;
-    //   else return 0;
-    // });
+        const replyLikesRefData = [];
+        replyLikeRefs.forEach((docRef) => {
+          const data = docRef.data();
+          replyLikesRefData.push({
+            ...data,
+            date: new Date(data.date.toDate()).toISOString(),
+          });
+        });
 
-    // const sortedReplies = [...repliesWithLikes, ...repliesWithoutLikes];
-
-    // preparedData.questionAnswers[i].replies = sortedReplies;
-    // }
+        preparedData.questionAnswers[i1].replies[i2].likes = replyLikesRefData;
+      }
+    }
 
     return preparedData;
   } catch (error) {
@@ -593,72 +665,6 @@ export const getLatestQuestions = async function (daysAgo, resultsLimit = 15) {
   }
 };
 
-// export const getQuestionAnswers = async function (questionUid) {
-//   // 1) Get all data in questions/questionUid/answers (list of uids of all the answers listed under the question)
-//   const answersQuerySnapshot = await getDocs(
-//     collection(db, `/questions/${questionUid}/answers`)
-//   );
-
-//   const questionAnswers = [];
-//   answersQuerySnapshot.forEach((document) =>
-//     questionAnswers.push({ ...document.data() })
-//   );
-
-//   // This is an array of promises because array.map does not await its callback function..
-//   const allQuestionAnswersRefsPromises = questionAnswers.map(async (answer) => {
-//     // Get /answers/answerUid for each answerUid
-//     const answerDocRef = await getDoc(doc(db, `/answers/${answer.uid}`));
-
-//     // Get /answers/answerUid/replies for each answerUid
-//     const repliesDocRefs = await getDocs(
-//       collection(db, `/answers/${answer.uid}/replies`)
-//     );
-
-//     return {
-//       answerDocRef,
-//       repliesDocRefs,
-//     };
-//   });
-
-//   const allQuestionAnswersRefs = await Promise.all(
-//     allQuestionAnswersRefsPromises
-//   );
-
-//   const docsData = allQuestionAnswersRefs.map(
-//     ({ answerDocRef, repliesDocRefs }) => {
-//       const answersDocRefData = answerDocRef.data();
-//       const repliesDocRefsData = [];
-
-//       repliesDocRefs.forEach((repliesDocRef) => {
-//         repliesDocRefsData.push(repliesDocRef.data());
-//       });
-
-//       // Convert to date string each firebase timestamp for current answer
-//       answersDocRefData.date = new Date(
-//         answersDocRefData.date.toDate()
-//       ).toISOString();
-//       // Must add answerUid in order to post a reply to it.
-//       answersDocRefData.uid = answerDocRef.id;
-
-//       repliesDocRefsData.forEach(
-//         (replyDocRefData) =>
-//           (replyDocRefData.date = new Date(
-//             replyDocRefData.date.toDate()
-//           ).toISOString())
-//       );
-
-//       const result = {
-//         ...answersDocRefData,
-//         replies: repliesDocRefsData,
-//       };
-
-//       return result;
-//     }
-//   );
-
-//   return docsData;
-// };
-
 export const getQuestionsWithTopicUid = async function (topicUid) {
   try {
     const queryRef = query(
@@ -719,8 +725,8 @@ export const getQuestionsWithTopicUids = async function (topicUids) {
     for (let i = 0; i < topicUids.length; i++) {
       const questions = await getQuestionsWithTopicUid(topicUids[i]);
       results.push(questions);
-      return results.flat();
     }
+    return results.flat();
   } catch (error) {
     console.error(`@getQuestionsWithTopicUids()🚨${error}`);
   }
@@ -847,9 +853,9 @@ export const getQuestionAnswers = async (questionUid) => {
       ({ answerDocRef, repliesDocRefs }) => {
         const answersDocRefData = answerDocRef.data();
         const repliesDocRefsData = [];
-
         repliesDocRefs.forEach((repliesDocRef) => {
-          repliesDocRefsData.push(repliesDocRef.data());
+          const data = repliesDocRef.data();
+          repliesDocRefsData.push({ ...data, uid: repliesDocRef.id });
         });
 
         // Convert to date string each firebase timestamp for current answer

@@ -1,0 +1,42 @@
+@use "../../../../styles/variables";
+@use "../../../../styles/mixins";
+
+.up {
+  position: fixed;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  right: -60px;
+  bottom: -60px;
+  background-image: variables.$gradient;
+  opacity: 0.8;
+  z-index: 498;
+  cursor: pointer;
+
+  @include mixins.shadow;
+
+  svg {
+    stroke: #fff;
+    margin-top: 16px;
+    margin-left: 16px;
+    width: 42px;
+    height: 42px;
+    stroke-width: 2;
+    transition: all 0.1s ease-out;
+    transform: rotate(-90deg);
+  }
+}
+
+@media (hover: hover) {
+  .up:hover {
+    svg {
+      transform: rotate(-90deg) scale(1.2);
+    }
+  }
+}
+
+.up:active {
+  svg {
+    transform: rotate(-90deg) scale(1.2);
+  }
+}
