@@ -1,19 +1,37 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import classes from "./UserProfile.module.scss";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import QuestionIcon from "../UI/svg/QuestionIcon";
 import ReplyIcon from "../UI/svg/ReplyIcon";
 import AvatarIllustration from "../UI/svg/AvatarIllustration";
-import { convertDate } from "../../utils";
 import { useDispatch, useSelector } from "react-redux";
 import About from "./about/About";
 import { useRouter } from "next/router";
 import { globalActions } from "../../redux-store/globalSlice";
+import MyFeedInfo from "../my-feed-info/MyFeedInfo";
+import { getUserFollowedTopics } from "../../db";
+import QuestionItem from "../question-item/QuestionItem";
+
+// import MyFeedInfo from "../";
+
 const UserProfile = function ({ publicUserData }) {
-  // [ ]Todo: Update view and add followed topics with the hability to unfollow.
   const router = useRouter();
   const visitedUser = router.asPath.split("/")[1];
   const dispatch = useDispatch();
+  const [userTopics, setUserTopics] = useState([]);
+  const user = useSelector((state) => state.auth.user);
+  const intl = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" });
+  const { questionsAsked, questionsAnswered } = publicUserData;
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const userTopics = await getUserFollowedTopics(user.userId);
+
+      setUserTopics(userTopics);
+    })();
+  }, [user]);
+
   // When <UserProfile> mounts the visited user will be saved to state, and when <UserProfile> unmounts the visited user will be null
   useEffect(() => {
     dispatch(globalActions.setVisitedUser(visitedUser));
@@ -22,11 +40,11 @@ const UserProfile = function ({ publicUserData }) {
     };
   }, []);
 
-  const user = useSelector((state) => state.auth.user);
-
   const changePasswordHandler = () => {
     router.push("/change-password");
   };
+
+  const deleteAccountHandler = () => {};
 
   return (
     <div className={classes.container}>
@@ -40,9 +58,7 @@ const UserProfile = function ({ publicUserData }) {
               <AvatarIllustration className={classes.avatar} />
             )}
           </div>
-
           <h2>{publicUserData.username}</h2>
-
           <div className={classes["user-stats"]}>
             <div>
               <QuestionIcon className={classes["question-icon"]} />
@@ -59,48 +75,99 @@ const UserProfile = function ({ publicUserData }) {
         {publicUserData.about && <About text={publicUserData.about} />}
 
         <p className={classes.member}>
-          Member since{" "}
-          {convertDate(publicUserData.memberSince.seconds, {
-            dateStyle: "medium",
-          })}
+          Member since {intl.format(new Date(publicUserData.memberSince))}
         </p>
       </div>
 
-      {true && (
-        <>
-          <div className={classes.q}>
-            <h2 className={classes.h2}>
-              {user ? "My questions" : "Questions"}
-            </h2>
-            {/* <QuestionGroup
-              className={classes["profile-questions"]}
-              questions={getAllQuestions()}
-            /> */}
+      <div className={classes.sub}>
+        <MyFeedInfo
+          className={classes.feedInfo}
+          userTopicsState={[userTopics, setUserTopics]}
+          topicWrapperClass={classes.topicWrapper}
+          moreWrapperClass={classes.moreWrapper}
+        />
+        <div className={classes.userQuestions}>
+          <div className={classes.info}>
+            <h3>
+              {user
+                ? "My questions"
+                : `Questions by ${publicUserData.username}`}
+            </h3>
+            <div className={classes.stats}>
+              <div className={classes.stat}>
+                <QuestionIcon />0
+              </div>
+            </div>
           </div>
 
-          <div className={classes.a}>
-            <h2 className={classes.h2}>
-              {user ? "My answered questions" : "Answered questions"}
-            </h2>
-            {/* <QuestionGroup
-              className={classes["profile-questions"]}
-              questions={getAllQuestions()}
-            /> */}
-          </div>
-
-          {/* If user logged in is the same as the user being visited */}
-          {user?.username === visitedUser && (
-            <div className={classes.btns}>
-              <SecondaryButton onClick={changePasswordHandler}>
-                Change password
-              </SecondaryButton>
-              <SecondaryButton className={classes["delete-account"]}>
-                Delete account
-              </SecondaryButton>
+          {questionsAsked.length === 0 && (
+            <div className={classes.nothing}>
+              <h2>No questions</h2>
+              <p>
+                {" "}
+                {user
+                  ? "You have not posted any questions yet."
+                  : `${publicUserData.username} has not asked any questions yet.`}
+              </p>
             </div>
           )}
-        </>
-      )}
+
+          {questionsAsked.length > 0 &&
+            questionsAsked.map((questionAsked) => (
+              <QuestionItem
+                key={questionAsked.uid}
+                className={classes.questionItemOverride}
+                questionData={questionAsked}
+              />
+            ))}
+        </div>
+        <div className={classes.userAnswers}>
+          <div className={classes.info}>
+            <h3>
+              {user ? "My answers" : `Answers by ${publicUserData.username}`}
+            </h3>
+
+            <div className={classes.stats}>
+              <div className={classes.stat}>
+                <ReplyIcon />0
+              </div>
+            </div>
+          </div>
+
+          {questionsAnswered.length === 0 && (
+            <div className={classes.nothing}>
+              <h2>No answers</h2>
+              <p>
+                {" "}
+                {user
+                  ? "You have not posted any answers yet."
+                  : `${publicUserData.username} has not answered any questions yet.`}
+              </p>
+            </div>
+          )}
+
+          {questionsAnswered.length > 0 &&
+            questionsAnswered.map((questionAnswered) => (
+              <QuestionItem
+                key={questionAnswered.uid}
+                className={classes.questionItemOverride}
+                questionData={questionAnswered}
+              />
+            ))}
+        </div>
+
+        <div className={classes.btns}>
+          <SecondaryButton onClick={changePasswordHandler}>
+            Change password
+          </SecondaryButton>
+          <SecondaryButton
+            className={classes.deleteAccount}
+            onClick={deleteAccountHandler}
+          >
+            Delete account
+          </SecondaryButton>
+        </div>
+      </div>
     </div>
   );
 };

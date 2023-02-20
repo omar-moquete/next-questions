@@ -12,7 +12,7 @@ const Modal1 = function ({ title, paragraphs, buttons, children }) {
     <div className={classes.overlay}>
       <div className={classes.modal}>
         <h2>{title}</h2>
-        {paragraphs && paragraphs.map(p, (i) => <p key={i}>p</p>)}
+        {paragraphs && paragraphs.map((p, i) => <p key={i}>{p}</p>)}
 
         {children}
 

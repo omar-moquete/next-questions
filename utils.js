@@ -39,19 +39,6 @@ export const scrollToTop = () => {
   });
 };
 
-export const convertDate = function (
-  unixTimestamp,
-  options = {
-    dateStyle: "full",
-    timeStyle: "full",
-  }
-) {
-  const date = new Date(unixTimestamp * 1000);
-  const intl = new Intl.DateTimeFormat("en-US", options);
-
-  return intl.format(date);
-};
-
 export const toSerializable = (obj) => JSON.parse(JSON.stringify(obj));
 
 export const bindArgs = (fn, ...args) => {

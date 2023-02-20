@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getQuestionsWithTopicUids, getUserFollowedTopics } from "../../db";
 import FeedControlBar from "../feed-control-bar/FeedControlBar";
+import MyFeedInfo from "../my-feed-info/MyFeedInfo";
 import QuestionItem from "../question-item/QuestionItem";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
-import MyFeedInfo from "./my-feed-info/MyFeedInfo";
 import classes from "./MyFeed.module.scss";
 
 const MyFeed = function () {

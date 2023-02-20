@@ -27,36 +27,11 @@
   }
 }
 
-// .username-time-topic > .topic-style-override {
-//   border-color: variables.$accent-color-1;
-//   color: variables.$accent-color-1;
-//   border: 1px solid variables.$accent-color-1;
-//   outline: 0px solid variables.$accent-color-1;
-
-//   div {
-//     background-color: variables.$accent-color-1;
-//     color: #fff;
-//   }
-
-//   @media (max-width: 500px) {
-//     & {
-//       border-width: 1px;
-//     }
-//   }
-//   @media (hover: hover) {
-//     &:hover {
-//       outline: 1px solid variables.$accent-color-1;
-//     }
-//   }
-//   &:active {
-//     outline: 1px solid variables.$accent-color-1;
-//   }
-// }
-
 .text {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  color: #333;
 }
 
 .username-time-topic {

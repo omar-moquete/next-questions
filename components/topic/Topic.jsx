@@ -1,9 +1,17 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { followTopic, isUserFollowngTopic, unfollowTopic } from "../../db";
+import { MAX_FOLLOWED_TOPICS } from "../../app-config";
+import {
+  followTopic,
+  getUserFollowedTopics,
+  isUserFollowngTopic,
+  unfollowTopic,
+} from "../../db";
 import { globalActions } from "../../redux-store/globalSlice";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
+import Modal1 from "../UI/modals/Modal1";
+import Portal from "../UI/Portal";
 import classes from "./Topic.module.scss";
 
 const Topic = function ({ topicUid, className, title, userTopicsState }) {
@@ -17,6 +25,7 @@ const Topic = function ({ topicUid, className, title, userTopicsState }) {
   const [intervalId, setIntervalId] = useState();
   const [countdown, setCountdown] = useState(5);
   const [showCountdown, setShowCountdown] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   // Allows the useEffect to re-run "setIsFollowing" when it changes.
   const currentFollowedTopics = useSelector(
     (slices) => slices.global.questionUI.currentFollowedTopics
@@ -70,6 +79,17 @@ const Topic = function ({ topicUid, className, title, userTopicsState }) {
     } else {
       // Else If a click event happens and isFollowing === false, then follow and setIsFollowing to true
 
+      setLoading(true);
+      if (
+        (await getUserFollowedTopics(user.userId)).length >= MAX_FOLLOWED_TOPICS
+      ) {
+        console.error(
+          `Max followed topics reached (limit: ${MAX_FOLLOWED_TOPICS}).`
+        );
+        setShowModal(true);
+        setLoading(false);
+        return;
+      }
       if (intervalId) {
         timeoutId && clearTimeout(timeoutId);
         intervalId && clearInterval(intervalId);
@@ -77,7 +97,6 @@ const Topic = function ({ topicUid, className, title, userTopicsState }) {
         setShowCountdown(false);
       }
 
-      setLoading(true);
       await followTopic(topicUid);
       dispatch(globalActions.setCurrentFollowedTopic(topicUid));
       setIsFollowing(true);
@@ -92,6 +111,10 @@ const Topic = function ({ topicUid, className, title, userTopicsState }) {
     // Makes sure state is only set if mouse left while remove overlay is on.
     if (!isRemoving) return;
     setIsRemoving(false);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -116,6 +139,15 @@ const Topic = function ({ topicUid, className, title, userTopicsState }) {
         </div>
       )}
       #{title}
+      <Portal show={showModal}>
+        <Modal1
+          title="Max followed topics reached."
+          paragraphs={[
+            `You have reached the limit of ${MAX_FOLLOWED_TOPICS} followed topics.`,
+          ]}
+          buttons={[{ text: "Close", onClick: closeModal }]}
+        />
+      </Portal>
     </div>
   );
 };

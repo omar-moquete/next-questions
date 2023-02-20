@@ -139,7 +139,6 @@ export const getTopicInfoWithTopicUidLite = async (topicUid) => {
 export const answer = async function (text, questionUid) {
   try {
     const user = store.getState().auth.user;
-
     const data = {
       answeredBy: user.username,
       text,
@@ -149,12 +148,20 @@ export const answer = async function (text, questionUid) {
     const answerRef = await addDoc(collection(db, `/answers`), data);
 
     // Add answer to questionUid.answers[] collection. This way it can be retrieved using the questionUid only.
-    const questionsCollection = collection(
+    const questionsCollectionRef = collection(
       db,
       `/questions/${questionUid}/answers/`
     );
-    addDoc(questionsCollection, { uid: answerRef.id });
 
+    // Add answer to user answered questions
+    const addedAnswerDocRef = await addDoc(questionsCollectionRef, {
+      uid: answerRef.id,
+    });
+    const questionsAnsweredCollectionRef = collection(
+      db,
+      `/users/${user.userId}/questionsAnswered`
+    );
+    await addDoc(questionsAnsweredCollectionRef, { uid: addedAnswerDocRef.id });
     return {
       ...data,
       answerAuthorData: { imageUrl: store.getState().auth.user.imageUrl },
@@ -169,7 +176,7 @@ export const answer = async function (text, questionUid) {
 export const reply = async function (text, answerUid, mention) {
   try {
     const user = store.getState().auth.user;
-
+    if (!user) throw new Error("No user found in state");
     const data = {
       answer: answerUid,
       repliedBy: user.username,
@@ -476,7 +483,7 @@ export const getQuestionDetails = async function (questionUid) {
     );
 
     topicData.date = new Date(topicData.date.toDate()).toISOString();
-
+    //
     // add answers data
     const questionAnswers = await getQuestionAnswers(questionUid);
 
@@ -982,5 +989,147 @@ export const unfollowTopic = async function (topicUid) {
     );
   } catch (error) {
     console.error(`@unfollowTopic()🚨${error}`);
+  }
+};
+
+export const getQuestionDetailsLite = async function (questionUid) {
+  const questionDocumentRef = await getDoc(
+    doc(db, `/questions/${questionUid}`)
+  );
+
+  const questionData = questionDocumentRef.data();
+
+  // 2) find the user that asked the question and get the imageUrl
+  const questionAuthor = await getUserDataWithUsername(questionData.askedBy);
+
+  const questionDetails = {
+    ...questionData,
+    questionAuthorData: { imageUrl: questionAuthor.imageUrl },
+    uid: questionUid,
+    date: new Date(questionData.date.toDate()).toISOString(),
+  };
+
+  // add topic data
+  const topicData = await getTopicInfoWithTopicUidLite(
+    questionDetails.topic.uid
+  );
+
+  topicData.date = new Date(topicData.date.toDate()).toISOString();
+  //
+  // add answers data
+  const questionAnswers = await getQuestionAnswers(questionUid);
+
+  // get likes for question
+  const questionLikes = await getQuestionLikes(questionUid);
+  questionLikes.forEach(
+    (like) => (like.date = new Date(like.date.toDate()).toISOString())
+  );
+
+  // get likes and imageUrl for answers
+  for (let i = 0; i < questionAnswers.length; i++) {
+    const answerLikes = await getAnswerLikes(questionAnswers[i].uid);
+    answerLikes.forEach(
+      (like) => (like.date = new Date(like.date.toDate()).toISOString())
+    );
+
+    // add imageUrl
+    const answerAuthorData = await getUserDataWithUsername(
+      questionAnswers[i].answeredBy
+    );
+    questionAnswers[i].answerAuthorData = {
+      imageUrl: answerAuthorData.imageUrl,
+    };
+    questionAnswers[i].likes = answerLikes;
+  }
+
+  const preparedData = {
+    ...questionDetails,
+    topic: topicData,
+    questionAnswers,
+    likes: questionLikes,
+  };
+
+  return preparedData;
+};
+
+export const getUserAskedQuestions = async function (userId) {
+  try {
+    const queryRef = query(collection(db, `/users/${userId}/questionsAsked`));
+
+    const docsRefs = await getDocs(queryRef);
+    const userQuestionUids = [];
+
+    docsRefs.forEach((docRef) => userQuestionUids.push(docRef.data().uid));
+
+    const questions = [];
+    for (let i = 0; i < userQuestionUids.length; i++) {
+      const question = await getQuestionDetailsLite(userQuestionUids[i]);
+      questions.push(question);
+    }
+    return questions;
+  } catch (error) {
+    console.error(`@getUserAskedQuestions()🚨${error}`);
+  }
+};
+
+export const getUserAnsweredQuestions = async function (userId) {
+  try {
+    const queryRef = query(
+      collection(db, `/users/${userId}/questionsAnswered`)
+    );
+    const docsRefs = await getDocs(queryRef);
+    const userQuestionsAnsweredUids = [];
+    docsRefs.forEach((docRef) =>
+      userQuestionsAnsweredUids.push(docRef.data().uid)
+    );
+
+    const questions = [];
+    for (let i = 0; i < userQuestionsAnsweredUids.length; i++) {
+      const question = await getQuestionDetailsLite(userQuestionUids[i]);
+      questions.push(question);
+    }
+    return questions;
+  } catch (error) {
+    console.error(`@getUserAnsweredQuestions()🚨${error}`);
+  }
+};
+
+export const getPublicUserData = async function (username) {
+  // get public user information using username.
+
+  try {
+    // Query for user basic info
+    const queryRef = query(
+      collection(db, "/users"),
+      where("username", "==", username)
+    );
+
+    // Return null if no user was found
+    if (queryRef.empty) return null;
+
+    const querySnapshot = await getDocs(queryRef);
+
+    let publicUserData = {};
+    // Only one result, only one iteration.
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      publicUserData = {
+        ...data,
+        memberSince: new Date(data.memberSince.toDate()).toISOString(),
+      };
+    });
+
+    // add asked and answered questions.
+    publicUserData.questionsAsked = await getUserAskedQuestions(
+      publicUserData.userId
+    );
+
+    publicUserData.questionsAnswered = await getUserAnsweredQuestions(
+      publicUserData.userId
+    );
+
+    return publicUserData;
+  } catch (error) {
+    console.error(`@getPublicUserData()🚨${error}`);
   }
 };

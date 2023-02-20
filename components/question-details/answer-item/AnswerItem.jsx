@@ -34,13 +34,6 @@ const AnswerItem = function ({
 
   // Side note: questionsAnswers is never undefined in questionDetails because a value is always received from getStaticProps even if a question answer does not have a reply object, in which case an empty array is returned. In the case of adding a reply to an answer, when the reply is posted it's automatycally added to the DOM because our page is hydrated and react will take over. This means that when react tries to render <AnswerItem/> answerReplies will be undefined because getStaticProps is not passing this argument. This is why a default value of an empty array is assigned to it on component load. If left unhandled, app will crash on answer addition.
   const [repliesState, setRepliesState] = useState(answerReplies);
-
-  // useEffect(() => {
-  //   getUserDataWithUsername(answeredBy).then((userData) =>
-  //     setImageUrl(userData.imageUrl)
-  //   );
-  // });
-
   const { ReplyFormAnchor, show } = useReplyForm();
 
   // Likes

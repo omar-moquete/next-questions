@@ -9,3 +9,4 @@ export const INVALID_EMAIL_MESSAGE =
   "The email address is not a valid email address.";
 export const INVALID_USERNAME_MESSAGE =
   'The username must be between five and fifteen characters and cannot contain special characters, except for "-" and "_".';
+export const MAX_FOLLOWED_TOPICS = 50;

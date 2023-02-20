@@ -2,29 +2,36 @@
 @use "../../styles/variables";
 
 .container {
-  display: grid;
-  grid-template-columns: (350px + 42px + 42px) auto;
-  grid-template-rows: auto auto;
+  display: flex;
+  align-items: flex-start;
   justify-content: center;
   margin: 0 auto;
-  min-height: calc(100vh - 150px - 150px);
   margin-top: 150px;
   margin-bottom: 150px;
-  align-items: center;
-  justify-content: center;
-  row-gap: 64px;
+  gap: 24px;
+
+  .feedInfo {
+    background-image: variables.$gradient;
+    border: unset;
+    margin: 0;
+    align-self: start;
+    width: 50vw;
+    max-width: 700px;
+    @include mixins.shadow;
+  }
 }
 
+.sub {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+}
 .user-information {
   display: flex;
   justify-content: center;
   gap: 46px;
   justify-self: center;
-  align-self: start;
-}
-
-.a {
-  grid-column: 2 / -1;
 }
 
 .picture {
@@ -40,7 +47,6 @@
 }
 
 .user-information {
-  grid-row: 1/-1;
   flex-direction: column;
   font-size: 1.2rem;
   align-items: center;
@@ -78,7 +84,7 @@
 
 .user-information,
 .btns {
-  padding: 26px;
+  padding: 12px;
 }
 
 .member {
@@ -86,7 +92,6 @@
 }
 
 .btns {
-  grid-column: 2;
   display: flex;
   width: fit-content;
   align-self: center;
@@ -95,7 +100,7 @@
   background: variables.$gradient;
   align-self: center;
   justify-self: center;
-  .delete-account {
+  .deleteAccount {
     background-color: #f33b50;
   }
 
@@ -141,35 +146,89 @@
   align-self: start;
 }
 
-@media (max-width: 850px) {
+@media (max-width: 830px) {
   .container {
-    grid-template-columns: auto;
-    grid-template-rows: auto auto auto auto;
-    row-gap: 64px;
-
+    flex-direction: column;
+    align-items: center;
     .user-information {
-      grid-row: 1;
-      grid-column: 1;
       width: 90vw;
     }
 
-    .q {
-      grid-row: 2;
-      grid-column: 1;
-    }
-    .a {
-      grid-row: 3;
-      grid-column: 1;
+    .feedInfo {
+      width: 90vw;
     }
 
     .btns {
-      grid-row: 4;
-      grid-column: 1;
-      width: 100%;
+      width: 90vw;
     }
   }
 
   .profile-questions {
     width: 90vw;
+  }
+}
+
+.userQuestions,
+.userAnswers {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  border-radius: 8px;
+  background-image: variables.$gradient;
+  padding: 12px;
+  color: #fff;
+  max-height: 800px;
+  width: 50vw;
+  max-width: 700px;
+  overflow-y: auto;
+  @include mixins.shadow;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  height: 2.4rem;
+  justify-content: space-between;
+  border-bottom: solid 1px #fff;
+
+  h3 {
+    @include mixins.main-font;
+    font-size: 3rem;
+    font-weight: 500;
+  }
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+  font-size: 1.2rem;
+}
+
+.stat {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 4px;
+  svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke-width: 2;
+  }
+}
+
+.questionItemOverride {
+  width: 100%;
+}
+
+.nothing {
+  text-align: center;
+  margin: 16px;
+
+  h2 {
+    margin-bottom: 2px;
+    font-size: 3rem;
+    font-weight: 500;
+    @include mixins.main-font;
   }
 }

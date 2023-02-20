@@ -1,5 +1,5 @@
-@use "../../../styles/variables";
-@use "../../../styles/mixins";
+@use "../../styles/variables";
+@use "../../styles/mixins";
 
 .main {
   display: grid;
@@ -11,19 +11,18 @@
   border: 2px solid #fff;
   color: #fff;
   user-select: none;
+}
+.info {
+  display: flex;
+  align-items: center;
+  height: 2.4rem;
+  justify-content: space-between;
+  border-bottom: solid 1px #fff;
 
-  .info {
-    display: flex;
-    align-items: center;
-    height: 2.4rem;
-    justify-content: space-between;
-    border-bottom: solid 1px #fff;
-
-    h3 {
-      @include mixins.main-font;
-      font-size: 3rem;
-      font-weight: 500;
-    }
+  h3 {
+    @include mixins.main-font;
+    font-size: 3rem;
+    font-weight: 500;
   }
 }
 
@@ -50,7 +49,6 @@
   width: fit-content;
   align-items: center;
   gap: 4px;
-  stroke: #fff;
   svg {
     width: 26px;
     height: 26px;
@@ -58,7 +56,7 @@
   }
 }
 
-.topicContainer {
+.topicsContainer {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -96,7 +94,6 @@
 
 @media (max-width: 830px) {
   .main {
-    min-width: none;
     width: 90vw;
   }
 }
