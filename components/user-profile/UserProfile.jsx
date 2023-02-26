@@ -80,22 +80,23 @@ const UserProfile = function ({ publicUserData }) {
       </div>
 
       <div className={classes.sub}>
-        <MyFeedInfo
-          className={classes.feedInfo}
-          userTopicsState={[userTopics, setUserTopics]}
-          topicWrapperClass={classes.topicWrapper}
-          moreWrapperClass={classes.moreWrapper}
-        />
+        {user && (
+          <MyFeedInfo
+            className={classes.feedInfo}
+            userTopicsState={[userTopics, setUserTopics]}
+            topicWrapperClass={classes.topicWrapper}
+            moreWrapperClass={classes.moreWrapper}
+          />
+        )}
+
+        {/* user questions */}
         <div className={classes.userQuestions}>
           <div className={classes.info}>
-            <h3>
-              {user
-                ? "My questions"
-                : `Questions by ${publicUserData.username}`}
-            </h3>
+            <h3>{user ? "My questions" : "Questions"}</h3>
             <div className={classes.stats}>
               <div className={classes.stat}>
-                <QuestionIcon />0
+                <QuestionIcon />
+                {questionsAsked.length}
               </div>
             </div>
           </div>
@@ -121,15 +122,16 @@ const UserProfile = function ({ publicUserData }) {
               />
             ))}
         </div>
+
+        {/* user answers */}
         <div className={classes.userAnswers}>
           <div className={classes.info}>
-            <h3>
-              {user ? "My answers" : `Answers by ${publicUserData.username}`}
-            </h3>
+            <h3>{user ? "My answered questions" : `Answered questions`}</h3>
 
             <div className={classes.stats}>
               <div className={classes.stat}>
-                <ReplyIcon />0
+                <ReplyIcon />
+                {questionsAnswered.length}
               </div>
             </div>
           </div>
@@ -156,17 +158,19 @@ const UserProfile = function ({ publicUserData }) {
             ))}
         </div>
 
-        <div className={classes.btns}>
-          <SecondaryButton onClick={changePasswordHandler}>
-            Change password
-          </SecondaryButton>
-          <SecondaryButton
-            className={classes.deleteAccount}
-            onClick={deleteAccountHandler}
-          >
-            Delete account
-          </SecondaryButton>
-        </div>
+        {user && (
+          <div className={classes.btns}>
+            <SecondaryButton onClick={changePasswordHandler}>
+              Change password
+            </SecondaryButton>
+            <SecondaryButton
+              className={classes.deleteAccount}
+              onClick={deleteAccountHandler}
+            >
+              Delete account
+            </SecondaryButton>
+          </div>
+        )}
       </div>
     </div>
   );

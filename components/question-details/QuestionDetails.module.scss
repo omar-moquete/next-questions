@@ -19,7 +19,6 @@
 
 .border {
   border-radius: 8px;
-  overflow: hidden;
   @include mixins.shadow;
 }
 

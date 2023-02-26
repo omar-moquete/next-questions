@@ -16,6 +16,7 @@ export const getStaticProps = async function ({ params }) {
   const publicUserData = await getPublicUserData(params.usernameId);
 
   // === null because getPublicUserData() returns null if no user was found with the username Id passed.
+
   if (publicUserData === null) {
     return { notFound: true };
   }

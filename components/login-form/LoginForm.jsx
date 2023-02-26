@@ -84,7 +84,7 @@ const LoginForm = function () {
       )}
       {message && <FormMessage message={message} onClick={clearMessage} />}
 
-      <Link className={classes["forgot-password"]} href="/login/reset-password">
+      <Link className={classes["forgot-password"]} href="/forgot-password">
         Forgot your password?
       </Link>
     </PrimaryForm>

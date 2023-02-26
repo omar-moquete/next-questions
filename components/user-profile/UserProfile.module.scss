@@ -182,6 +182,9 @@
   max-width: 700px;
   overflow-y: auto;
   @include mixins.shadow;
+  .questionItemOverride {
+    width: 100%;
+  }
 }
 
 .info {
@@ -217,10 +220,6 @@
   }
 }
 
-.questionItemOverride {
-  width: 100%;
-}
-
 .nothing {
   text-align: center;
   margin: 16px;
@@ -230,5 +229,12 @@
     font-size: 3rem;
     font-weight: 500;
     @include mixins.main-font;
+  }
+}
+
+@media (max-width: 830px) {
+  .userQuestions,
+  .userAnswers {
+    width: 90vw;
   }
 }

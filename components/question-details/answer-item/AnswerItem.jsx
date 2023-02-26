@@ -1,17 +1,14 @@
 import React from "react";
-import { getUserImageUrlWithUsername } from "../../../_TEST_DATA";
 import classes from "./AnswerItem.module.scss";
 import Chevron from "../../UI/svg/chevron";
 import ReplyItem from "./ReplyItem";
 import { useSelector } from "react-redux";
 import LikeButton from "../../question-item/LikeButton";
 import useReplyForm from "../../../hooks/useReplyForm";
-import ReplyButton from "../../question-item/ReplyButton";
 import { timeAgoFormatter } from "../../../utils";
 import Link from "next/link";
 import TimeAgo from "react-timeago";
 import { useState } from "react";
-import InlineSpinner from "../../UI/inline-spinner/InlineSpinner";
 import { likeAnswer } from "../../../db";
 import { useEffect } from "react";
 import AvatarIllustration from "../../UI/svg/AvatarIllustration";
@@ -107,6 +104,9 @@ const AnswerItem = function ({
         dataState={[repliesState, setRepliesState]}
         placeholder="Enter your reply"
         mention={answeredBy}
+        showReplies={() => {
+          setShowReplies(true);
+        }}
       />
 
       {repliesState.length > 0 && showReplies && (

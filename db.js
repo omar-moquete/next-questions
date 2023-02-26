@@ -153,15 +153,17 @@ export const answer = async function (text, questionUid) {
       `/questions/${questionUid}/answers/`
     );
 
-    // Add answer to user answered questions
-    const addedAnswerDocRef = await addDoc(questionsCollectionRef, {
+    await addDoc(questionsCollectionRef, {
       uid: answerRef.id,
     });
+
+    // Add question to user answered questions
     const questionsAnsweredCollectionRef = collection(
       db,
       `/users/${user.userId}/questionsAnswered`
     );
-    await addDoc(questionsAnsweredCollectionRef, { uid: addedAnswerDocRef.id });
+
+    await addDoc(questionsAnsweredCollectionRef, { uid: questionUid });
     return {
       ...data,
       answerAuthorData: { imageUrl: store.getState().auth.user.imageUrl },
@@ -189,12 +191,18 @@ export const reply = async function (text, answerUid, mention) {
       collection(db, `/answers/${answerUid}/replies`),
       data
     );
-    return {
+    // This returned data is used to display the new reply. The reply state will be set to this. This function (reply()) is called on ReplyForm submission for a reply.
+
+    const postedReply = {
       ...data,
-      uid: docRef.uid,
+      replyAuthorData: { imageUrl: user.imageUrl, username: user.username },
+      uid: docRef.id,
       date: new Date().toISOString(),
-      replyAuthorData: { imageUrl: store.getState().auth.user.imageUrl },
+      likes: [],
+      answers: [],
     };
+
+    return postedReply;
   } catch (error) {
     console.error(`@reply()🚨${error}`);
   }
@@ -547,13 +555,6 @@ export const getQuestionDetails = async function (questionUid) {
 
     // get replies likes
     for (let i1 = 0; i1 < preparedData.questionAnswers.length; i1++) {
-      // const replyRefs = [];
-      // const replyLikesDocRefs = await getDocs(
-      //   collection(db, `/answers/${preparedData.questionAnswers[i1].uid}/replies/`)
-      // );
-
-      // replyLikesDocRefs.forEach((docRef) => replyRefs.push(docRef));
-
       for (
         let i2 = 0;
         i2 < preparedData.questionAnswers[i1].replies.length;
@@ -577,6 +578,34 @@ export const getQuestionDetails = async function (questionUid) {
 
         preparedData.questionAnswers[i1].replies[i2].likes = replyLikesRefData;
       }
+
+      // After replies have been added, sor by likes and then by date
+      const repliesWithLikes = preparedData.questionAnswers[i1].replies.filter(
+        (reply) => reply.likes.length > 0
+      );
+
+      const repliesWithoutLikes = preparedData.questionAnswers[
+        i1
+      ].replies.filter((reply) => reply.likes.length === 0);
+
+      // Sort by likes
+      repliesWithLikes.sort((a, b) => {
+        if (a.likes.length > b.likes.length) return -1;
+        else if (a.likes.length < b.likes.length) return 1;
+        else return 0;
+      });
+
+      // Sort by posted time.
+      repliesWithoutLikes.sort((a, b) => {
+        if (+new Date(a.date) > +new Date(b.date)) return 1;
+        else if (+new Date(a.date) < +new Date(b.date)) return -1;
+        else return 0;
+      });
+
+      preparedData.questionAnswers[i1].replies = [
+        ...repliesWithLikes,
+        ...repliesWithoutLikes,
+      ];
     }
 
     return preparedData;
@@ -993,63 +1022,58 @@ export const unfollowTopic = async function (topicUid) {
 };
 
 export const getQuestionDetailsLite = async function (questionUid) {
-  const questionDocumentRef = await getDoc(
-    doc(db, `/questions/${questionUid}`)
-  );
+  try {
+    const questionDocumentRef = await getDoc(
+      doc(db, `/questions/${questionUid}`)
+    );
 
-  const questionData = questionDocumentRef.data();
+    const questionData = questionDocumentRef.data();
 
-  // 2) find the user that asked the question and get the imageUrl
-  const questionAuthor = await getUserDataWithUsername(questionData.askedBy);
+    // 2) find the user that asked the question and get the imageUrl
+    const questionAuthor = await getUserDataWithUsername(questionData.askedBy);
 
-  const questionDetails = {
-    ...questionData,
-    questionAuthorData: { imageUrl: questionAuthor.imageUrl },
-    uid: questionUid,
-    date: new Date(questionData.date.toDate()).toISOString(),
-  };
+    const questionDetails = {
+      ...questionData,
+      questionAuthorData: { imageUrl: questionAuthor.imageUrl },
+      uid: questionUid,
+      date: new Date(questionData.date.toDate()).toISOString(),
+    };
 
-  // add topic data
-  const topicData = await getTopicInfoWithTopicUidLite(
-    questionDetails.topic.uid
-  );
+    // add topic data
+    const topicData = await getTopicInfoWithTopicUidLite(
+      questionDetails.topic.uid
+    );
 
-  topicData.date = new Date(topicData.date.toDate()).toISOString();
-  //
-  // add answers data
-  const questionAnswers = await getQuestionAnswers(questionUid);
+    topicData.date = new Date(topicData.date.toDate()).toISOString();
 
-  // get likes for question
-  const questionLikes = await getQuestionLikes(questionUid);
-  questionLikes.forEach(
-    (like) => (like.date = new Date(like.date.toDate()).toISOString())
-  );
+    // Get answers for question
+    const answersQuerySnapshot = await getDocs(
+      collection(db, `/questions/${questionUid}/answers`)
+    );
 
-  // get likes and imageUrl for answers
-  for (let i = 0; i < questionAnswers.length; i++) {
-    const answerLikes = await getAnswerLikes(questionAnswers[i].uid);
-    answerLikes.forEach(
+    const questionAnswers = [];
+
+    answersQuerySnapshot.forEach((docRef) =>
+      questionAnswers.push({ ...docRef.data() })
+    );
+
+    // get likes for question
+    const questionLikes = await getQuestionLikes(questionUid);
+    questionLikes.forEach(
       (like) => (like.date = new Date(like.date.toDate()).toISOString())
     );
 
-    // add imageUrl
-    const answerAuthorData = await getUserDataWithUsername(
-      questionAnswers[i].answeredBy
-    );
-    questionAnswers[i].answerAuthorData = {
-      imageUrl: answerAuthorData.imageUrl,
+    const preparedData = {
+      ...questionDetails,
+      topic: topicData,
+      questionAnswers,
+      likes: questionLikes,
     };
-    questionAnswers[i].likes = answerLikes;
+
+    return preparedData;
+  } catch (error) {
+    console.error(`@getQuestionDetailsLite()🚨${error}`);
   }
-
-  const preparedData = {
-    ...questionDetails,
-    topic: topicData,
-    questionAnswers,
-    likes: questionLikes,
-  };
-
-  return preparedData;
 };
 
 export const getUserAskedQuestions = async function (userId) {
@@ -1078,6 +1102,7 @@ export const getUserAnsweredQuestions = async function (userId) {
       collection(db, `/users/${userId}/questionsAnswered`)
     );
     const docsRefs = await getDocs(queryRef);
+
     const userQuestionsAnsweredUids = [];
     docsRefs.forEach((docRef) =>
       userQuestionsAnsweredUids.push(docRef.data().uid)
@@ -1085,9 +1110,13 @@ export const getUserAnsweredQuestions = async function (userId) {
 
     const questions = [];
     for (let i = 0; i < userQuestionsAnsweredUids.length; i++) {
-      const question = await getQuestionDetailsLite(userQuestionUids[i]);
+      const question = await getQuestionDetailsLite(
+        userQuestionsAnsweredUids[i]
+      );
+
       questions.push(question);
     }
+
     return questions;
   } catch (error) {
     console.error(`@getUserAnsweredQuestions()🚨${error}`);
@@ -1104,10 +1133,10 @@ export const getPublicUserData = async function (username) {
       where("username", "==", username)
     );
 
-    // Return null if no user was found
-    if (queryRef.empty) return null;
-
     const querySnapshot = await getDocs(queryRef);
+
+    // Return null if no user was found
+    if (querySnapshot.empty) return null;
 
     let publicUserData = {};
     // Only one result, only one iteration.

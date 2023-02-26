@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import classes from "./PasswordChangeForm.module.scss";
 import PrimaryForm from "../UI/forms/PrimaryForm";
-import CustomField from "../UI/custom-field/CustomFields";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import PasswordIcon from "../UI/svg/PasswordIcon";
 import FormMessage from "../UI/forms/form-message/FormMessage";
@@ -15,6 +14,7 @@ import useAuth from "../../hooks/useAuth";
 import { useRouter } from "next/router";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import CheckIcon from "../UI/svg/CheckIcon";
+import CustomField from "../UI/custom-fields/CustomField";
 
 const PasswordChangeForm = function () {
   const [message, setMessage] = useState("");

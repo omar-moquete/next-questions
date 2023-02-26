@@ -4,7 +4,6 @@ import classes from "./NavBarUserProfile.module.scss";
 import useAuth from "../../../../../hooks/useAuth";
 import AvatarIllustration from "../../../svg/AvatarIllustration";
 import { useSelector } from "react-redux";
-import { useRouter } from "next/router";
 
 const NavBarUserProfile = function (props) {
   const { logout } = useAuth();

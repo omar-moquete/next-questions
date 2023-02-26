@@ -14,8 +14,8 @@ const ReplyForm = function ({
   questionUid = null,
   answerUid = null,
   mention,
-  postReversed = false,
   updateAnswersQuantity,
+  showReplies, // Show replies updates the UI when an answer reply is posted. This causes all the replies for the answer get displayed including the just posted reply.
 }) {
   const inputRef = useRef();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,16 +41,10 @@ const ReplyForm = function ({
       // post a new reply to questions/questionUid/answers/answerUid/replies
 
       const postedReply = await reply(text, answerUid, mention);
-
-      if (postReversed) {
-        const copy = [...data];
-        copy.push(postedReply);
-        setData(copy);
-        unmounter();
-      } else {
-        setData([postedReply, ...data]);
-        unmounter();
-      }
+      const newPostedReply = [postedReply, ...data];
+      setData(newPostedReply); // Set new data state which allows the UI to update with the old replies plus the just posted reply. Prevents the need to fetch data after posted to the DB.
+      showReplies(); // Show all replies
+      unmounter(); // unmount form
     }
   };
 

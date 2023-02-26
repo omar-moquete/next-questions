@@ -1,8 +1,13 @@
 import React from "react";
 import LoginForm from "../../components/login-form/LoginForm";
+import RouteGuard from "../../components/route-guard/RouteGuard";
 
-const Homepage = function () {
-  return <LoginForm />;
+const LoginPage = function () {
+  return (
+    <RouteGuard whenLoggedIn={false} redirectPath="/__USER_PROFILE__">
+      <LoginForm />
+    </RouteGuard>
+  );
 };
 
-export default Homepage;
+export default LoginPage;
