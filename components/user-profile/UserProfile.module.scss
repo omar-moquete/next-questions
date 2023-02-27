@@ -63,6 +63,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     width: 200px;
     height: 200px;
     border-radius: 50%;
@@ -75,6 +76,37 @@
       border-radius: 50%;
       object-fit: cover;
     }
+  }
+  .newImageOverlayInactive {
+    background-color: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    svg {
+      opacity: 0;
+    }
+  }
+  .newImageOverlayActive {
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+    svg {
+      opacity: 1;
+    }
+  }
+}
+
+.newImageOverlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  svg {
+    width: 64px;
+    height: 64px;
+    stroke-width: 1.5;
+    transition: opacity 0.2s ease-in-out;
   }
 }
 .avatar {
@@ -231,7 +263,33 @@
     @include mixins.main-font;
   }
 }
+.chooseImage {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+}
 
+.chooseImageInactive {
+  border: solid 2px #8c8c8c;
+  color: #8c8c8c;
+}
+
+.chooseImageActive {
+  border: solid 2px #01ed01;
+  color: #01ed01;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+}
+.uploadBtnDisabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
 @media (max-width: 830px) {
   .userQuestions,
   .userAnswers {

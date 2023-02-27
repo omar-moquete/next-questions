@@ -244,14 +244,23 @@ const QuestionItem = function ({
     }
   }, [user, questionLikes]);
 
+  const [questionUserImage, setQuestionUserImage] = useState(
+    questionData.questionAuthorData.imageUrl
+  );
+
+  // Dynamically set the image displayed for this component to a state if the question author name is the same as the logged in username
+  useEffect(() => {
+    if (!user) return;
+    if (user.username === questionData.askedBy) {
+      setQuestionUserImage(user.imageUrl);
+    }
+  }, [user]);
+
   return (
     <li className={`${classes.container} ${className || ""}`}>
       <div className={classes.info}>
         {questionData.questionAuthorData.imageUrl && (
-          <img
-            src={questionData.questionAuthorData.imageUrl}
-            alt="User image"
-          />
+          <img src={questionUserImage} alt="User image" />
         )}
         {!questionData.questionAuthorData.imageUrl && (
           <AvatarIllustration className={classes.avatarIllustration} />

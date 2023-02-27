@@ -5,7 +5,6 @@ import { bindArgs } from "../../utils";
 import Highlight from "./Highlight";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import { useDispatch } from "react-redux";
 import { globalActions } from "../../redux-store/globalSlice";
 
@@ -21,6 +20,7 @@ const TopicResults = function ({
   setQuery,
   searchingTopic,
   resetSearchBar,
+  isTopicValid,
 }) {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -44,11 +44,22 @@ const TopicResults = function ({
 
   return (
     <ul className={classes.results}>
+      {!isTopicValid && (
+        <li className={classes.invalidTopic}>
+          <div>
+            <h3>Topics cannot contain spaces or special characters.</h3>
+            <p>Example: #TheBeatles</p>
+          </div>
+        </li>
+      )}
+
+      {console.log("isTopicValid", isTopicValid)}
       {router.asPath.split("?")[0] === "/new-question" &&
         topics.every(
           (topic) =>
             topic.title.trim().toLowerCase() !== query.trim().toLowerCase()
-        ) && (
+        ) &&
+        isTopicValid && (
           <li
             className={classes["new-topic"]}
             onClick={() => {
@@ -63,30 +74,35 @@ const TopicResults = function ({
           </li>
         )}
 
-      {canForwardTopic && topics.length === 0 && !searchingTopic && (
-        <li className={classes["no-questions"]}>
-          <Link
-            href={{
-              pathname: "/new-question",
-              query: { query },
-            }}
+      {canForwardTopic &&
+        topics.length === 0 &&
+        !searchingTopic &&
+        isTopicValid && (
+          <li className={classes["no-questions"]}>
+            <Link
+              href={{
+                pathname: "/new-question",
+                query: { query },
+              }}
+            >
+              <h3>
+                No questions listed for <span>#{query}</span>. Click here to
+                start this topic with a question.
+              </h3>
+            </Link>
+          </li>
+        )}
+
+      {isTopicValid &&
+        topics.map((topic) => (
+          <li
+            key={topic.uid}
+            onClick={bindArgs(handleSelectedTopic, topic.uid, topic.title)}
           >
-            <h3>
-              No questions listed for <span>#{query}</span>. Click here to start
-              this topic with a question.
-            </h3>
-          </Link>
-        </li>
-      )}
-      {topics.map((topic) => (
-        <li
-          key={topic.uid}
-          onClick={bindArgs(handleSelectedTopic, topic.uid, topic.title)}
-        >
-          <div className={classes.text}>
-            <h3>
-              <span>#</span>
-              {/* 
+            <div className={classes.text}>
+              <h3>
+                <span>#</span>
+                {/* 
               typed query: "carr", length = 4
               topic result: CarRepairs
               substring from 0 which is "C" to query length which is 4 = 
@@ -95,18 +111,18 @@ const TopicResults = function ({
 
           highlight(CarR) +  topic.title.substring(query.length)(epairs)         
               */}
-              <Highlight value={topic.title.substring(0, query.length)} />
-              {topic.title.substring(query.length)}
-            </h3>
-            <p>{topic.description}</p>
-          </div>
-          <div className={classes["total-questions-wrapper"]}>
-            <div className={classes["total-questions"]}>
-              <QuestionIcon /> <span>{topic.questionsAsked.length}</span>
+                <Highlight value={topic.title.substring(0, query.length)} />
+                {topic.title.substring(query.length)}
+              </h3>
+              <p>{topic.description}</p>
             </div>
-          </div>
-        </li>
-      ))}
+            <div className={classes["total-questions-wrapper"]}>
+              <div className={classes["total-questions"]}>
+                <QuestionIcon /> <span>{topic.questionsAsked.length}</span>
+              </div>
+            </div>
+          </li>
+        ))}
     </ul>
   );
 };

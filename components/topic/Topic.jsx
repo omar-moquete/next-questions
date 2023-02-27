@@ -42,7 +42,10 @@ const Topic = function ({ topicUid, className, title, userTopicsState }) {
   }, [user, currentFollowedTopics]);
 
   const handleTopicSubscription = async () => {
-    if (!user) router.push("/login");
+    if (!user) {
+      router.push("/login");
+      return;
+    }
 
     if (isFollowing) {
       // If a click event happens and isFollowing === true, then unfollow and setIsFollowing to false

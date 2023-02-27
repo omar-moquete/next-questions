@@ -16,15 +16,18 @@ const Modal1 = function ({ title, paragraphs, buttons, children }) {
 
         {children}
 
-        {buttons &&
-          buttons.map((button) => (
-            <SecondaryButton
-              key={button.text}
-              onClick={button.onClick || (() => {})}
-            >
-              {button.text}
-            </SecondaryButton>
-          ))}
+        {buttons && (
+          <div className={classes.buttons}>
+            {buttons.map((button) => (
+              <SecondaryButton
+                key={button.text}
+                onClick={button.onClick || (() => {})}
+              >
+                {button.text}
+              </SecondaryButton>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

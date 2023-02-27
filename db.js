@@ -10,14 +10,18 @@ import {
   limit,
   query,
   serverTimestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
+
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { firebaseConfig } from "./api/firebaseApp";
 import store from "./redux-store/store";
 
 // NOTE: These functions control database requests.
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 export const createTopic = async function (topicData) {
   try {
@@ -949,10 +953,26 @@ export const getQuestionAnswers = async (questionUid) => {
   }
 };
 
-export const uploadProfilePicture = async function () {
+export const uploadProfileImage = async function (file) {
+  // Stores the user image and returns a URL to this resource in the cloud.
   try {
+    const user = store.getState().auth.user;
+    if (!user) throw new Error("No user found in state");
+    const imageRef = ref(storage, `/PUBLIC_USER_PROFILE_IMAGES/${user.userId}`);
+    await uploadBytes(imageRef, file);
+    const imageUrl = await getDownloadURL(imageRef);
+    // Save image url to user in db
+    updateDoc(doc(db, `/users/${user.userId}`), { imageUrl });
+    return imageUrl;
   } catch (error) {
     console.error(`@uploadProfilePicture()🚨${error}`);
+  }
+};
+
+export const deleteProfileImage = async function () {
+  try {
+  } catch (error) {
+    console.error(`@deleteProfileImage()🚨${error}`);
   }
 };
 

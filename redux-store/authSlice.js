@@ -39,6 +39,14 @@ const authSlice = createSlice({
     setListenerActive(state) {
       state.listenerActive = true;
     },
+
+    setImageUrl(state, { payload: newImageUrl }) {
+      if (state.user === null) {
+        console.error("User is null at store.auth.user");
+        return;
+      }
+      state.user.imageUrl = newImageUrl;
+    },
   },
 });
 

@@ -10,8 +10,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.8);
+
   color: #333;
   z-index: 600;
 
@@ -31,6 +31,7 @@
   border-radius: 8px;
   padding: 24px;
   gap: 24px;
+  min-width: 400px;
   @include mixins.shadow;
 
   h2 {
@@ -38,5 +39,17 @@
     margin-top: -8px;
     margin-bottom: -8px;
     @include mixins.main-font;
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 830px) {
+  .modal {
+    width: 80vw;
+    min-width: unset;
   }
 }

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import HashIcon from "../UI/svg/HashIcon";
 import FeedIcon from "../UI/svg/FeedIcon";
 import classes from "./TopicFinder.module.scss";
 import TopicResults from "./TopicsResults";
-import { globalActions } from "../../redux-store/globalSlice";
 import { useRouter } from "next/router";
 import { getTopicsWithQuery } from "../../db";
+import { TOPIC_VALIDATION_REGEX } from "../../app-config";
 
 const TopicFinder = function ({
   onSelect,
@@ -27,13 +27,8 @@ const TopicFinder = function ({
   const [isTyping, setIsTyping] = useState(false);
   const [topicResults, setTopicResults] = useState([]);
   const [searchingTopic, setSearchingTopic] = useState(false);
-  const dispatch = useDispatch();
+  const [isTopicValid, setIsTopicValid] = useState(true);
   const router = useRouter();
-
-  // Used to show/hide my feed button depending on the selected feed.
-  const selectedTopicUid = useSelector(
-    (state) => state.global.selectedTopicUid
-  );
 
   const unmount = () => {
     setIsTyping(false);
@@ -108,9 +103,13 @@ const TopicFinder = function ({
     onChange && onChange();
     const currentQuery = topicInputRef.current.value;
 
+    if (TOPIC_VALIDATION_REGEX.test(currentQuery)) setIsTopicValid(true);
+    else setIsTopicValid(false);
+
     // if no query user is not typing
     if (!currentQuery) setIsTyping(false);
     else setIsTyping(true);
+
     setTopicQuery(currentQuery);
   };
 
@@ -124,8 +123,8 @@ const TopicFinder = function ({
   useEffect(() => {
     if (searchParam) topicInputRef.current.value = "";
   }, [searchParam]);
-
   const user = useSelector((slices) => slices.auth.user);
+
   return (
     <div className={`${classes.topics} ${className}`}>
       <div className={classes["input-wrapper"]}>
@@ -160,6 +159,7 @@ const TopicFinder = function ({
           inputRef={topicInputRef}
           searchingTopic={searchingTopic}
           resetSearchBar={resetSearchBar}
+          isTopicValid={isTopicValid}
         />
       )}
     </div>

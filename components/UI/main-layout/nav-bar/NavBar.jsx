@@ -50,7 +50,7 @@ const NavBar = function () {
           )}
 
           {/* If user show profile button  */}
-
+          {/* When the user image is changed in state.auth.user.imageUrl, it will be automatically updated in the UI by redux toolkit. */}
           {user && <NavBarUserProfile imageUrl={user.imageUrl} />}
 
           {/* If no user after loaded show buttons */}
