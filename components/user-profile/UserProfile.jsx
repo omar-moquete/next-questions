@@ -9,7 +9,11 @@ import About from "./about/About";
 import { useRouter } from "next/router";
 import { globalActions } from "../../redux-store/globalSlice";
 import MyFeedInfo from "../my-feed-info/MyFeedInfo";
-import { getUserFollowedTopics, uploadProfileImage } from "../../db";
+import {
+  deleteProfileImage,
+  getUserFollowedTopics,
+  uploadProfileImage,
+} from "../../db";
 import QuestionItem from "../question-item/QuestionItem";
 import CameraIcon from "../UI/svg/CameraIcon";
 import Portal from "../UI/Portal";
@@ -17,6 +21,7 @@ import Modal1 from "../UI/modals/Modal1";
 import SelectedImageNameDisplayer from "./SelectedImageNameDisplayer";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import { authActions } from "../../redux-store/authSlice";
+import DeleteAccountButton from "../UI/buttons/DeleteAccountButton";
 
 const UserProfile = function ({ publicUserData }) {
   const router = useRouter();
@@ -50,6 +55,7 @@ const UserProfile = function ({ publicUserData }) {
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState("");
   const [loadingNewImage, setLoadingNewImage] = useState(false);
+  const [deletingImage, setDeletingImage] = useState(false);
 
   const imageSelectionHandler = async () => {
     const [file] = fileInputRef.current.files;
@@ -69,11 +75,22 @@ const UserProfile = function ({ publicUserData }) {
     }
   };
 
+  const deleteImageHandler = async () => {
+    setDeletingImage(true);
+    await deleteProfileImage();
+    // set user.imageUrl to null so UI is updated
+    dispatch(authActions.setImageUrl(null));
+    setDeletingImage(false);
+    setShowImageUploadModal(false);
+  };
+
   const changePasswordHandler = () => {
     router.push("/change-password");
   };
 
-  const deleteAccountHandler = () => {};
+  const deleteAccountHandler = async () => {
+    router.push(`/${user.username}/delete-account`);
+  };
 
   const isViewedUserTheLoggedInUser = () => {
     return user !== null && user.username === publicUserData.username;
@@ -110,15 +127,23 @@ const UserProfile = function ({ publicUserData }) {
             )}
 
             {/* If user and viewing user's profile page, the image will be tied to a state in case it changes. */}
-            {user !== null &&
+
+            {/* If user and viewing this user and user has an image */}
+            {user &&
               router.asPath.split("/")[1] === user.username &&
               user.imageUrl && <img src={user.imageUrl} alt="User picture" />}
+
+            {/* If no image received through props and no user authenticated */}
             {!publicUserData.imageUrl && user === null && (
               <AvatarIllustration className={classes.avatar} />
             )}
-            {!publicUserData.imageUrl && user && !user.imageUrl && (
-              <AvatarIllustration className={classes.avatar} />
-            )}
+
+            {/* if user and viewing user and this user doesn't have an image */}
+            {user &&
+              router.asPath.split("/")[1] === user.username &&
+              !user.imageUrl && (
+                <AvatarIllustration className={classes.avatar} />
+              )}
           </div>
 
           <Portal show={showImageUploadModal}>
@@ -129,7 +154,7 @@ const UserProfile = function ({ publicUserData }) {
               accept="image/png, image/gif, image/jpeg"
               style={{ display: "none" }}
             />
-            <Modal1 title="Upload image">
+            <Modal1 title="My profile image">
               <div
                 className={`${classes.chooseImage} ${
                   selectedFileName
@@ -161,9 +186,19 @@ const UserProfile = function ({ publicUserData }) {
                 >
                   Cancel
                 </SecondaryButton>
+
+                <SecondaryButton onClick={deleteImageHandler}>
+                  {deletingImage && (
+                    <InlineSpinner height={24} color="#005c97" />
+                  )}
+
+                  {!deletingImage && "Delete profile image"}
+                </SecondaryButton>
                 <SecondaryButton
-                  className={`${classes.uploadBtn} ${
-                    loadingNewImage ? classes.uploadBtnDisabled : ""
+                  className={`${
+                    !selectedFileName || loadingNewImage
+                      ? classes.uploadBtnDisabled
+                      : ""
                   }`}
                   onClick={() => {
                     imageUploadHandler();
@@ -289,12 +324,7 @@ const UserProfile = function ({ publicUserData }) {
             <SecondaryButton onClick={changePasswordHandler}>
               Change password
             </SecondaryButton>
-            <SecondaryButton
-              className={classes.deleteAccount}
-              onClick={deleteAccountHandler}
-            >
-              Delete account
-            </SecondaryButton>
+            <DeleteAccountButton onClick={deleteAccountHandler} />
           </div>
         )}
       </div>

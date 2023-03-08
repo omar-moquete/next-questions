@@ -6,10 +6,11 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updatePassword,
+  deleteUser as firebaseAuthDeleteUser,
+  sendPasswordResetEmail as firebaseAuthSendPasswordResetEmail,
 } from "firebase/auth";
 import {
   collection,
-  deleteDoc,
   doc,
   getDocs,
   getFirestore,
@@ -21,11 +22,9 @@ import {
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { firebaseConfig } from "../api/firebaseApp";
+import { deleteUserData } from "../db";
 import { authActions } from "../redux-store/authSlice";
-import { toSerializable } from "../utils";
-
-// The user object returned by firebase auth. Required by specific firebase functions (such as updatePassword(user, newPassword)).
-let firebaseUserData = null;
+import { formatFirebaseErrorCode, toSerializable } from "../utils";
 
 // useAuth initializes auth and returns apis to manage auth.
 const useAuth = function () {
@@ -44,9 +43,6 @@ const useAuth = function () {
       if (user) {
         try {
           dispatch(authActions.setAuthStatus(authStatusNames.loading));
-          // Required by specific firebase functions:
-          firebaseUserData = user;
-
           // Querying data: find username with uid
           // Get query reference. __name__ is the name of the document which is meant to be the user id
           const queryInUsers = query(
@@ -108,8 +104,9 @@ const useAuth = function () {
       return await signInWithEmailAndPassword(auth, email, password);
     },
 
-    logout() {
-      signOut(auth);
+    async logout() {
+      // signOut runs listener before resolving. The route /login is pushed to the history after the listener is ran.
+      await signOut(auth);
       router.push("/login");
     },
 
@@ -134,8 +131,22 @@ const useAuth = function () {
       return userData;
     },
 
-    async deleteAccount(uid) {
-      await deleteDoc(doc(db, "/users/" + uid));
+    async deleteUser(password) {
+      try {
+        // Must reauthenticate before deleting account. Required by firebase auth.
+        const { user: reauthenticatedUser } = await signInWithEmailAndPassword(
+          auth,
+          user.email,
+          password
+        );
+
+        // If there were no errors during reauthentication, these lines will run. Otherwise the function stops execution and returns error from signInWithEmailAndPassword.
+        // firebaseAuthDeleteUser cannot be ran in parallel with Promise.all because it automatically loads a new route.
+        await deleteUserData(user); // user from state
+        await firebaseAuthDeleteUser(reauthenticatedUser); // user from firebase
+      } catch (error) {
+        throw new Error(error.message);
+      }
     },
 
     async changePassword(oldPassword, newPassword) {
@@ -146,12 +157,17 @@ const useAuth = function () {
           user.email,
           oldPassword
         );
+
         // After the previous function executes, next the authState listener will be executed, which automatically updates the user in the state.
 
         await updatePassword(reauthenticatedUser, newPassword);
       } catch (e) {
         throw new Error(e.message);
       }
+    },
+
+    async sendPasswordResetEmail(email) {
+      await firebaseAuthSendPasswordResetEmail(auth, email);
     },
   };
 };

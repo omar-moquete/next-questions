@@ -11,3 +11,4 @@ export const INVALID_EMAIL_MESSAGE =
 export const INVALID_USERNAME_MESSAGE =
   'The username must be between five and fifteen characters and cannot contain special characters, except for "-" and "_".';
 export const MAX_FOLLOWED_TOPICS = 50;
+export const MAX_DISPLAYED_TOPICS_IN_MY_TOPIC_INFO = 10;

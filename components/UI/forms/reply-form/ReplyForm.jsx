@@ -43,7 +43,7 @@ const ReplyForm = function ({
       const postedReply = await reply(text, answerUid, mention);
       const newPostedReply = [postedReply, ...data];
       setData(newPostedReply); // Set new data state which allows the UI to update with the old replies plus the just posted reply. Prevents the need to fetch data after posted to the DB.
-      showReplies(); // Show all replies
+      showReplies && showReplies(); // Show all replies
       unmounter(); // unmount form
     }
   };

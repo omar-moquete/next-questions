@@ -11,6 +11,7 @@ const Portal = function ({ show, children }) {
       setMounted(false);
     };
   });
+
   return mounted && show
     ? createPortal(children, document.getElementById("portal"))
     : null;

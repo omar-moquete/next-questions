@@ -29,7 +29,7 @@ const TopicResults = function ({
     // Set input to selected topic
 
     dispatch(globalActions.resetSearchParam());
-    resetSearchBar();
+    resetSearchBar && resetSearchBar();
     inputRef.current.value = topicTitle;
     setQuery(topicTitle);
     onSelect && onSelect(topicUid, topicTitle);
@@ -53,7 +53,6 @@ const TopicResults = function ({
         </li>
       )}
 
-      {console.log("isTopicValid", isTopicValid)}
       {router.asPath.split("?")[0] === "/new-question" &&
         topics.every(
           (topic) =>

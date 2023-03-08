@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import classes from "./MyFeedInfo.module.scss";
 import HashIcon from "../UI/svg/HashIcon";
 import Topic from "../topic/Topic";
+import { MAX_DISPLAYED_TOPICS_IN_MY_TOPIC_INFO } from "../../app-config";
 
 const MyFeedInfo = function ({
   userTopicsState,
@@ -29,8 +30,6 @@ const MyFeedInfo = function ({
       </div>
 
       <div className={`${classes.topics}`}>
-        {/* [ ]TODO: Limit results */}
-        {/* [ ]TODO: Make sure component updates when topic is removed */}
         {userTopics.length === 0 && (
           <div className={classes.nothing}>
             <h2>No topics</h2>
@@ -59,22 +58,27 @@ const MyFeedInfo = function ({
                   })}
 
                 {!showMoreTopics &&
-                  userTopics.slice(0, 2).map((topic) => {
-                    return (
-                      <li key={topic.uid} className={classes["topic-wrapper"]}>
-                        <Topic
-                          className={classes.topic}
-                          topicUid={topic.uid}
-                          title={topic.title}
-                          userTopicsState={userTopicsState}
-                        />
-                      </li>
-                    );
-                  })}
+                  userTopics
+                    .slice(0, MAX_DISPLAYED_TOPICS_IN_MY_TOPIC_INFO)
+                    .map((topic) => {
+                      return (
+                        <li
+                          key={topic.uid}
+                          className={classes["topic-wrapper"]}
+                        >
+                          <Topic
+                            className={classes.topic}
+                            topicUid={topic.uid}
+                            title={topic.title}
+                            userTopicsState={userTopicsState}
+                          />
+                        </li>
+                      );
+                    })}
               </>
             </ul>
 
-            {userTopics.length > 2 && (
+            {userTopics.length > MAX_DISPLAYED_TOPICS_IN_MY_TOPIC_INFO && (
               <label
                 className={`${classes.more} ${moreWrapperClass || ""}`}
                 onClick={moreHandler}

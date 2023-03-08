@@ -27,8 +27,6 @@ const ReplyItem = function ({
   const router = useRouter();
 
   // Likes
-  // BUG:  likes.length is undefined when posting a reply to an answer.
-  console.log("likes", likes);
   const [likesAmount, setLikesAmount] = useState(likes.length);
   const [likedByUser, setLikedByUser] = useState(null);
   const user = useSelector((slices) => slices.auth.user);

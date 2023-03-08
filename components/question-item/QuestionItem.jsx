@@ -259,10 +259,9 @@ const QuestionItem = function ({
   return (
     <li className={`${classes.container} ${className || ""}`}>
       <div className={classes.info}>
-        {questionData.questionAuthorData.imageUrl && (
-          <img src={questionUserImage} alt="User image" />
-        )}
-        {!questionData.questionAuthorData.imageUrl && (
+        {questionUserImage && <img src={questionUserImage} alt="User image" />}
+
+        {!questionUserImage && (
           <AvatarIllustration className={classes.avatarIllustration} />
         )}
         <div className={classes["username-time-topic"]}>

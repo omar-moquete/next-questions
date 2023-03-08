@@ -63,12 +63,13 @@ const TopicFinder = function ({
   }, [topicQuery]);
 
   useEffect(() => {
-    // Adds text to topicInput if passed through a url query
+    // Adds text to topicInput if passed through a url query and sets the topicQuery state.
     (async () => {
       if (router.asPath.includes("?topic=")) {
         const query = router.asPath.split("?topic=")[1];
         const topicData = (await getTopicsWithQuery(query))[0];
         topicInputRef.current.value = topicData.title;
+        setTopicQuery(query);
         onSelect(topicData.uid, topicData.title);
       }
     })();

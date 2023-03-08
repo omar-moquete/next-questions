@@ -132,9 +132,6 @@
   background: variables.$gradient;
   align-self: center;
   justify-self: center;
-  .deleteAccount {
-    background-color: #f33b50;
-  }
 
   button {
     font-size: 0.9rem;
@@ -188,6 +185,7 @@
 
     .feedInfo {
       width: 90vw;
+      max-width: unset;
     }
 
     .btns {
@@ -286,13 +284,16 @@
   display: flex;
   gap: 12px;
 }
+
 .uploadBtnDisabled {
   pointer-events: none;
   opacity: 0.6;
 }
+
 @media (max-width: 830px) {
   .userQuestions,
   .userAnswers {
     width: 90vw;
+    max-width: unset;
   }
 }

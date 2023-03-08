@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import Link from "next/link";
 import classes from "./LoginForm.module.scss";
@@ -15,9 +15,7 @@ import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 
 // This component uses a higher order component approach to protect this route from being accessed while logged in.
 const LoginForm = function () {
-  const { user, authStatus, authStatusNames } = useSelector(
-    (state) => state.auth
-  );
+  const user = useSelector((state) => state.auth.user);
   const router = useRouter();
 
   const emailInputRef = useRef();
@@ -82,9 +80,13 @@ const LoginForm = function () {
       ) : (
         <SecondaryButton>Login</SecondaryButton>
       )}
+
       {message && <FormMessage message={message} onClick={clearMessage} />}
 
-      <Link className={classes["forgot-password"]} href="/forgot-password">
+      <Link
+        className={classes["forgot-password"]}
+        href="/login/forgot-password"
+      >
         Forgot your password?
       </Link>
     </PrimaryForm>

@@ -9,6 +9,8 @@
   background-color: #fff;
   width: 700px;
   padding: 12px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
   @include mixins.divider-top;
 }
 

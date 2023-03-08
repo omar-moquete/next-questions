@@ -14,7 +14,13 @@ import {
   where,
 } from "firebase/firestore";
 
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 import { firebaseConfig } from "./api/firebaseApp";
 import store from "./redux-store/store";
 
@@ -93,7 +99,11 @@ export const getUserDataWithUsername = async function (username) {
       usersCollectionRef,
       where("username", "==", username)
     );
+
     const querySnapshot = await getDocs(queryRef);
+    if (querySnapshot.empty)
+      return { username: "deleted account", imageUrl: null };
+
     const match = [];
     querySnapshot.forEach((user) => match.push(user.data()));
     const [userData] = match;
@@ -661,12 +671,17 @@ export const getLatestQuestions = async function (daysAgo, resultsLimit = 15) {
         )
       );
 
-      // add imageUrl. Only 1 result returns from querySnapshot.forEach
-      userDataQuerySnapshot.forEach((docRef) => {
+      // add imageUrl. Only 1 result returns from querySnapshot.forEach. If no result, add {imageUrl: null}. This will automatically be set to the avatar image for each question.
+      if (!userDataQuerySnapshot.empty)
+        userDataQuerySnapshot.forEach((docRef) => {
+          latestQuestionsData[i].questionAuthorData = {
+            imageUrl: docRef.data().imageUrl,
+          };
+        });
+      else
         latestQuestionsData[i].questionAuthorData = {
-          imageUrl: docRef.data().imageUrl || null,
+          imageUrl: null,
         };
-      });
 
       // add answers (light version. Only QuestionDetails page needs the full version)
       const queryRef = query(
@@ -969,13 +984,150 @@ export const uploadProfileImage = async function (file) {
   }
 };
 
-export const deleteProfileImage = async function () {
+export const deleteProfileImage = async function (userId) {
   try {
+    // Delete user image from cloud storage
+    const imageRef = ref(storage, `/PUBLIC_USER_PROFILE_IMAGES/${userId}`);
+
+    await Promise.all([
+      // Delete from firebase storage
+      await deleteObject(imageRef),
+      // Set to null in DB from db
+      await updateDoc(doc(db, `/users/${user.userId}`), { imageUrl: null }),
+    ]);
   } catch (error) {
     console.error(`@deleteProfileImage()🚨${error}`);
   }
 };
 
+export const deleteUserData = async function (user) {
+  // NOTE: Step 1.Delete user.questionsAnswered and user.questionsAsked, user.followedTopics. lastly, delete entire user collection
+  const questionsAnsweredQueryPromise = getDocs(
+    query(collection(db, `/users/${user.userId}/questionsAnswered`))
+  );
+  const questionsAskedQueryPromise = getDocs(
+    query(collection(db, `/users/${user.userId}/questionsAsked`))
+  );
+  const followedTopicsQueryPromise = getDocs(
+    query(collection(db, `/users/${user.userId}/followedTopics`))
+  );
+
+  // Running promises in parallel
+  const queriesResults = await Promise.all([
+    questionsAnsweredQueryPromise,
+    questionsAskedQueryPromise,
+    followedTopicsQueryPromise,
+  ]);
+
+  const [
+    questionsAnsweredQueryResult,
+    questionsAskedQueryResult,
+    followedTopicsQueryResult,
+  ] = queriesResults;
+
+  // In order for the user to be fully removed from the users collection, this deletions must happen. This is because subcollections are not automatically deleted.
+  questionsAnsweredQueryResult.forEach((docRef) => deleteDoc(docRef.ref));
+  questionsAskedQueryResult.forEach((docRef) => {
+    console.log("docRef.data()", docRef.data());
+    deleteDoc(docRef.ref);
+  });
+  followedTopicsQueryResult.forEach((docRef) => {
+    console.log("docRef.data()", docRef.data());
+    deleteDoc(docRef.ref);
+  });
+
+  // Lastly, delete entire user collection in users/userId in db
+  await deleteDoc(doc(db, `/users/${user.userId}`));
+  // NOTE: End step 1
+
+  // NOTE: Step 2. Replace user username in questions collection
+  // Replace questions/quiestionUid and questions/questionUid/likes/likedBy with "Deleted Account".
+  const questionsCollectionRef = collection(db, "/questions");
+
+  const questionQueryRef = query(
+    questionsCollectionRef,
+    where("askedBy", "==", user.username)
+  );
+
+  const questionsQuerySnapshot = await getDocs(questionQueryRef);
+  questionsQuerySnapshot.forEach(async (docRef) => {
+    // Not awaited to save execution time
+    updateDoc(docRef.ref, { askedBy: "Deleted Account" });
+
+    // Likes collection under question
+    const likesCollection = collection(db, `/questions/${docRef.id}/likes`);
+    const likesDocs = await getDocs(likesCollection);
+    likesDocs.forEach((docRef) =>
+      updateDoc(docRef.ref, { likedBy: "Deleted Account" })
+    );
+  });
+  // NOTE: End step 2
+
+  // NOTE: Step 3. Replace user username in answers collection with "Deleted Account"
+  // 1) Replace answers/answerUid > {answeredBy: to "Deleted Account"}
+  const answersCollectionRef = collection(db, "/answers");
+
+  const answersQueryRef = query(
+    answersCollectionRef,
+    where("answeredBy", "==", user.username)
+  );
+
+  const answersQuerySnapshot = await getDocs(answersQueryRef);
+
+  answersQuerySnapshot.forEach(async (answerDocRef) => {
+    // Not awaited to run faster
+    updateDoc(answerDocRef.ref, { answeredBy: "Deleted Account" });
+    // Likes collection under answers
+    const likesCollection = collection(db, `/answers/${answerDocRef.id}/likes`);
+    const likesDocs = await getDocs(likesCollection);
+    likesDocs.forEach((likeDocRef) =>
+      updateDoc(likeDocRef.ref, { likedBy: "Deleted Account" })
+    );
+
+    // Replies collection under answers
+    const repliesCollection = collection(
+      db,
+      `/answers/${answerDocRef.id}/replies`
+    );
+
+    const repliesDocs = await getDocs(repliesCollection);
+
+    repliesDocs.forEach((replyDocRef) => {
+      const replyData = replyDocRef.data();
+      // If mention is username, update mention too, else only update repliedBy
+
+      if (replyData.mention === user.username)
+        updateDoc(replyDocRef.ref, {
+          repliedBy: "Deleted Account",
+          mention: "Deleted Account",
+        });
+      else updateDoc(replyDocRef.ref, { repliedBy: "Deleted Account" });
+    });
+  });
+  // NOTE: End step 3
+
+  // NOTE: Step 4. Replace user username in topics/author
+  const topicsCollectionRef = collection(db, "/topics");
+
+  const topicsQueryRef = query(
+    topicsCollectionRef,
+    where("author", "==", user.username)
+  );
+
+  const topicsSnapshot = await getDocs(topicsQueryRef);
+
+  topicsSnapshot.forEach((docRef) =>
+    // Not awaited to save execution time
+    updateDoc(docRef.ref, { author: "Deleted Account" })
+  );
+  // NOTE: End step 4
+
+  // NOTE: Step 5. Delete user image
+
+  //  Can throw an error if the imageRef does not exists. This is not a problen since we only want to delete the image if it exists. Not awaited to
+  deleteObject(ref(storage, `/PUBLIC_USER_PROFILE_IMAGES/${user.userId}`));
+  // NOTE: End step 5
+};
 export const getQuestionsWithSearchParam = async function (searchParam) {
   const allQuestions = await getAllQuestions();
   const results = allQuestions.filter((question) =>

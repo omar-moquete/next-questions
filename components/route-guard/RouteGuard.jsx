@@ -1,8 +1,7 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
-import classes from "./RouteGuard.module.scss";
+import PageSpinner from "../UI/page-spinner/PageSpinner";
 
 // RouteGuard renders given components or redirects. Renders a spinner while user is being logged in.
 
@@ -15,13 +14,7 @@ const RouteGuard = function ({ whenLoggedIn = true, redirectPath, children }) {
   );
   const router = useRouter();
 
-  const Spinner = (
-    <div className={classes.spinner}>
-      <InlineSpinner color="#005c97" width={64} />
-    </div>
-  );
-
-  const [CurrentComponent, setCurrentComponent] = useState(Spinner);
+  const [CurrentComponent, setCurrentComponent] = useState(PageSpinner);
 
   useEffect(() => {
     if (whenLoggedIn === true) {

@@ -12,8 +12,13 @@ const NotFound = function () {
       <div>
         <h2>404</h2>
         <p>Sorry, the page you're looking for does not exist.</p>
-        <SecondaryButton className={classes.btn} onClick={router.back}>
-          Go back
+        <SecondaryButton
+          className={classes.btn}
+          onClick={() => {
+            router.replace("/");
+          }}
+        >
+          Go to homepage
         </SecondaryButton>
       </div>
     </div>
