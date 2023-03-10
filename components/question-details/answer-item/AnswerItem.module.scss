@@ -9,9 +9,16 @@
   background-color: #fff;
   width: 700px;
   padding: 12px;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
   @include mixins.divider-top;
+
+  .childHighlight {
+    background-color: rgba($color: #005c97, $alpha: 0.2);
+  }
+
+  &:last-child {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
 }
 
 .user {

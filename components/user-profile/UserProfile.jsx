@@ -95,6 +95,7 @@ const UserProfile = function ({ publicUserData }) {
   const isViewedUserTheLoggedInUser = () => {
     return user !== null && user.username === publicUserData.username;
   };
+
   return (
     <div className={classes.container}>
       <div className={classes["user-information"]}>
@@ -226,8 +227,19 @@ const UserProfile = function ({ publicUserData }) {
           </div>
         </div>
 
-        {/* If about is present */}
-        {publicUserData.about && <About text={publicUserData.about} />}
+        {/* If visited user is current user, show about section even if empty, so that it can be modified by the user. */}
+
+        {/* If there is about or the user is the logged in user */}
+        {publicUserData.about ||
+        user?.username === router.asPath.split("/")[1] ? (
+          <About
+            initialText={publicUserData.about}
+            notEditingPlaceholder="Add a short description about yourself."
+            editingPlaceholder="Start typing..."
+          />
+        ) : (
+          ""
+        )}
 
         <p className={classes.member}>
           Member since {intl.format(new Date(publicUserData.memberSince))}

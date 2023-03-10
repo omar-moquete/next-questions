@@ -23,6 +23,7 @@ import {
 } from "firebase/storage";
 import { firebaseConfig } from "./api/firebaseApp";
 import store from "./redux-store/store";
+import { removeDuplicates } from "./utils";
 
 // NOTE: These functions control database requests.
 const app = initializeApp(firebaseConfig);
@@ -70,19 +71,20 @@ export const createQuestion = async function (questionData) {
       `/users/${user.userId}/questionsAsked`
     );
 
-    // 4) add a database reference for the user: {uid: questionUid} to the previous reference
-    await addDoc(userQuestionsCollectioRef, {
-      uid: questionDocRef.id,
-    });
-
-    // 5) add a questionUid reference: {uid: questionUid} to the question topic in /topics
-    await addDoc(
-      collection(
-        db,
-        `/topics/${improvedQuestionData.topic.uid}/questionsAsked`
+    await Promise.all([
+      // 4) add a database reference for the user: {uid: questionUid} to the previous reference
+      addDoc(userQuestionsCollectioRef, {
+        uid: questionDocRef.id,
+      }),
+      // 5) add a questionUid reference: {uid: questionUid} to the question topic in /topics
+      addDoc(
+        collection(
+          db,
+          `/topics/${improvedQuestionData.topic.uid}/questionsAsked`
+        ),
+        { uid: questionDocRef.id }
       ),
-      { uid: questionDocRef.id }
-    );
+    ]);
 
     // Allows for imperative navigation to questions/questionId
     return questionDocRef.id;
@@ -102,11 +104,10 @@ export const getUserDataWithUsername = async function (username) {
 
     const querySnapshot = await getDocs(queryRef);
     if (querySnapshot.empty)
-      return { username: "deleted account", imageUrl: null };
+      return { username: "Deleted Account", imageUrl: null };
 
-    const match = [];
-    querySnapshot.forEach((user) => match.push(user.data()));
-    const [userData] = match;
+    let userData = null;
+    querySnapshot.forEach((user) => (userData = user.data()));
     return userData;
   } catch (error) {
     console.error(`@getUserDataWithUsername()🚨${error}`);
@@ -167,7 +168,7 @@ export const answer = async function (text, questionUid) {
       `/questions/${questionUid}/answers/`
     );
 
-    await addDoc(questionsCollectionRef, {
+    addDoc(questionsCollectionRef, {
       uid: answerRef.id,
     });
 
@@ -177,7 +178,7 @@ export const answer = async function (text, questionUid) {
       `/users/${user.userId}/questionsAnswered`
     );
 
-    await addDoc(questionsAnsweredCollectionRef, { uid: questionUid });
+    addDoc(questionsAnsweredCollectionRef, { uid: questionUid });
     return {
       ...data,
       answerAuthorData: { imageUrl: store.getState().auth.user.imageUrl },
@@ -275,6 +276,7 @@ export const likeQuestion = async function (questionUid) {
       );
     }
 
+    // Get total likes
     const updatedLikes = await getQuestionLikes(questionUid);
     // Convert Firebase timestamp to date object
     updatedLikes.forEach(
@@ -499,22 +501,20 @@ export const getQuestionDetails = async function (questionUid) {
       date: new Date(questionData.date.toDate()).toISOString(),
     };
 
-    // add topic data
-    const topicData = await getTopicInfoWithTopicUidLite(
-      questionDetails.topic.uid
-    );
+    // Running promises in parallel
+    const [topicData, questionAnswers, questionLikes] = await Promise.all([
+      // * To add topic data
+      getTopicInfoWithTopicUidLite(questionDetails.topic.uid),
+      // ** To add answers data
+      getQuestionAnswers(questionUid),
+      // ***To get likes for question
+      getQuestionLikes(questionUid),
+    ]);
 
+    // *
     topicData.date = new Date(topicData.date.toDate()).toISOString();
-    //
-    // add answers data
-    const questionAnswers = await getQuestionAnswers(questionUid);
 
-    // get likes for question
-    const questionLikes = await getQuestionLikes(questionUid);
-    questionLikes.forEach(
-      (like) => (like.date = new Date(like.date.toDate()).toISOString())
-    );
-
+    // **
     // get likes and imageUrl for answers
     for (let i = 0; i < questionAnswers.length; i++) {
       const answerLikes = await getAnswerLikes(questionAnswers[i].uid);
@@ -531,6 +531,11 @@ export const getQuestionDetails = async function (questionUid) {
       };
       questionAnswers[i].likes = answerLikes;
     }
+
+    // ***
+    questionLikes.forEach(
+      (like) => (like.date = new Date(like.date.toDate()).toISOString())
+    );
 
     const preparedData = {
       ...questionDetails,
@@ -593,33 +598,12 @@ export const getQuestionDetails = async function (questionUid) {
         preparedData.questionAnswers[i1].replies[i2].likes = replyLikesRefData;
       }
 
-      // After replies have been added, sor by likes and then by date
-      const repliesWithLikes = preparedData.questionAnswers[i1].replies.filter(
-        (reply) => reply.likes.length > 0
-      );
-
-      const repliesWithoutLikes = preparedData.questionAnswers[
-        i1
-      ].replies.filter((reply) => reply.likes.length === 0);
-
-      // Sort by likes
-      repliesWithLikes.sort((a, b) => {
-        if (a.likes.length > b.likes.length) return -1;
-        else if (a.likes.length < b.likes.length) return 1;
-        else return 0;
-      });
-
       // Sort by posted time.
-      repliesWithoutLikes.sort((a, b) => {
+      preparedData.questionAnswers[i1].replies.sort((a, b) => {
         if (+new Date(a.date) > +new Date(b.date)) return 1;
         else if (+new Date(a.date) < +new Date(b.date)) return -1;
         else return 0;
       });
-
-      preparedData.questionAnswers[i1].replies = [
-        ...repliesWithLikes,
-        ...repliesWithoutLikes,
-      ];
     }
 
     return preparedData;
@@ -842,18 +826,18 @@ export const getAllQuestions = async function () {
         const queryRef = query(
           collection(db, `/questions/${questions[i].uid}/answers`)
         );
-
         const querySnapshot = await getDocs(queryRef);
         const answers = [];
         querySnapshot.forEach((docRef) => answers.push(docRef.data()));
         questions[i].questionAnswers = answers;
       }
 
-      // Add topic data
-      const topic = await getTopicInfoWithTopicUid(questions[i].topic.uid);
-
-      // add likes
-      const likes = await getQuestionLikes(questions[i].uid);
+      const [topic, likes] = await Promise.all([
+        // Add topic data
+        getTopicInfoWithTopicUid(questions[i].topic.uid),
+        // add likes
+        getQuestionLikes(questions[i].uid),
+      ]);
 
       questions[i].questionAuthorData = questionAuthorData;
       questions[i].topic = topic;
@@ -882,16 +866,15 @@ export const getQuestionAnswers = async (questionUid) => {
       questionAnswers.push({ ...docRef.data() })
     );
 
-    // This is an array of promises because array.map does not await its callback function..
+    // This is an array of promises because array.map does not await its callback function.
     const allQuestionAnswersRefsPromises = questionAnswers.map(
       async (answer) => {
-        // Get /answers/answerUid for each answerUid
-        const answerDocRef = await getDoc(doc(db, `/answers/${answer.uid}`));
-
-        // Get /answers/answerUid/replies for each answerUid
-        const repliesDocRefs = await getDocs(
-          collection(db, `/answers/${answer.uid}/replies`)
-        );
+        const [answerDocRef, repliesDocRefs] = await Promise.all([
+          // Get /answers/answerUid for each answerUid
+          getDoc(doc(db, `/answers/${answer.uid}`)),
+          // Get /answers/answerUid/replies for each answerUid
+          getDocs(collection(db, `/answers/${answer.uid}/replies`)),
+        ]);
 
         return {
           answerDocRef,
@@ -1028,11 +1011,9 @@ export const deleteUserData = async function (user) {
   // In order for the user to be fully removed from the users collection, this deletions must happen. This is because subcollections are not automatically deleted.
   questionsAnsweredQueryResult.forEach((docRef) => deleteDoc(docRef.ref));
   questionsAskedQueryResult.forEach((docRef) => {
-    console.log("docRef.data()", docRef.data());
     deleteDoc(docRef.ref);
   });
   followedTopicsQueryResult.forEach((docRef) => {
-    console.log("docRef.data()", docRef.data());
     deleteDoc(docRef.ref);
   });
 
@@ -1211,6 +1192,7 @@ export const getQuestionDetailsLite = async function (questionUid) {
       date: new Date(questionData.date.toDate()).toISOString(),
     };
 
+    // NOTE: Parallel
     // add topic data
     const topicData = await getTopicInfoWithTopicUidLite(
       questionDetails.topic.uid
@@ -1321,13 +1303,38 @@ export const getPublicUserData = async function (username) {
     });
 
     // add asked and answered questions.
-    publicUserData.questionsAsked = await getUserAskedQuestions(
-      publicUserData.userId
-    );
+    const [questionsAsked, questionsAnswered] = await Promise.all([
+      getUserAskedQuestions(publicUserData.userId),
+      getUserAnsweredQuestions(publicUserData.userId),
+    ]);
 
-    publicUserData.questionsAnswered = await getUserAnsweredQuestions(
-      publicUserData.userId
-    );
+    //
+    // const questionsAskedFiltered = questionsAsked.filter(
+    //   (currentQuestion) =>
+    //     !questionsAsked.some(
+    //       (evaluatedQuestion) => evaluatedQuestion.uid === currentQuestion.uid
+    //     )
+    // );
+
+    // The initial value is "new Map()", which initially we get as the accumulator in the first iteration of questionsAnswered. On each iteration we call map.set(key, value) where key is the current question uid and the value is the question itself.
+
+    // The set() method of the map prototype ADDS or UPDATES an entry in a Map object with a specified key and a value. If we add a value to the map that was already there, it will be replaced and not added again.
+
+    // .reduce returns the result of the operation which will be the last value of the accumulator. In this case it will be the last state of the Map after questionsAnswered is fully iterrated..
+
+    // Before the result of calling .reduce is stored in questionsAnsweredFiltered, we call Map.values() on the this result. The values() method returns a new iterator object (of type [Map iterator]) that contains the values for each element in the Map object in insertion order. This map iterator is then converted to an array with the help of the spread operator.
+
+    const questionsAnsweredFiltered = [
+      ...questionsAnswered
+        .reduce(
+          (map, currentItem) => map.set(currentItem.uid, currentItem),
+          new Map()
+        )
+        .values(),
+    ];
+
+    publicUserData.questionsAsked = questionsAsked;
+    publicUserData.questionsAnswered = questionsAnsweredFiltered;
 
     return publicUserData;
   } catch (error) {

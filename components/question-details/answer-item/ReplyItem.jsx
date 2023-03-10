@@ -10,6 +10,7 @@ import { timeAgoFormatter } from "../../../utils";
 import AvatarIllustration from "../../UI/svg/AvatarIllustration";
 import { useRouter } from "next/router";
 import { likeReply } from "../../../db";
+import { useRef } from "react";
 
 const ReplyItem = function ({
   repliedBy,
@@ -57,7 +58,6 @@ const ReplyItem = function ({
   return (
     <li className={classes.container}>
       <div className={classes["user-container"]}>
-        {/* Flex 100% ,  */}
         <div className={classes.user}>
           {imageUrl && <img src={imageUrl} alt="user image" />}
 

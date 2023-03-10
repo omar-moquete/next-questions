@@ -12,6 +12,7 @@ import { useState } from "react";
 import { likeAnswer } from "../../../db";
 import { useEffect } from "react";
 import AvatarIllustration from "../../UI/svg/AvatarIllustration";
+import { useRef } from "react";
 
 // [ ] TODO: ------> MAKE AnswerItemITEM
 const AnswerItem = function ({
@@ -38,6 +39,7 @@ const AnswerItem = function ({
   const [likedByUser, setLikedByUser] = useState(null);
   const user = useSelector((slices) => slices.auth.user);
   const [showReplies, setShowReplies] = useState(false);
+  const scrollRef = useRef();
 
   useEffect(() => {
     // Wait to see if user data loads. Sets liked class on liked button
@@ -63,6 +65,22 @@ const AnswerItem = function ({
 
     await likeAnswer(answerUid);
   };
+
+  // Scrolls to the last element added in the replies array.
+  useEffect(() => {
+    const lastAddedReply = scrollRef?.current?.lastElementChild;
+    if (!lastAddedReply) return;
+    lastAddedReply.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    lastAddedReply.classList.add(classes.childHighlight);
+    setTimeout(() => {
+      lastAddedReply.classList.remove(classes.childHighlight);
+    }, 1500);
+  }, [repliesState.length]);
+
   return (
     <li className={classes.container}>
       <div className={classes["user-container"]}>
@@ -110,7 +128,7 @@ const AnswerItem = function ({
       />
 
       {repliesState.length > 0 && showReplies && (
-        <ul className={classes.replies}>
+        <ul className={classes.replies} ref={scrollRef}>
           {/* The order of the replies is last reply, last place. */}
           {repliesState.map((reply) => (
             <ReplyItem

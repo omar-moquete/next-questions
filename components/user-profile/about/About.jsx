@@ -9,11 +9,15 @@ import SecondaryButton from "../../UI/buttons/SecondaryButton";
 import EditIcon from "../../UI/svg/EditIcon";
 import classes from "./About.module.scss";
 
-const About = function (props) {
+const About = function ({
+  initialText,
+  editingPlaceholder = "",
+  notEditingPlaceholder = "",
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const user = useSelector((state) => state.auth.user);
   const inputareaRef = useRef();
-  const [text, setText] = useState(props.text);
+  const [text, setText] = useState(initialText);
   const visitedUser = useSelector((state) => state.global.visitedUser);
 
   const handleCancelEdit = () => setIsEditing(false);
@@ -48,13 +52,23 @@ const About = function (props) {
         {!isEditing && user && <EditIcon onClick={handleIconClick} />}
       </div>
 
-      {!isEditing && <pre>{text}</pre>}
+      {/* The <pre> component will be rendered if there is text and if the visited user is the logged in user (handled in <UserProfile>)*/}
+      {!isEditing && (
+        <pre>
+          {text || (
+            <p className={classes.notEditingPlaceholder}>
+              {notEditingPlaceholder}
+            </p>
+          )}
+        </pre>
+      )}
       {isEditing && user?.username === visitedUser && (
         <>
           <ReactTextareaAutosize
             className={classes.autosize}
             ref={inputareaRef}
             maxLength={500}
+            placeholder={editingPlaceholder}
           />
 
           <div className={classes.controls}>

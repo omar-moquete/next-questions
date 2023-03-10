@@ -6,6 +6,7 @@ import { useRef } from "react";
 import { useState } from "react";
 import InlineSpinner from "../../inline-spinner/InlineSpinner";
 import { answer, reply } from "../../../../db";
+import { useEffect } from "react";
 
 const ReplyForm = function ({
   unmounter,
@@ -19,6 +20,7 @@ const ReplyForm = function ({
 }) {
   const inputRef = useRef();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef();
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -41,19 +43,27 @@ const ReplyForm = function ({
       // post a new reply to questions/questionUid/answers/answerUid/replies
 
       const postedReply = await reply(text, answerUid, mention);
-      const newPostedReply = [postedReply, ...data];
+      const newPostedReply = [...data, postedReply];
       setData(newPostedReply); // Set new data state which allows the UI to update with the old replies plus the just posted reply. Prevents the need to fetch data after posted to the DB.
       showReplies && showReplies(); // Show all replies
       unmounter(); // unmount form
     }
   };
 
+  useEffect(() => {
+    if (!formRef) return;
+    formRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, []);
+
   const onCancel = (e) => {
     e.preventDefault();
     unmounter();
   };
   return (
-    <form className={classes.container} onSubmit={onSubmit}>
+    <form className={classes.container} onSubmit={onSubmit} ref={formRef}>
       <TextareaAutosize
         minRows={3}
         className={classes.textarea}

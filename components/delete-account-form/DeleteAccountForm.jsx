@@ -47,7 +47,7 @@ const DeleteAccountForm = function () {
   const onDeleteAccount = async (e) => {
     e.preventDefault();
     try {
-      // deleteUser will automatically call logout()
+      // deleteUser will automatically call logout the user
       await deleteUser(enteredPassword);
     } catch (error) {
       scrollToTop();
