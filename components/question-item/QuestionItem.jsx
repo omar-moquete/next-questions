@@ -12,8 +12,9 @@ import { useSelector } from "react-redux";
 import Portal from "../UI/Portal";
 import Modal1 from "../UI/modals/Modal1";
 import LikesList from "./LikesList";
-import { like, likeQuestion } from "../../db";
+import { likeQuestion } from "../../db";
 import AvatarIllustration from "../UI/svg/AvatarIllustration";
+import { DELETED_USER_USERNAME } from "../../app-config";
 
 const QuestionItem = function ({
   questionData,
@@ -81,12 +82,16 @@ const QuestionItem = function ({
     if (!user) {
       // liked by username.
       if (questionLikes.length === 1) {
+        const username1 = questionLikes[0].likedBy;
+
         setLikedByText(
           <p>
             Liked by{" "}
-            <Link href={`/${questionLikes[0].likedBy}`}>
-              {questionLikes[0].likedBy}
-            </Link>
+            {username1 === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username1}`}>{username1}</Link>
+            )}
             .
           </p>
         );
@@ -95,23 +100,53 @@ const QuestionItem = function ({
 
       // liked by username and username.
       if (questionLikes.length === 2) {
-        const byUsernames = questionLikes.map((like) => like.likedBy);
+        const [username1, username2] = questionLikes.map(
+          (like) => like.likedBy
+        );
         setLikedByText(
           <p>
-            Liked by <Link href={`/${byUsernames[0]}`}>{byUsernames[0]}</Link>{" "}
-            and <Link href={`/${byUsernames[1]}`}>{byUsernames[1]}</Link>
+            Liked by{" "}
+            {username1 === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username1}`}>{username1}</Link>
+            )}{" "}
+            and{" "}
+            {username2 === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username2}`}>{username2}</Link>
+            )}
           </p>
         );
         return;
       }
-      // liked by username, username and n others
+
+      // liked by username, username and username
       if (questionLikes.length === 3) {
-        const byUsernames = questionLikes.map((like) => like.likedBy);
+        const [username1, username2, username3] = questionLikes.map(
+          (like) => like.likedBy
+        );
         setLikedByText(
           <p>
-            Liked by <Link href={`/${byUsernames[0]}`}>{byUsernames[0]}</Link>,{" "}
-            <Link href={`/${byUsernames[1]}`}>{byUsernames[1]}</Link> and{" "}
-            <Link href={`/${byUsernames[2]}`}>{byUsernames[2]}</Link>
+            Liked by{" "}
+            {username1 === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username1}`}>{username1}</Link>
+            )}
+            ,{" "}
+            {username2 === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username2}`}>{username2}</Link>
+            )}{" "}
+            and{" "}
+            {username3 === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username3}`}>{username3}</Link>
+            )}
           </p>
         );
         return;
@@ -146,12 +181,16 @@ const QuestionItem = function ({
         questionLikes.length === 1 &&
         questionLikes[0].likedBy !== user.username
       ) {
+        const username = questionLikes[0].likedBy;
+
         setLikedByText(
           <p>
             Liked by{" "}
-            <Link href={`/${questionLikes[0].likedBy}`}>
-              {questionLikes[0].likedBy}
-            </Link>
+            {username === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username}`}>{username}</Link>
+            )}
             .
           </p>
         );
@@ -164,12 +203,19 @@ const QuestionItem = function ({
         questionLikes.length === 2 &&
         questionLikes.some((like) => like.likedBy === user.username)
       ) {
-        const byUsername = questionLikes.find(
+        const username = questionLikes.find(
           (like) => like.likedBy !== user.username
         ).likedBy;
+
         setLikedByText(
           <p>
-            Liked by <Link href={`/${byUsername}`}>{byUsername}</Link> and me.
+            Liked by{" "}
+            {username === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username}`}>{username}</Link>
+            )}{" "}
+            and me.
           </p>
         );
         return;
@@ -181,11 +227,24 @@ const QuestionItem = function ({
         questionLikes.length === 2 &&
         questionLikes.some((like) => like.likedBy !== user.username)
       ) {
-        const byUsernames = questionLikes.map((like) => like.likedBy);
+        const [username1, username2] = questionLikes.map(
+          (like) => like.likedBy
+        );
+
         setLikedByText(
           <p>
-            Liked by <Link href={`/${byUsernames[0]}`}>{byUsernames[0]}</Link>{" "}
-            and <Link href={`/${byUsernames[1]}`}>{byUsernames[1]}</Link>
+            Liked by{" "}
+            {username1 === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username1}`}>{username1}</Link>
+            )}{" "}
+            and{" "}
+            {username2 === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username2}`}>{username2}</Link>
+            )}
           </p>
         );
         return;
@@ -197,21 +256,30 @@ const QuestionItem = function ({
         questionLikes.length === 3 &&
         questionLikes.some((like) => like.likedBy === user.username)
       ) {
-        const byUsernames = questionLikes
+        const [username1, username2] = questionLikes
           .filter((like) => like.likedBy !== user.username)
           .map((like) => like.likedBy);
 
         setLikedByText(
           <p>
-            Liked by <Link href={`/${byUsernames[0]}`}>{byUsernames[0]}</Link>
+            Liked by{" "}
+            {username1 === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username1}`}>{username1}</Link>
+            )}
             {", "}
-            <Link href={`/${byUsernames[1]}`}>{byUsernames[1]}</Link> and me
+            {username2 === DELETED_USER_USERNAME ? (
+              <i>{DELETED_USER_USERNAME}</i>
+            ) : (
+              <Link href={`/${username2}`}>{username2}</Link>
+            )}{" "}
+            and me
           </p>
         );
         return;
       }
 
-      // should go first
       // If likes > 3 and user is one of them
       // Liked by me and n others
       if (
@@ -266,12 +334,18 @@ const QuestionItem = function ({
         )}
         <div className={classes["username-time-topic"]}>
           <div className={classes["username-time"]}>
-            <Link
-              className={classes.username}
-              href={`/${questionData.askedBy}`}
-            >
-              {questionData.askedBy}
-            </Link>
+            {questionData.askedBy === DELETED_USER_USERNAME ? (
+              <p className={classes.deletedAccount}>
+                <i>{DELETED_USER_USERNAME}</i>
+              </p>
+            ) : (
+              <Link
+                className={classes.username}
+                href={`/${questionData.askedBy}`}
+              >
+                {questionData.askedBy}
+              </Link>
+            )}
             <div className={classes["dot-time"]}>
               <p>
                 <TimeAgo

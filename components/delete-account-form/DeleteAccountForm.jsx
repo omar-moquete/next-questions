@@ -1,12 +1,9 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { useEffect } from "react";
 import { useState } from "react";
 import { useRef } from "react";
-import { deleteUserData } from "../../db";
 import useAuth from "../../hooks/useAuth";
-import store from "../../redux-store/store";
-import { formatFirebaseErrorCode, scrollToTop } from "../../utils";
+import { scrollToTop } from "../../utils";
 import DeleteAccountButton from "../UI/buttons/DeleteAccountButton";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import CustomField from "../UI/custom-fields/CustomField";
@@ -19,12 +16,11 @@ import classes from "./DeleteAccountForm.module.scss";
 const DeleteAccountForm = function () {
   const checkboxInputRef = useRef();
   const router = useRouter();
-  const { deleteUser } = useAuth();
-  // Subscribing this component to the store is not needed, and since this route is protected, the user will always be truthy.
-  const user = store.getState().auth.user;
+  const auth = useAuth();
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
   const [enteredPassword, setEnteredPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const clearMessage = () => {
     if (message === "") return;
@@ -48,12 +44,12 @@ const DeleteAccountForm = function () {
     e.preventDefault();
     try {
       // deleteUser will automatically call logout the user
-      await deleteUser(enteredPassword);
+      setDeleting(true);
+      await auth.deleteUser(enteredPassword);
     } catch (error) {
       scrollToTop();
-      // BUG: Call if contains firebase/auth in string
-      console.log("error.message", error.message);
-      setMessage(formatFirebaseErrorCode(error.message));
+      setDeleting(false);
+      setMessage(auth.formatErrorCode(error.message));
     }
   };
 
@@ -104,6 +100,7 @@ const DeleteAccountForm = function () {
               ? classes.deleteButtonEnabled
               : ""
           }`}
+          isLoading={deleting}
         />
       </div>
 

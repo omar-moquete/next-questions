@@ -9,7 +9,7 @@ import {
   unfollowTopic,
 } from "../../db";
 import { globalActions } from "../../redux-store/globalSlice";
-import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
+import InlineSpinner2 from "../UI/inline-spinner/InlineSpinner2";
 import Modal1 from "../UI/modals/Modal1";
 import Portal from "../UI/Portal";
 import classes from "./Topic.module.scss";
@@ -135,7 +135,7 @@ const Topic = function ({ topicUid, className, title, userTopicsState }) {
           } ${className || ""}`}
           onClick={handleTopicSubscription}
         >
-          {loading && <InlineSpinner width="24px" height="24px" />}
+          {loading && <InlineSpinner2 width="24px" />}
           {isFollowing && !loading && !showCountdown && "unfollow"}
           {!isFollowing && !loading && !showCountdown && "follow"}
           {showCountdown && !loading && countdown}

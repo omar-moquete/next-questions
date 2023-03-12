@@ -6,7 +6,6 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updatePassword,
-  deleteUser as firebaseAuthDeleteUser,
   sendPasswordResetEmail as firebaseAuthSendPasswordResetEmail,
 } from "firebase/auth";
 import {
@@ -21,10 +20,12 @@ import {
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
+import { DELETE_ACCOUNT_ENDPOINT } from "../api-endpoints";
 import { firebaseConfig } from "../api/firebaseApp";
+import { UI_GENERIC_ERROR } from "../app-config";
 import { deleteUserData } from "../db";
 import { authActions } from "../redux-store/authSlice";
-import { formatFirebaseErrorCode, toSerializable } from "../utils";
+import { toSerializable } from "../utils";
 
 // useAuth initializes auth and returns apis to manage auth.
 const useAuth = function () {
@@ -59,9 +60,7 @@ const useAuth = function () {
             (doc) => (usersCollectionDocData = doc.data())
           );
 
-          // Only one user will be returned from the query. Convert to json to object will prevent unserialized value error from redux.
           // Get questions linked to user
-          let questionsCollectionDocData = null;
           const queryInQuestions = query(
             collection(db, "/questions"),
             where("userId", "==", user.uid)
@@ -134,16 +133,17 @@ const useAuth = function () {
     async deleteUser(password) {
       try {
         // Must reauthenticate before deleting account. Required by firebase auth.
-        const { user: reauthenticatedUser } = await signInWithEmailAndPassword(
-          auth,
-          user.email,
-          password
-        );
+        const response = await (
+          await fetch(DELETE_ACCOUNT_ENDPOINT, {
+            method: "POST",
+            body: JSON.stringify({ email: user.email, password }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+        ).json();
 
-        // If there were no errors during reauthentication, these lines will run. Otherwise the function stops execution and returns error from signInWithEmailAndPassword.
-        // firebaseAuthDeleteUser cannot be ran in parallel with Promise.all because it automatically loads a new route.
-        await deleteUserData(user); // user from state
-        await firebaseAuthDeleteUser(reauthenticatedUser); // user from firebase
+        if (response?.deleted) await signOut(auth);
       } catch (error) {
         throw new Error(error.message);
       }
@@ -168,6 +168,40 @@ const useAuth = function () {
 
     async sendPasswordResetEmail(email) {
       await firebaseAuthSendPasswordResetEmail(auth, email);
+    },
+
+    formatErrorCode(errorString) {
+      // Return user readable error and log dev readable error to console.
+      if (!errorString.startsWith("Firebase: Error (auth/")) {
+        console.error(
+          `🚨 @auth.formatErrorCode | UI_GENERIC_ERROR: ${UI_GENERIC_ERROR} | Details: ${errorString}`
+        );
+        return UI_GENERIC_ERROR;
+      }
+      // Initial errorString format: firebaseService/error-message-no-spaces
+
+      // Remove "/" and "-"s
+      const words = errorString.split("/")[1].split(")")[0].split("-");
+
+      // Get word to capitalize
+      const firstWord = words[0];
+
+      // Capitalize word
+      const capitalizedFirstWord = [
+        firstWord[0].toUpperCase(),
+        firstWord.substring(1),
+      ].join("");
+
+      // Array of all the words with first word capitalized.
+      const capitalizedSentenceArray = [
+        capitalizedFirstWord,
+        ...words.slice(1),
+      ];
+
+      // Add period to end of sentence.
+      const formattedWords = capitalizedSentenceArray.join(" ") + ".";
+
+      return formattedWords;
     },
   };
 };

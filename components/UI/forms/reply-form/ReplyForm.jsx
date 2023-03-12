@@ -4,9 +4,9 @@ import TextareaAutosize from "react-textarea-autosize";
 import SecondaryButton from "../../buttons/SecondaryButton";
 import { useRef } from "react";
 import { useState } from "react";
-import InlineSpinner from "../../inline-spinner/InlineSpinner";
 import { answer, reply } from "../../../../db";
 import { useEffect } from "react";
+import InlineSpinner2 from "../../inline-spinner/InlineSpinner2";
 
 const ReplyForm = function ({
   unmounter,
@@ -73,10 +73,9 @@ const ReplyForm = function ({
       />
       <div className={classes.controls}>
         {isSubmitting && (
-          <InlineSpinner
-            color="#005c97"
-            height="32px"
+          <InlineSpinner2
             width="32px"
+            color="#005c97"
             className={classes.spinner}
           />
         )}

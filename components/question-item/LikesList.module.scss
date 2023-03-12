@@ -31,6 +31,11 @@
       text-decoration: underline;
     }
   }
+
+  p {
+    color: #8c8c8c;
+    user-select: none;
+  }
   li {
     display: flex;
     justify-content: space-between;

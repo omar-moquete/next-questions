@@ -8,6 +8,7 @@ import CustomField2 from "../UI/custom-fields/CustomField2";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { createQuestion, createTopic } from "../../db";
+import InlineSpinner2 from "../UI/inline-spinner/InlineSpinner2";
 
 const NewQuestion = function () {
   // 1) user types topic. Topics result shows
@@ -160,7 +161,8 @@ const NewQuestion = function () {
             className={`${classes.submit} ${blocked ? classes.inactive : ""}`}
             disabled={blocked}
           >
-            Submit
+            {blocked && <InlineSpinner2 width="24px" color="#005c97" />}
+            {!blocked && "Submit"}
           </SecondaryButton>
         </div>
       </form>

@@ -4,6 +4,7 @@ import HashIcon from "../UI/svg/HashIcon";
 import Topic from "../topic/Topic";
 import { MAX_DISPLAYED_TOPICS_IN_MY_TOPIC_INFO } from "../../app-config";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
+import InlineSpinner2 from "../UI/inline-spinner/InlineSpinner2";
 
 const MyFeedInfo = function ({
   userTopicsState,
@@ -25,14 +26,15 @@ const MyFeedInfo = function ({
         <div className={classes.stats}>
           <div className={classes.stat}>
             <HashIcon />
-            <p className={classes.total}>{userTopics?.length || "..."}</p>
+            {!userTopics && <InlineSpinner2 height="5px" />}
+            {userTopics && <p className={classes.total}>{userTopics.length}</p>}
           </div>
         </div>
       </div>
 
       {userTopics === null && (
         <div className={classes.initialSpinner}>
-          <InlineSpinner height={32} color="#fff" />
+          <InlineSpinner />
         </div>
       )}
       {userTopics !== null && (

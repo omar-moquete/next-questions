@@ -24,6 +24,8 @@ import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import { authActions } from "../../redux-store/authSlice";
 import DeleteAccountButton from "../UI/buttons/DeleteAccountButton";
 import UserImage from "./UserImage";
+import imageCompression from "browser-image-compression";
+import InlineSpinner2 from "../UI/inline-spinner/InlineSpinner2";
 
 const UserProfile = function ({ publicUserData }) {
   const router = useRouter();
@@ -32,6 +34,7 @@ const UserProfile = function ({ publicUserData }) {
   const [userTopics, setUserTopics] = useState(null);
   const user = useSelector((state) => state.auth.user);
   const intl = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" });
+  const [compressingImage, setCompressingImage] = useState(false);
   // Questions asked start being fetch after initial profile UI is loaded. Improves user experience
   const [questionsAsked, setQuestionsAsked] = useState(null);
   const [questionsAnswered, setQuestionsAnswered] = useState(null);
@@ -97,9 +100,20 @@ const UserProfile = function ({ publicUserData }) {
 
   const imageUploadHandler = async () => {
     try {
-      setLoadingNewImage(true);
       const [file] = fileInputRef.current.files;
-      const imageUrl = await uploadProfileImage(file);
+      // Compress image before uploading to firebase
+      const compressorOptions = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      setCompressingImage(true);
+      const compressedFile = await imageCompression(file, compressorOptions);
+      setCompressingImage(false);
+
+      setLoadingNewImage(true);
+      const imageUrl = await uploadProfileImage(compressedFile);
       dispatch(authActions.setImageUrl(imageUrl));
       setLoadingNewImage(false);
       setShowImageUploadModal(false);
@@ -192,6 +206,12 @@ const UserProfile = function ({ publicUserData }) {
 
               <div className={classes.controls}>
                 <SecondaryButton
+                  className={`${
+                    loadingNewImage || compressingImage
+                      ? classes.uploadBtnDisabled
+                      : ""
+                  }`}
+                  disabled={loadingNewImage || compressingImage || false}
                   onClick={() => {
                     setShowImageUploadModal(false);
                   }}
@@ -199,10 +219,18 @@ const UserProfile = function ({ publicUserData }) {
                   Cancel
                 </SecondaryButton>
 
-                <SecondaryButton onClick={deleteImageHandler}>
+                <SecondaryButton
+                  className={`${
+                    loadingNewImage || compressingImage
+                      ? classes.uploadBtnDisabled
+                      : ""
+                  }`}
+                  disabled={loadingNewImage || compressingImage || false}
+                  onClick={deleteImageHandler}
+                >
                   {deletingImage && (
                     <div className={classes.initialSpinner}>
-                      <InlineSpinner height={24} color="#005c97" />
+                      <InlineSpinner2 height="8px" color="#005c97" />
                     </div>
                   )}
 
@@ -210,19 +238,25 @@ const UserProfile = function ({ publicUserData }) {
                 </SecondaryButton>
                 <SecondaryButton
                   className={`${
-                    !selectedFileName || loadingNewImage
+                    !selectedFileName || loadingNewImage || compressingImage
                       ? classes.uploadBtnDisabled
                       : ""
                   }`}
                   onClick={() => {
                     imageUploadHandler();
                   }}
-                  disabled={loadingNewImage}
+                  disabled={
+                    !selectedFileName ||
+                    loadingNewImage ||
+                    compressingImage ||
+                    false
+                  }
                 >
+                  {!loadingNewImage && !compressingImage && "Upload"}
+                  {compressingImage && "Compressing..."}
                   {loadingNewImage && (
-                    <InlineSpinner height={24} color="#005c97" />
+                    <InlineSpinner2 height="8px" color="#005c97" />
                   )}
-                  {!loadingNewImage && "Upload"}
                 </SecondaryButton>
               </div>
             </Modal1>
@@ -231,11 +265,13 @@ const UserProfile = function ({ publicUserData }) {
           <div className={classes["user-stats"]}>
             <div>
               <QuestionIcon className={classes["question-icon"]} />
-              <p>{questionsAsked?.length || "..."}</p>
+              {!questionsAsked && <InlineSpinner2 height="8px" />}
+              {questionsAsked && <p>{questionsAsked.length}</p>}
             </div>
             <div>
               <ReplyIcon className={classes["answer-icon"]} />
-              <p>{questionsAnswered?.length || "..."}</p>
+              {!questionsAnswered && <InlineSpinner2 height="8px" />}
+              {questionsAnswered && <p>{questionsAnswered.length}</p>}
             </div>
           </div>
         </div>
@@ -277,14 +313,14 @@ const UserProfile = function ({ publicUserData }) {
             </h3>
             <div className={classes.stats}>
               <div className={classes.stat}>
-                <QuestionIcon />
-                {questionsAsked?.length || "..."}
+                <QuestionIcon className={classes.statSvg} />
+                {questionsAsked?.length ?? <InlineSpinner2 height="5px" />}
               </div>
             </div>
           </div>
           {questionsAsked === null && (
             <div className={classes.initialSpinner}>
-              <InlineSpinner height={32} color="#fff" />
+              <InlineSpinner />
             </div>
           )}
           {questionsAsked !== null && (
@@ -331,15 +367,15 @@ const UserProfile = function ({ publicUserData }) {
 
             <div className={classes.stats}>
               <div className={classes.stat}>
-                <ReplyIcon />
-                {questionsAnswered?.length || "..."}
+                <ReplyIcon className={classes.statSvg} />
+                {questionsAnswered?.length ?? <InlineSpinner2 height="5px" />}
               </div>
             </div>
           </div>
 
           {questionsAnswered === null && (
             <div className={classes.initialSpinner}>
-              <InlineSpinner height={32} color="#fff" />
+              <InlineSpinner />
             </div>
           )}
           {questionsAnswered !== null && (

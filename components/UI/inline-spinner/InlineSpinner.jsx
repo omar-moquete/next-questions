@@ -1,6 +1,5 @@
 import React from "react";
 import { TailSpin } from "react-loader-spinner";
-import classes from "./InlineSpinner.module.scss";
 
 function InlineSpinner({
   color = "#fff",
@@ -16,7 +15,10 @@ function InlineSpinner({
       ariaLabel="tail-spin-loading"
       radius="1"
       visible={true}
-      wrapperClass={`${classes.spinner} ${className}`}
+      wrapperClass={className || ""}
+      wrapperStyle={{
+        display: "inline-block",
+      }}
     />
   );
 }

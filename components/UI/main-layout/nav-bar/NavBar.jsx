@@ -32,7 +32,7 @@ const NavBar = function () {
         isFixed ? classes.fixed : classes["not-fixed"]
       }`}
     >
-      <h2 onClick={redirectHandler}>NJSQuestions</h2>
+      <h2 onClick={redirectHandler}>NextQuestions</h2>
       <div>
         <nav>
           {/* If loading user show spinner */}

@@ -4,6 +4,7 @@ import TimeAgo from "react-timeago";
 import Link from "next/link";
 import { timeAgoFormatter } from "../../utils";
 import { useSelector } from "react-redux";
+import { DELETED_USER_USERNAME } from "../../app-config";
 
 const LikesList = function ({ data }) {
   const user = useSelector((slices) => slices.auth.user);
@@ -18,21 +19,28 @@ const LikesList = function ({ data }) {
   });
   return (
     <ul className={classes["likes-list"]}>
-      {data.map((like) => {
-        // Exclude the current user from the list
-        if (user && user.username === like.likedBy) return "";
+      {data &&
+        data.map((like) => {
+          // Exclude the current user from the list
+          if (user && user.username === like.likedBy) return "";
 
-        return (
-          <li key={like.date}>
-            <Link href={`/${like.likedBy}`}>{like.likedBy}</Link>
-            <TimeAgo
-              date={like.date}
-              formatter={timeAgoFormatter}
-              minPeriod={60}
-            />
-          </li>
-        );
-      })}
+          return (
+            <li key={like.date}>
+              {like.likedBy === DELETED_USER_USERNAME ? (
+                <p>
+                  <i>{DELETED_USER_USERNAME}</i>
+                </p>
+              ) : (
+                <Link href={`/${like.likedBy}`}>{like.likedBy}</Link>
+              )}
+              <TimeAgo
+                date={like.date}
+                formatter={timeAgoFormatter}
+                minPeriod={60}
+              />
+            </li>
+          );
+        })}
     </ul>
   );
 };

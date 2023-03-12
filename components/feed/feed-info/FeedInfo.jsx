@@ -3,6 +3,7 @@ import classes from "./FeedInfo.module.scss";
 import QuestionIcon from "../../UI/svg/QuestionIcon";
 
 import Link from "next/link";
+import { DELETED_USER_USERNAME } from "../../../app-config";
 
 const FeedInfo = function ({ topicInfo }) {
   return (
@@ -17,12 +18,17 @@ const FeedInfo = function ({ topicInfo }) {
           {/* Can add more stats here */}
         </div>
       </div>
-
       <p>{topicInfo.description}</p>
-      <p className={classes.author}>
-        Created by:{" "}
-        <Link href={`/${topicInfo.author}`}>{topicInfo.author}</Link>
-      </p>
+      <span className={classes.author}>
+        <em>
+          Created by:{" "}
+          {topicInfo.author === DELETED_USER_USERNAME ? (
+            DELETED_USER_USERNAME
+          ) : (
+            <Link href={`/${topicInfo.author}`}>{topicInfo.author}</Link>
+          )}
+        </em>
+      </span>
     </div>
   );
 };

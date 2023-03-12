@@ -9,7 +9,7 @@ import {
   PASSWORDS_DO_NOT_MATCH_MESSAGE,
   PASSWORD_VALIDATION_REGEX,
 } from "../../app-config";
-import { clearField, formatFirebaseErrorCode } from "../../utils";
+import { clearField } from "../../utils";
 import useAuth from "../../hooks/useAuth";
 import { useRouter } from "next/router";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
@@ -22,7 +22,7 @@ const PasswordChangeForm = function () {
   const newPasswordRef = useRef();
   const confirmPasswordRef = useRef();
   const clearMessage = () => setMessage("");
-  const { changePassword } = useAuth();
+  const auth = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordChanged, setPasswordChanged] = useState(false);
@@ -52,7 +52,7 @@ const PasswordChangeForm = function () {
 
     try {
       setIsSubmitting(true);
-      await changePassword(
+      await auth.changePassword(
         oldPasswordRef.current.value,
         newPasswordRef.current.value
       );
@@ -68,7 +68,7 @@ const PasswordChangeForm = function () {
       clearField(oldPasswordRef);
       clearField(newPasswordRef);
       clearField(confirmPasswordRef);
-      setMessage(formatFirebaseErrorCode(e.message));
+      setMessage(auth.formatErrorCode(e.message));
       setIsSubmitting(false);
     }
   };

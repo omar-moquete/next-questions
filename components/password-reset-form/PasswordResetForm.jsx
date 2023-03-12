@@ -19,15 +19,20 @@ const PasswordResetForm = function () {
   const [showModal, setShowModal] = useState(false);
   const [message, setMessage] = useState("");
 
-  const submitHandler = function (e) {
+  const submitHandler = async function (e) {
     e.preventDefault();
     const email = passwordInputRef.current.value;
-    if (EMAIL_VALIDATION_REGEX.test(email)) {
-      auth.sendPasswordResetEmail(email);
+    if (!EMAIL_VALIDATION_REGEX.test(email)) {
+      setMessage("The entered email is invalid.");
+      return;
+    }
+
+    try {
+      await auth.sendPasswordResetEmail(email);
       setMessage("");
       setShowModal(true);
-    } else {
-      setMessage("The entered email is invalid.");
+    } catch (error) {
+      setMessage(auth.formatErrorCode(error.message));
     }
   };
   return (
@@ -60,7 +65,14 @@ const PasswordResetForm = function () {
       />
       <SecondaryButton>Submit</SecondaryButton>
 
-      {message && <FormMessage message={message} />}
+      {message && (
+        <FormMessage
+          message={message}
+          onClick={() => {
+            setMessage("");
+          }}
+        />
+      )}
     </PrimaryForm>
   );
 };

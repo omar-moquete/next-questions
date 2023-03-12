@@ -228,9 +228,10 @@
   border-bottom: solid 1px #fff;
 
   h3 {
-    @include mixins.main-font;
     font-size: 3rem;
     font-weight: 500;
+    white-space: nowrap;
+    @include mixins.main-font;
   }
 }
 
@@ -245,7 +246,7 @@
   width: fit-content;
   align-items: center;
   gap: 4px;
-  svg {
+  .statSvg {
     width: 26px;
     height: 26px;
     fill: none;
@@ -266,6 +267,9 @@
 }
 .chooseImage {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 12px;
   padding: 8px;
   border-radius: 8px;
@@ -286,6 +290,9 @@
 .controls {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
 }
 
 .uploadBtnDisabled {

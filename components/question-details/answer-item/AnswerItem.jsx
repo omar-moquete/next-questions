@@ -13,6 +13,7 @@ import { likeAnswer } from "../../../db";
 import { useEffect } from "react";
 import AvatarIllustration from "../../UI/svg/AvatarIllustration";
 import { useRef } from "react";
+import { DELETED_USER_USERNAME } from "../../../app-config";
 
 // [ ] TODO: ------> MAKE AnswerItemITEM
 const AnswerItem = function ({
@@ -91,7 +92,14 @@ const AnswerItem = function ({
           )}
 
           <div className={classes["username-and-datetime"]}>
-            <Link href={`/${answeredBy}`}>{answeredBy}</Link>
+            {answeredBy === DELETED_USER_USERNAME ? (
+              <p className={classes.deletedAccount}>
+                <i>{DELETED_USER_USERNAME}</i>
+              </p>
+            ) : (
+              <Link href={`/${answeredBy}`}>{answeredBy}</Link>
+            )}
+
             <span>•</span>
             <p>
               <TimeAgo

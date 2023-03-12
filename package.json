@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 192.168.1.118",
     "build": "next build",
     "start": "next build && next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@next/font": "13.0.7",
+    "browser-image-compression": "^2.0.2",
     "next": "13.0.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",

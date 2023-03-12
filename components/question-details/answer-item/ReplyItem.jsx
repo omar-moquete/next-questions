@@ -11,6 +11,7 @@ import AvatarIllustration from "../../UI/svg/AvatarIllustration";
 import { useRouter } from "next/router";
 import { likeReply } from "../../../db";
 import { useRef } from "react";
+import { DELETED_USER_USERNAME } from "../../../app-config";
 
 const ReplyItem = function ({
   repliedBy,
@@ -65,13 +66,25 @@ const ReplyItem = function ({
             <AvatarIllustration className={classes.avatarIllustration} />
           )}
           <div className={classes["username-and-datetime"]}>
-            <Link href={`/${repliedBy}`} className={classes.username}>
-              {repliedBy}
-            </Link>
-            <span>•</span>
+            {repliedBy === DELETED_USER_USERNAME ? (
+              <p className={classes.deletedAccount}>
+                <i>{DELETED_USER_USERNAME}</i>
+              </p>
+            ) : (
+              <Link href={`/${repliedBy}`} className={classes.username}>
+                {repliedBy}
+              </Link>
+            )}
+            <MentionIcon className={classes["mention-icon"]} />
+
             <div className={classes.mention}>
-              <Link href={mention}>{mention}</Link>
-              <MentionIcon className={classes["mention-icon"]} />
+              {mention === DELETED_USER_USERNAME ? (
+                <p className={classes.deletedAccount}>
+                  <i>{DELETED_USER_USERNAME}</i>
+                </p>
+              ) : (
+                <Link href={`/${mention}`}>@{mention}</Link>
+              )}
             </div>
             <span>•</span>
             <TimeAgo date={date} minPeriod={60} formatter={timeAgoFormatter} />
@@ -80,10 +93,7 @@ const ReplyItem = function ({
       </div>
       <p className={classes.text}>{text}</p>
       <div className={classes.icons}>
-        <div className={classes.reply} onClick={show}>
-          <label>Mention</label>
-          <MentionIcon className={classes["mention-icon"]} />
-        </div>
+        <label onClick={show}>Mention</label>
         <LikeButton
           wrapperClass={likedByUser ? classes.liked : ""}
           likes={likesAmount}

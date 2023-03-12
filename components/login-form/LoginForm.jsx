@@ -7,7 +7,7 @@ import PrimaryForm from "../UI/forms/PrimaryForm";
 import EmailIcon from "../UI/svg/EmailIcon";
 import PasswordIcon from "../UI/svg/PasswordIcon";
 import FormMessage from "../UI/forms/form-message/FormMessage";
-import { clearField, formatFirebaseErrorCode, scrollToTop } from "../../utils";
+import { clearField, scrollToTop } from "../../utils";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import useAuth from "../../hooks/useAuth";
@@ -22,7 +22,7 @@ const LoginForm = function () {
   const passwordInputRef = useRef();
   const [message, setMessage] = useState("");
 
-  const { login } = useAuth();
+  const auth = useAuth();
   const clearMessage = () => {
     if (message === "") return;
     else setMessage("");
@@ -33,17 +33,16 @@ const LoginForm = function () {
 
   const submitHandler = async function (e) {
     e.preventDefault();
-
     setIsSubmitting(true);
 
     try {
       const email = emailInputRef.current.value;
       const password = passwordInputRef.current.value;
       // signIn will automatically set state.user
-      await login(email, password);
+      await auth.login(email, password);
     } catch (error) {
       scrollToTop();
-      setMessage(formatFirebaseErrorCode(error.message));
+      setMessage(auth.formatErrorCode(error.message));
       clearField(passwordInputRef);
 
       setIsSubmitting(false);
