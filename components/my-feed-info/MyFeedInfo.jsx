@@ -3,6 +3,7 @@ import classes from "./MyFeedInfo.module.scss";
 import HashIcon from "../UI/svg/HashIcon";
 import Topic from "../topic/Topic";
 import { MAX_DISPLAYED_TOPICS_IN_MY_TOPIC_INFO } from "../../app-config";
+import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 
 const MyFeedInfo = function ({
   userTopicsState,
@@ -24,71 +25,85 @@ const MyFeedInfo = function ({
         <div className={classes.stats}>
           <div className={classes.stat}>
             <HashIcon />
-            <p className={classes.total}>{userTopics.length}</p>
+            <p className={classes.total}>{userTopics?.length || "..."}</p>
           </div>
         </div>
       </div>
 
-      <div className={`${classes.topics}`}>
-        {userTopics.length === 0 && (
-          <div className={classes.nothing}>
-            <h2>No topics</h2>
-            <p>To follow a topic just tap on the topic of any question.</p>
-          </div>
-        )}
+      {userTopics === null && (
+        <div className={classes.initialSpinner}>
+          <InlineSpinner height={32} color="#fff" />
+        </div>
+      )}
+      {userTopics !== null && (
+        <>
+          <div className={`${classes.topics}`}>
+            {userTopics.length === 0 && (
+              <div className={classes.nothing}>
+                <h2>No topics</h2>
+                <p>To follow a topic just tap on the topic of any question.</p>
+              </div>
+            )}
 
-        {userTopics.length > 0 && (
-          <div
-            className={`${classes.topicsContainer} ${topicWrapperClass || ""}`}
-          >
-            <ul>
-              <>
-                {showMoreTopics &&
-                  userTopics.map((topic) => {
-                    return (
-                      <li key={topic.uid} className={classes["topic-wrapper"]}>
-                        <Topic
-                          className={classes.topic}
-                          topicUid={topic.uid}
-                          title={topic.title}
-                          userTopicsState={userTopicsState}
-                        />
-                      </li>
-                    );
-                  })}
-
-                {!showMoreTopics &&
-                  userTopics
-                    .slice(0, MAX_DISPLAYED_TOPICS_IN_MY_TOPIC_INFO)
-                    .map((topic) => {
-                      return (
-                        <li
-                          key={topic.uid}
-                          className={classes["topic-wrapper"]}
-                        >
-                          <Topic
-                            className={classes.topic}
-                            topicUid={topic.uid}
-                            title={topic.title}
-                            userTopicsState={userTopicsState}
-                          />
-                        </li>
-                      );
-                    })}
-              </>
-            </ul>
-
-            {userTopics.length > MAX_DISPLAYED_TOPICS_IN_MY_TOPIC_INFO && (
-              <label
-                className={`${classes.more} ${moreWrapperClass || ""}`}
-                onClick={moreHandler}
+            {userTopics.length > 0 && (
+              <div
+                className={`${classes.topicsContainer} ${
+                  topicWrapperClass || ""
+                }`}
               >
-                {showMoreTopics ? "Show less" : "Show more"}
-              </label>
+                <ul>
+                  <>
+                    {showMoreTopics &&
+                      userTopics.map((topic) => {
+                        return (
+                          <li
+                            key={topic.uid}
+                            className={classes["topic-wrapper"]}
+                          >
+                            <Topic
+                              className={classes.topic}
+                              topicUid={topic.uid}
+                              title={topic.title}
+                              userTopicsState={userTopicsState}
+                            />
+                          </li>
+                        );
+                      })}
+
+                    {!showMoreTopics &&
+                      userTopics
+                        .slice(0, MAX_DISPLAYED_TOPICS_IN_MY_TOPIC_INFO)
+                        .map((topic) => {
+                          return (
+                            <li
+                              key={topic.uid}
+                              className={classes["topic-wrapper"]}
+                            >
+                              <Topic
+                                className={classes.topic}
+                                topicUid={topic.uid}
+                                title={topic.title}
+                                userTopicsState={userTopicsState}
+                              />
+                            </li>
+                          );
+                        })}
+                  </>
+                </ul>
+
+                {userTopics.length > MAX_DISPLAYED_TOPICS_IN_MY_TOPIC_INFO && (
+                  <label
+                    className={`${classes.more} ${moreWrapperClass || ""}`}
+                    onClick={moreHandler}
+                  >
+                    {showMoreTopics ? "Show less" : "Show more"}
+                  </label>
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 };

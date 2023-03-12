@@ -156,8 +156,6 @@ const SignUpForm = function () {
 
   const submitHandler = async function (e) {
     e.preventDefault();
-    setIssubmitting(true);
-
     const email = emailInputRef.current.value;
     const username = usernameInputRef.current.value;
     const password1 = password1InputRef.current.value;
@@ -165,6 +163,7 @@ const SignUpForm = function () {
 
     // check if email is valid
     if (!formState.emailValid) {
+      scrollToTop();
       setMessage(INVALID_EMAIL_MESSAGE);
       return;
     }
@@ -178,19 +177,19 @@ const SignUpForm = function () {
     // Check if password1 is valid
     if (!PASSWORD_VALIDATION_REGEX.test(password1)) {
       // password validation regex here
-      setFormState({ ...formState, passwordValid: false });
       scrollToTop();
       setMessage(INVALID_PASSWORD_MESSAGE);
+      setFormState({ ...formState, passwordValid: false });
     } else setFormState({ ...formState, passwordValid: true });
 
     // Check if p2 === p1
     if (password2 !== password1) {
+      scrollToTop();
+      setMessage(PASSWORDS_DO_NOT_MATCH_MESSAGE);
       setFormState((latestState) => {
         return { ...latestState, passwordsMatch: false };
       });
       clearField(password2InputRef);
-      scrollToTop();
-      setMessage(PASSWORDS_DO_NOT_MATCH_MESSAGE);
     } else
       setFormState((latestState) => {
         return { ...latestState, passwordsMatch: true };

@@ -969,6 +969,7 @@ export const uploadProfileImage = async function (file) {
 
 export const deleteProfileImage = async function (userId) {
   try {
+    if (!userId) throw new Error(`"${userId}" is not a valid user ID.`);
     // Delete user image from cloud storage
     const imageRef = ref(storage, `/PUBLIC_USER_PROFILE_IMAGES/${userId}`);
 
@@ -976,7 +977,7 @@ export const deleteProfileImage = async function (userId) {
       // Delete from firebase storage
       await deleteObject(imageRef),
       // Set to null in DB from db
-      await updateDoc(doc(db, `/users/${user.userId}`), { imageUrl: null }),
+      await updateDoc(doc(db, `/users/${userId}`), { imageUrl: null }),
     ]);
   } catch (error) {
     console.error(`@deleteProfileImage()🚨${error}`);
@@ -1301,40 +1302,6 @@ export const getPublicUserData = async function (username) {
         memberSince: new Date(data.memberSince.toDate()).toISOString(),
       };
     });
-
-    // add asked and answered questions.
-    const [questionsAsked, questionsAnswered] = await Promise.all([
-      getUserAskedQuestions(publicUserData.userId),
-      getUserAnsweredQuestions(publicUserData.userId),
-    ]);
-
-    //
-    // const questionsAskedFiltered = questionsAsked.filter(
-    //   (currentQuestion) =>
-    //     !questionsAsked.some(
-    //       (evaluatedQuestion) => evaluatedQuestion.uid === currentQuestion.uid
-    //     )
-    // );
-
-    // The initial value is "new Map()", which initially we get as the accumulator in the first iteration of questionsAnswered. On each iteration we call map.set(key, value) where key is the current question uid and the value is the question itself.
-
-    // The set() method of the map prototype ADDS or UPDATES an entry in a Map object with a specified key and a value. If we add a value to the map that was already there, it will be replaced and not added again.
-
-    // .reduce returns the result of the operation which will be the last value of the accumulator. In this case it will be the last state of the Map after questionsAnswered is fully iterrated..
-
-    // Before the result of calling .reduce is stored in questionsAnsweredFiltered, we call Map.values() on the this result. The values() method returns a new iterator object (of type [Map iterator]) that contains the values for each element in the Map object in insertion order. This map iterator is then converted to an array with the help of the spread operator.
-
-    const questionsAnsweredFiltered = [
-      ...questionsAnswered
-        .reduce(
-          (map, currentItem) => map.set(currentItem.uid, currentItem),
-          new Map()
-        )
-        .values(),
-    ];
-
-    publicUserData.questionsAsked = questionsAsked;
-    publicUserData.questionsAnswered = questionsAnsweredFiltered;
 
     return publicUserData;
   } catch (error) {

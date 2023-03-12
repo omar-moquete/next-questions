@@ -1,6 +1,13 @@
 @use "../../styles/variables";
 @use "../../styles/mixins";
 
+.initialSpinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88px;
+}
+
 .main {
   display: grid;
   width: 700px;

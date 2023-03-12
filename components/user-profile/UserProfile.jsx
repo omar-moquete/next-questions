@@ -3,7 +3,6 @@ import classes from "./UserProfile.module.scss";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import QuestionIcon from "../UI/svg/QuestionIcon";
 import ReplyIcon from "../UI/svg/ReplyIcon";
-import AvatarIllustration from "../UI/svg/AvatarIllustration";
 import { useDispatch, useSelector } from "react-redux";
 import About from "./about/About";
 import { useRouter } from "next/router";
@@ -11,6 +10,8 @@ import { globalActions } from "../../redux-store/globalSlice";
 import MyFeedInfo from "../my-feed-info/MyFeedInfo";
 import {
   deleteProfileImage,
+  getUserAnsweredQuestions,
+  getUserAskedQuestions,
   getUserFollowedTopics,
   uploadProfileImage,
 } from "../../db";
@@ -22,24 +23,56 @@ import SelectedImageNameDisplayer from "./SelectedImageNameDisplayer";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import { authActions } from "../../redux-store/authSlice";
 import DeleteAccountButton from "../UI/buttons/DeleteAccountButton";
+import UserImage from "./UserImage";
 
 const UserProfile = function ({ publicUserData }) {
   const router = useRouter();
   const visitedUser = router.asPath.split("/")[1];
   const dispatch = useDispatch();
-  const [userTopics, setUserTopics] = useState([]);
+  const [userTopics, setUserTopics] = useState(null);
   const user = useSelector((state) => state.auth.user);
   const intl = new Intl.DateTimeFormat("en-US", { dateStyle: "medium" });
-  const { questionsAsked, questionsAnswered } = publicUserData;
+  // Questions asked start being fetch after initial profile UI is loaded. Improves user experience
+  const [questionsAsked, setQuestionsAsked] = useState(null);
+  const [questionsAnswered, setQuestionsAnswered] = useState(null);
 
   const fileInputRef = useRef();
 
   useEffect(() => {
     if (!user) return;
+    // Three async functions IFEE's will ensure each component receives data when it arrives and is updated accordingly.
     (async () => {
       const userTopics = await getUserFollowedTopics(user.userId);
-
       setUserTopics(userTopics);
+    })();
+    (async () => {
+      const questionsAsked = await getUserAskedQuestions(publicUserData.userId);
+      setQuestionsAsked(questionsAsked);
+    })();
+
+    (async () => {
+      const questionsAnswered = await getUserAnsweredQuestions(
+        publicUserData.userId
+      );
+
+      // // The initial value is "new Map()", which initially we get as the accumulator in the first iteration of questionsAnswered. On each iteration we call map.set(key, value) where key is the current question uid and the value is the question itself.
+
+      // // The set() method of the map prototype ADDS or UPDATES an entry in a Map object with a specified key and a value. If we add a value to the map that was already there, it will be replaced and not added again.
+
+      // // .reduce returns the result of the operation which will be the last value of the accumulator. In this case it will be the last state of the Map after questionsAnswered is fully iterrated..
+
+      // // Before the result of calling .reduce is stored in questionsAnsweredFiltered, we call Map.values() on the this result. The values() method returns a new iterator object (of type [Map iterator]) that contains the values for each element in the Map object in insertion order. This map iterator is then converted to an array with the help of the spread operator.
+
+      const questionsAnsweredFiltered = [
+        ...questionsAnswered
+          .reduce(
+            (map, currentItem) => map.set(currentItem.uid, currentItem),
+            new Map()
+          )
+          .values(),
+      ];
+
+      setQuestionsAnswered(questionsAnsweredFiltered);
     })();
   }, [user]);
 
@@ -77,7 +110,7 @@ const UserProfile = function ({ publicUserData }) {
 
   const deleteImageHandler = async () => {
     setDeletingImage(true);
-    await deleteProfileImage();
+    await deleteProfileImage(user.userId);
     // set user.imageUrl to null so UI is updated
     dispatch(authActions.setImageUrl(null));
     setDeletingImage(false);
@@ -122,29 +155,7 @@ const UserProfile = function ({ publicUserData }) {
               </div>
             )}
 
-            {/* If no user, the img is not tied to a state. Allowing the image to be viewed by anyone. */}
-            {publicUserData.imageUrl && user === null && (
-              <img src={publicUserData.imageUrl} alt="User picture" />
-            )}
-
-            {/* If user and viewing user's profile page, the image will be tied to a state in case it changes. */}
-
-            {/* If user and viewing this user and user has an image */}
-            {user &&
-              router.asPath.split("/")[1] === user.username &&
-              user.imageUrl && <img src={user.imageUrl} alt="User picture" />}
-
-            {/* If no image received through props and no user authenticated */}
-            {!publicUserData.imageUrl && user === null && (
-              <AvatarIllustration className={classes.avatar} />
-            )}
-
-            {/* if user and viewing user and this user doesn't have an image */}
-            {user &&
-              router.asPath.split("/")[1] === user.username &&
-              !user.imageUrl && (
-                <AvatarIllustration className={classes.avatar} />
-              )}
+            <UserImage imageUrl={publicUserData.imageUrl} />
           </div>
 
           <Portal show={showImageUploadModal}>
@@ -190,7 +201,9 @@ const UserProfile = function ({ publicUserData }) {
 
                 <SecondaryButton onClick={deleteImageHandler}>
                   {deletingImage && (
-                    <InlineSpinner height={24} color="#005c97" />
+                    <div className={classes.initialSpinner}>
+                      <InlineSpinner height={24} color="#005c97" />
+                    </div>
                   )}
 
                   {!deletingImage && "Delete profile image"}
@@ -218,11 +231,11 @@ const UserProfile = function ({ publicUserData }) {
           <div className={classes["user-stats"]}>
             <div>
               <QuestionIcon className={classes["question-icon"]} />
-              <p>{publicUserData.questionsAsked.length}</p>
+              <p>{questionsAsked?.length || "..."}</p>
             </div>
             <div>
               <ReplyIcon className={classes["answer-icon"]} />
-              <p>{publicUserData.questionsAnswered.length}</p>
+              <p>{questionsAnswered?.length || "..."}</p>
             </div>
           </div>
         </div>
@@ -265,31 +278,46 @@ const UserProfile = function ({ publicUserData }) {
             <div className={classes.stats}>
               <div className={classes.stat}>
                 <QuestionIcon />
-                {questionsAsked.length}
+                {questionsAsked?.length || "..."}
               </div>
             </div>
           </div>
-
-          {questionsAsked.length === 0 && (
-            <div className={classes.nothing}>
-              <h2>No questions</h2>
-              <p>
-                {" "}
-                {isViewedUserTheLoggedInUser()
-                  ? "You have not posted any questions yet."
-                  : `${publicUserData.username} has not asked any questions yet.`}
-              </p>
+          {questionsAsked === null && (
+            <div className={classes.initialSpinner}>
+              <InlineSpinner height={32} color="#fff" />
             </div>
           )}
+          {questionsAsked !== null && (
+            <>
+              {questionsAsked.length === 0 && (
+                <div className={classes.nothing}>
+                  <h2>No questions</h2>
+                  <p>
+                    {" "}
+                    {isViewedUserTheLoggedInUser() ? (
+                      "You have not posted any questions yet."
+                    ) : (
+                      <span>
+                        <em className={classes.bold}>
+                          {publicUserData.username}
+                        </em>{" "}
+                        has not asked any questions yet.
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
 
-          {questionsAsked.length > 0 &&
-            questionsAsked.map((questionAsked) => (
-              <QuestionItem
-                key={questionAsked.uid}
-                className={classes.questionItemOverride}
-                questionData={questionAsked}
-              />
-            ))}
+              {questionsAsked.length > 0 &&
+                questionsAsked.map((questionAsked) => (
+                  <QuestionItem
+                    key={questionAsked.uid}
+                    className={classes.questionItemOverride}
+                    questionData={questionAsked}
+                  />
+                ))}
+            </>
+          )}
         </div>
 
         {/* user answers */}
@@ -304,31 +332,47 @@ const UserProfile = function ({ publicUserData }) {
             <div className={classes.stats}>
               <div className={classes.stat}>
                 <ReplyIcon />
-                {questionsAnswered.length}
+                {questionsAnswered?.length || "..."}
               </div>
             </div>
           </div>
 
-          {questionsAnswered.length === 0 && (
-            <div className={classes.nothing}>
-              <h2>No answers</h2>
-              <p>
-                {" "}
-                {isViewedUserTheLoggedInUser()
-                  ? "You have not posted any answers yet."
-                  : `${publicUserData.username} has not answered any questions yet.`}
-              </p>
+          {questionsAnswered === null && (
+            <div className={classes.initialSpinner}>
+              <InlineSpinner height={32} color="#fff" />
             </div>
           )}
+          {questionsAnswered !== null && (
+            <>
+              {questionsAnswered.length === 0 && (
+                <div className={classes.nothing}>
+                  <h2>No answers</h2>
+                  <p>
+                    {" "}
+                    {isViewedUserTheLoggedInUser() ? (
+                      "You have not posted any answers yet."
+                    ) : (
+                      <span>
+                        <em className={classes.bold}>
+                          {publicUserData.username}
+                        </em>{" "}
+                        has not answered any questions yet.
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
 
-          {questionsAnswered.length > 0 &&
-            questionsAnswered.map((questionAnswered) => (
-              <QuestionItem
-                key={questionAnswered.uid}
-                className={classes.questionItemOverride}
-                questionData={questionAnswered}
-              />
-            ))}
+              {questionsAnswered.length > 0 &&
+                questionsAnswered.map((questionAnswered) => (
+                  <QuestionItem
+                    key={questionAnswered.uid}
+                    className={classes.questionItemOverride}
+                    questionData={questionAnswered}
+                  />
+                ))}
+            </>
+          )}
         </div>
 
         {isViewedUserTheLoggedInUser() && (

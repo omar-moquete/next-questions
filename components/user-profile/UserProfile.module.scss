@@ -1,6 +1,13 @@
 @use "../../styles/mixins";
 @use "../../styles/variables";
 
+.initialSpinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 188px;
+}
+
 .container {
   display: flex;
   align-items: flex-start;
@@ -108,10 +115,6 @@
     stroke-width: 1.5;
     transition: opacity 0.2s ease-in-out;
   }
-}
-.avatar {
-  width: 95%;
-  height: 95%;
 }
 
 .user-information,
@@ -288,6 +291,10 @@
 .uploadBtnDisabled {
   pointer-events: none;
   opacity: 0.6;
+}
+
+.bold {
+  font-weight: 500;
 }
 
 @media (max-width: 830px) {
