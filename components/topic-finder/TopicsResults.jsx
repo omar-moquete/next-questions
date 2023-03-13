@@ -8,8 +8,6 @@ import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { globalActions } from "../../redux-store/globalSlice";
 
-// [ ]TODO: Add author to topic results
-
 const TopicResults = function ({
   topics,
   query,

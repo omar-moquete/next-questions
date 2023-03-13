@@ -72,7 +72,6 @@ const Feed = function () {
         </div>
       )}
 
-      {/* [ ]TODO: Add No questions component */}
       {currentFeed && !loading && (
         <ul className={classes.questions}>
           {currentFeed.map((question) => (

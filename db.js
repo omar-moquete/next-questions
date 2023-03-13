@@ -56,6 +56,7 @@ export const createQuestion = async function (questionData) {
       unixTimestamp: +new Date(),
     };
 
+    console.log("improvedQuestionData", improvedQuestionData);
     // 1) get a collection reference to /questions
     const questionsCollectionRef = collection(db, "/questions");
 
@@ -1204,27 +1205,22 @@ export const getQuestionDetailsLite = async function (questionUid) {
       date: new Date(questionData.date.toDate()).toISOString(),
     };
 
-    // NOTE: Parallel
-    // add topic data
-    const topicData = await getTopicInfoWithTopicUidLite(
-      questionDetails.topic.uid
-    );
+    const [topicData, answersQuerySnapshot, questionLikes] = await Promise.all([
+      // add topic data
+      getTopicInfoWithTopicUidLite(questionDetails.topic.uid),
+      // Get answers for question
+      getDocs(collection(db, `/questions/${questionUid}/answers`)),
+      // get likes for question
+      getQuestionLikes(questionUid),
+    ]);
 
     topicData.date = new Date(topicData.date.toDate()).toISOString();
 
-    // Get answers for question
-    const answersQuerySnapshot = await getDocs(
-      collection(db, `/questions/${questionUid}/answers`)
-    );
-
     const questionAnswers = [];
-
     answersQuerySnapshot.forEach((docRef) =>
       questionAnswers.push({ ...docRef.data() })
     );
 
-    // get likes for question
-    const questionLikes = await getQuestionLikes(questionUid);
     questionLikes.forEach(
       (like) => (like.date = new Date(like.date.toDate()).toISOString())
     );

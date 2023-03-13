@@ -20,7 +20,6 @@ const Home = function () {
   useEffect(() => {
     (async () => {
       const latestQuestions = await getLatestQuestions(7);
-      console.log("latestQuestions", latestQuestions);
       latestQuestions.sort((a, b) => {
         if (a.unixTimestamp > b.unixTimestamp) return -1;
         if (a.unixTimestamp < b.unixTimestamp) return 1;

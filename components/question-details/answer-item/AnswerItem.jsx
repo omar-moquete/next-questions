@@ -15,7 +15,6 @@ import AvatarIllustration from "../../UI/svg/AvatarIllustration";
 import { useRef } from "react";
 import { DELETED_USER_USERNAME } from "../../../app-config";
 
-// [ ] TODO: ------> MAKE AnswerItemITEM
 const AnswerItem = function ({
   answerReplies = [],
   answerUid,

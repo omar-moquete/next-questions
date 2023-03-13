@@ -212,7 +212,6 @@ export default async function handler(req, res) {
       .json({ deleted: true, message: "Account successfully deleted." });
   } catch (error) {
     // If there was an unexpected error
-    console.log("error", error);
     res.status(400).json({ deleted: false, error: error.message });
   }
 }
