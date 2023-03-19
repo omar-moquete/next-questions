@@ -24,7 +24,7 @@ const QuestionDetailsPage = function ({ questionData }) {
 
 export default QuestionDetailsPage;
 
-export const getStaticProps = async function (context) {
+export const getServerSideProps = async function (context) {
   const questionUidRequested = context.params.questionId;
   // question data
   const questionData = await getQuestionDetails(questionUidRequested);
@@ -44,14 +44,5 @@ export const getStaticProps = async function (context) {
 
   return {
     props,
-  };
-};
-
-export const getStaticPaths = function () {
-  return {
-    paths: [],
-    // Pages are pre-rendered on request while a spinner loader is shown.
-    // getStaticProps runs in the background when using fallback: true
-    fallback: true,
   };
 };
