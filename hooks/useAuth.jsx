@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { DELETE_ACCOUNT_ENDPOINT } from "../api-endpoints";
 import { firebaseConfig } from "../api/firebaseApp";
 import { UI_GENERIC_ERROR } from "../app-config";
-import { deleteUserData } from "../db";
+import { deleteUserData, getPrivateUserData } from "../db";
 import { authActions } from "../redux-store/authSlice";
 import { toSerializable } from "../utils";
 
@@ -60,25 +60,17 @@ const useAuth = function () {
             (doc) => (usersCollectionDocData = doc.data())
           );
 
-          // Get questions linked to user
-          const queryInQuestions = query(
-            collection(db, "/questions"),
-            where("userId", "==", user.uid)
-          );
-
-          const queryInQuestionsSnapshot = await getDocs(queryInQuestions);
-
-          queryInQuestionsSnapshot.forEach(
-            (doc) => (questionsCollectionDocData = doc.data())
-          );
-
           if (!usersCollectionDocData) {
             dispatch(authActions.setAuthStatus("authStatusNames.error"));
             throw new Error("There was an error while getting user data.");
           }
 
+          const privateUserData = (
+            await getPrivateUserData(usersCollectionDocData.userId)
+          ).data();
+
           const userData = {
-            email: usersCollectionDocData.email,
+            email: privateUserData.email,
             username: usersCollectionDocData.username,
             userId: usersCollectionDocData.userId,
             imageUrl: usersCollectionDocData.imageUrl,
@@ -87,13 +79,12 @@ const useAuth = function () {
           dispatch(authActions.setAuthStatus(authStatusNames.loaded));
           dispatch(authActions._setUser(toSerializable(userData)));
         } catch (e) {
-          console.error(`⛔ ${e}`);
+          console.error(`🚨@useAuth: ${e}`);
           dispatch(authActions.setAuthStatus(authStatusNames.error));
         }
       } else {
         dispatch(authActions._setUser(null));
         dispatch(authActions.setAuthStatus(authStatusNames.notLoaded));
-        // when state.user is changed by signOut()
       }
     });
   }
@@ -116,18 +107,24 @@ const useAuth = function () {
       ).user;
 
       // Structure data that will go in firestore
-      const userData = {
-        email,
+      const publicUserData = {
         username,
         userId,
         // Make image null when creating account.
         imageUrl: null,
         memberSince: serverTimestamp(),
       };
+      const privateUserDataDocRef = doc(db, `/private_user_data/${userId}`);
 
-      const docRef = doc(db, `/users/${userId}`);
-      await setDoc(docRef, userData);
-      return userData;
+      const privateUserData = { email };
+      const publicUserDataDocRef = doc(db, `/users/${userId}`);
+
+      await Promise.all([
+        setDoc(privateUserDataDocRef, privateUserData),
+        setDoc(publicUserDataDocRef, publicUserData),
+      ]);
+
+      return publicUserData;
     },
 
     async deleteUser(password) {

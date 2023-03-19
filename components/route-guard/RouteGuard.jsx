@@ -14,7 +14,7 @@ const RouteGuard = function ({ whenLoggedIn = true, redirectPath, children }) {
   );
   const router = useRouter();
 
-  const [CurrentComponent, setCurrentComponent] = useState(PageSpinner);
+  const [CurrentComponent, setCurrentComponent] = useState(<PageSpinner />);
 
   useEffect(() => {
     if (whenLoggedIn === true) {

@@ -4,7 +4,6 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
   getDocs,
   getFirestore,
   query,
@@ -203,8 +202,11 @@ export default async function handler(req, res) {
       );
     // NOTE: End step 6
 
-    // NOTE: Step 7. Delete user from Firebase Auth
-    await deleteUser(user.firebaseAuthUserData);
+    // NOTE: Step 7. Delete user from Firebase Auth, delete private user data collection.
+    await Promise.all([
+      deleteDoc(doc(db, `/private_user_data/${user.firebaseAuthUserData.uid}`)),
+      deleteUser(user.firebaseAuthUserData),
+    ]);
     // NOTE: End Step 7.
 
     res

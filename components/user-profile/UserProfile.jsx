@@ -42,12 +42,12 @@ const UserProfile = function ({ publicUserData }) {
   const fileInputRef = useRef();
 
   useEffect(() => {
-    if (!user) return;
     // Three async functions IFEE's will ensure each component receives data when it arrives and is updated accordingly.
     (async () => {
-      const userTopics = await getUserFollowedTopics(user.userId);
+      const userTopics = await getUserFollowedTopics(publicUserData.userId);
       setUserTopics(userTopics);
     })();
+
     (async () => {
       const questionsAsked = await getUserAskedQuestions(publicUserData.userId);
       setQuestionsAsked(questionsAsked);
@@ -282,7 +282,7 @@ const UserProfile = function ({ publicUserData }) {
         {publicUserData.about ||
         user?.username === router.asPath.split("/")[1] ? (
           <About
-            initialText={publicUserData.about}
+            initialText={publicUserData.about || ""}
             notEditingPlaceholder="Add a short description about yourself."
             editingPlaceholder="Start typing..."
           />

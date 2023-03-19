@@ -56,6 +56,7 @@ const ReplyForm = function ({
       behavior: "smooth",
       block: "center",
     });
+    inputRef && inputRef.current.focus();
   }, []);
 
   const onCancel = (e) => {

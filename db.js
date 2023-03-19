@@ -56,7 +56,6 @@ export const createQuestion = async function (questionData) {
       unixTimestamp: +new Date(),
     };
 
-    console.log("improvedQuestionData", improvedQuestionData);
     // 1) get a collection reference to /questions
     const questionsCollectionRef = collection(db, "/questions");
 
@@ -466,7 +465,6 @@ export const getTopicsWithQuery = async function (query) {
       }
     });
 
-    // add questionsAsked
     for (let i = 0; i < topics.length; i++) {
       // add questionsAsked
       const questionsAsked = [];
@@ -1313,5 +1311,26 @@ export const getPublicUserData = async function (username) {
     return publicUserData;
   } catch (error) {
     console.error(`@getPublicUserData()🚨${error}`);
+  }
+};
+
+export const saveAboutUser = async function (about) {
+  try {
+    const user = store.getState().auth.user;
+    if (!user) throw new Error("No user found in state");
+
+    await updateDoc(doc(db, `/users/${user.userId}`), { about });
+  } catch (error) {
+    console.error(`@saveAboutUser()🚨${error}`);
+  }
+};
+
+export const getPrivateUserData = async function (userId) {
+  try {
+    if (typeof userId !== "string")
+      throw new Error(`Expected type string but received "${userId}"`);
+    return await getDoc(doc(db, `/private_user_data/${userId}`));
+  } catch (error) {
+    console.error(`@saveAboutUser()🚨${error}`);
   }
 };

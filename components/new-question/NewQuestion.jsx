@@ -3,7 +3,6 @@ import classes from "./NewQuestion.module.scss";
 import SecondaryButton from "../UI/buttons/SecondaryButton";
 import TopicFinder from "../topic-finder/TopicFinder";
 import { useRef } from "react";
-import { useSelector } from "react-redux";
 import CustomField2 from "../UI/custom-fields/CustomField2";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -32,7 +31,6 @@ const NewQuestion = function () {
   const detailsRef = useRef();
   const [blocked, setBlocked] = useState(true);
 
-  const user = useSelector((state) => state.auth.user);
   const [isNewTopic, setIsNewTopic] = useState(false);
   // topic data
   const [newTopicText, setNewTopicText] = useState("");
@@ -74,7 +72,6 @@ const NewQuestion = function () {
         const topicData = {
           title: newTopicText,
           description,
-          author: user.username,
         };
 
         currentTopic.uid = await createTopic(topicData);

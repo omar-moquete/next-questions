@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import { firebaseConfig } from "../../../api/firebaseApp";
+import { saveAboutUser } from "../../../db";
 import SecondaryButton from "../../UI/buttons/SecondaryButton";
 import EditIcon from "../../UI/svg/EditIcon";
 import classes from "./About.module.scss";
@@ -22,18 +23,12 @@ const About = function ({
 
   const handleCancelEdit = () => setIsEditing(false);
 
-  const handleSave = async () => {
+  const handleSave = () => {
     // Update about for user in db
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const docRef = doc(db, `/users/${user.userId}`);
-    await setDoc(
-      docRef,
-      { about: inputareaRef.current.value },
-      { merge: true }
-    );
+    const text = inputareaRef.current.value;
+    saveAboutUser(text);
     // Will locally update the text so that no more db fetches are needed.
-    setText(inputareaRef.current.value);
+    setText(text);
     setIsEditing(false);
   };
 

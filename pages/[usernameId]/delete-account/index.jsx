@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import DeleteAccountForm from "../../../components/delete-account-form/DeleteAccountForm";
+import RouteGuard from "../../../components/route-guard/RouteGuard";
 import PageSpinner from "../../../components/UI/page-spinner/PageSpinner";
 
 const DeleteAccountPage = function () {
@@ -42,7 +43,9 @@ const DeleteAccountPage = function () {
       setComponent(<DeleteAccountForm />);
       return;
     }
-  }, [user]);
+
+    if (authStatus === authStatusNames.notLoaded) router.replace("/login");
+  }, [user, authStatus]);
 
   return Component;
 };
