@@ -22,6 +22,7 @@ export const getStaticProps = async function ({ params }) {
   return {
     props: {
       publicUserData,
+      revalidate: 1,
     },
   };
 };
