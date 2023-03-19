@@ -75,7 +75,7 @@ const SignUpForm = function () {
         // Check if email exists in collection users, field email
         body: JSON.stringify({
           // What collection
-          inCollection: "/users",
+          inCollection: "/private_user_data",
           // What field name
           fieldName: "email",
           // What should or should not exist in that fieldName
