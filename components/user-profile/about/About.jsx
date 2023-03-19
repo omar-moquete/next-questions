@@ -1,10 +1,7 @@
-import { initializeApp } from "firebase/app";
-import { doc, getFirestore, setDoc } from "firebase/firestore";
 import React, { useRef, useState } from "react";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import ReactTextareaAutosize from "react-textarea-autosize";
-import { firebaseConfig } from "../../../api/firebaseApp";
 import { saveAboutUser } from "../../../db";
 import SecondaryButton from "../../UI/buttons/SecondaryButton";
 import EditIcon from "../../UI/svg/EditIcon";
