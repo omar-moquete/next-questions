@@ -12,7 +12,7 @@ const ProfilePage = function ({ publicUserData }) {
 
 export default ProfilePage;
 
-export const getStaticProps = async function ({ params }) {
+export const getServerSideProps = async function ({ params }) {
   const publicUserData = await getPublicUserData(params.usernameId);
 
   // === null because getPublicUserData() returns null if no user was found with the username Id passed.
@@ -23,14 +23,5 @@ export const getStaticProps = async function ({ params }) {
     props: {
       publicUserData,
     },
-    revalidate: 1,
-  };
-};
-
-export const getStaticPaths = async function () {
-  // Rendered server-side on demand
-  return {
-    paths: [],
-    fallback: true,
   };
 };
