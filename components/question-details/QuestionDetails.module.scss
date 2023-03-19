@@ -34,7 +34,7 @@
   @include mixins.divider-top;
 
   h2 {
-    @include mixins.main-font;
+    @include mixins.corinthia-regular;
     font-size: 3rem;
   }
 }

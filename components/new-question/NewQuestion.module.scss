@@ -22,7 +22,7 @@
     @include mixins.shadow;
 
     h2 {
-      @include mixins.main-font;
+      @include mixins.corinthia-regular;
       font-size: 3rem;
       text-align: center;
       margin-top: -8px;

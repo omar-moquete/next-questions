@@ -13,7 +13,7 @@
   @include mixins.shadow;
 
   h2 {
-    font-family: "Corinthia", cursive;
+    @include mixins.corinthia-regular;
     font-weight: 600;
     font-size: 3rem;
     text-align: center;

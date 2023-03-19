@@ -38,7 +38,7 @@
   justify-content: space-between;
   border-bottom: solid 1px #fff;
   h3 {
-    @include mixins.main-font;
+    @include mixins.corinthia-regular;
     font-size: 3rem;
     font-weight: 500;
   }

@@ -4,8 +4,8 @@
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
 
-@mixin main-font {
-  font-family: "Corinthia", cursive;
+@mixin corinthia-regular {
+  font-family: "corinthia-regular", cursive;
 }
 
 @mixin divider-top {

@@ -18,7 +18,7 @@
   @include mixins.shadow;
   contain: layout;
   h2 {
-    font-family: "Corinthia", cursive;
+    @include mixins.corinthia-regular;
     font-weight: 400;
     font-size: 3rem;
     cursor: pointer;

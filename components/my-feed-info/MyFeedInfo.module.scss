@@ -27,7 +27,7 @@
   border-bottom: solid 1px #fff;
 
   h3 {
-    @include mixins.main-font;
+    @include mixins.corinthia-regular;
     font-size: 3rem;
     font-weight: 500;
   }
@@ -95,7 +95,7 @@
     margin-bottom: 2px;
     font-size: 3rem;
     font-weight: 500;
-    @include mixins.main-font;
+    @include mixins.corinthia-regular;
   }
 }
 

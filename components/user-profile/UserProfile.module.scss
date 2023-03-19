@@ -142,7 +142,7 @@
 }
 
 .h2 {
-  font-family: "Corinthia", cursive;
+  @include mixins.corinthia-regular;
   font-weight: 600;
   font-size: 3rem;
   margin-bottom: 8px;
@@ -231,7 +231,7 @@
     font-size: 3rem;
     font-weight: 500;
     white-space: nowrap;
-    @include mixins.main-font;
+    @include mixins.corinthia-regular;
   }
 }
 
@@ -262,7 +262,7 @@
     margin-bottom: 2px;
     font-size: 3rem;
     font-weight: 500;
-    @include mixins.main-font;
+    @include mixins.corinthia-regular;
   }
 }
 .chooseImage {

@@ -1,6 +1,37 @@
 @use "./variables";
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Corinthia&display=swap");
+
+@font-face {
+  font-family: "corinthia-bold";
+  src: url("../fonts/Corinthia-Bold.ttf");
+}
+@font-face {
+  font-family: "corinthia-regular";
+  src: url("../fonts/Corinthia-Regular.ttf");
+}
+@font-face {
+  font-family: "roboto-light";
+  src: url("../fonts/Roboto-Medium.ttf");
+}
+@font-face {
+  font-family: "roboto-light-italic";
+  src: url("../fonts/Roboto-Light.ttf");
+}
+@font-face {
+  font-family: "roboto-medium";
+  src: url("../fonts/Roboto-LightItalic.ttf");
+}
+@font-face {
+  font-family: "roboto-medium-italic";
+  src: url("../fonts/Roboto-MediumItalic.ttf");
+}
+@font-face {
+  font-family: "roboto-bold";
+  src: url("../fonts/Roboto-Bold.ttf");
+}
+@font-face {
+  font-family: "roboto-bold-italic";
+  src: url("../fonts/Roboto-BoldItalic.ttf");
+}
 
 * {
   margin: 0;
@@ -9,7 +40,7 @@
 }
 
 :root {
-  font-family: "Roboto", sans-serif;
+  font-family: "roboto-light", sans-serif;
   color: variables.$root-text-color;
 }
 
