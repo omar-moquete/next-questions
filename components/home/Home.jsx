@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import HomepageIllustration from "../UI/svg/HomepageIllustration";
+
 import classes from "./Home.module.scss";
 import Introduction from "./introduction/Introduction";
 import LatestQuestions from "./latest-questions/LatestQuestions";
 import FeedControlBar from "../feed-control-bar/FeedControlBar";
 import { useRouter } from "next/router";
 import { getLatestQuestions } from "../../db";
+import HomepageIllustration from "../UI/svg/HomepageIllustration";
 
 const Home = function () {
   const router = useRouter();
