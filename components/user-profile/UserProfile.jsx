@@ -28,6 +28,7 @@ import imageCompression from "browser-image-compression";
 import InlineSpinner2 from "../UI/inline-spinner/InlineSpinner2";
 
 const UserProfile = function ({ publicUserData }) {
+  console.log("publicUserData", publicUserData);
   const router = useRouter();
   const visitedUser = router.asPath.split("/")[1];
   const dispatch = useDispatch();
