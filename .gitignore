@@ -30,7 +30,3 @@ yarn-error.log*
 
 # vercel
 .vercel
-
-/api
-
-firestore.rules
