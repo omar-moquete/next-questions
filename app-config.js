@@ -1,5 +1,5 @@
 export const PASSWORD_VALIDATION_REGEX =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
 export const EMAIL_VALIDATION_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,8}$/;
 export const USERNAME_VALIDATION_REGEX = /^[a-zA-Z0-9_-]{5,15}$/i;
 export const TOPIC_VALIDATION_REGEX = /^[a-zA-Z0-9]*$/;

@@ -14,6 +14,7 @@ import { deleteObject, getStorage, ref } from "firebase/storage";
 import { firebaseConfig } from "../../api/firebaseApp";
 import { DELETED_USER_USERNAME } from "../../app-config";
 
+// BUG: Deletes wrong account. The delete account button is disabled temporarily.
 export default async function handler(req, res) {
   try {
     if (req.method !== "POST") throw new Error("Only POST Requests allowed");
@@ -96,6 +97,7 @@ export default async function handler(req, res) {
     // Replace questions/quiestionUid and questions/questionUid/likes/likedBy with DELETED_USER_USERNAME.
     const questionsCollectionRef = collection(db, "/questions");
 
+    console.log("user", user);
     const questionQueryRef = query(
       questionsCollectionRef,
       where("askedBy", "==", user.username)

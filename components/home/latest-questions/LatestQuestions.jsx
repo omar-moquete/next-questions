@@ -10,8 +10,8 @@ const LatestQuestions = function ({ latestQuestionsData }) {
       <div className={classes.wrapper}>
         {latestQuestionsData && latestQuestionsData.length === 0 && (
           <div className={classes.nothing}>
-            <h2>No questions yet</h2>
-            <p>Ask the first question!</p>
+            <h2>No new questions yet</h2>
+            <p>Ask a new question!</p>
           </div>
         )}
         {!latestQuestionsData && (

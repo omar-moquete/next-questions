@@ -41,7 +41,9 @@ const About = function ({
     <div className={classes.about}>
       <div className={classes["label-and-icon"]}>
         <label htmlFor="about">About me</label>
-        {!isEditing && user && <EditIcon onClick={handleIconClick} />}
+        {!isEditing && user?.username === visitedUser && (
+          <EditIcon onClick={handleIconClick} />
+        )}
       </div>
 
       {/* The <pre> component will be rendered if there is text and if the visited user is the logged in user (handled in <UserProfile>)*/}

@@ -279,8 +279,7 @@ const UserProfile = function ({ publicUserData }) {
         {/* If visited user is current user, show about section even if empty, so that it can be modified by the user. */}
 
         {/* If there is about or the user is the logged in user */}
-        {publicUserData.about ||
-        user?.username === router.asPath.split("/")[1] ? (
+        {publicUserData.about || user?.username === visitedUser ? (
           <About
             initialText={publicUserData.about || ""}
             notEditingPlaceholder="Add a short description about yourself."
