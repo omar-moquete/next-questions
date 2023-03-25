@@ -32,6 +32,12 @@ const ReplyItem = function ({
   const [likesAmount, setLikesAmount] = useState(likes.length);
   const [likedByUser, setLikedByUser] = useState(null);
   const user = useSelector((slices) => slices.auth.user);
+
+  const replyActionHandler = () => {
+    !user && router.push("/login");
+    user && show();
+  };
+
   useEffect(() => {
     // Wait to see if user data loads. Sets liked class on liked button
     if (user)
@@ -93,7 +99,7 @@ const ReplyItem = function ({
       </div>
       <p className={classes.text}>{text}</p>
       <div className={classes.icons}>
-        <label onClick={show}>Mention</label>
+        <label onClick={replyActionHandler}>Mention</label>
         <LikeButton
           wrapperClass={likedByUser ? classes.liked : ""}
           likes={likesAmount}

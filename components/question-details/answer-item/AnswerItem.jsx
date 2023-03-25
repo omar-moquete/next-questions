@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import AvatarIllustration from "../../UI/svg/AvatarIllustration";
 import { useRef } from "react";
 import { DELETED_USER_USERNAME } from "../../../app-config";
+import { useRouter } from "next/router";
 
 const AnswerItem = function ({
   answerReplies = [],
@@ -40,6 +41,7 @@ const AnswerItem = function ({
   const user = useSelector((slices) => slices.auth.user);
   const [showReplies, setShowReplies] = useState(false);
   const scrollRef = useRef();
+  const router = useRouter();
 
   useEffect(() => {
     // Wait to see if user data loads. Sets liked class on liked button
@@ -64,6 +66,11 @@ const AnswerItem = function ({
     }
 
     await likeAnswer(answerUid);
+  };
+
+  const answerActionHandler = () => {
+    !user && router.push("/login");
+    user && show();
   };
 
   // Scrolls to the last element added in the replies array.
@@ -112,7 +119,7 @@ const AnswerItem = function ({
       </div>
       <p className={classes.text}>{text}</p>
       <div className={classes.icons}>
-        <label className={classes.reply} onClick={show}>
+        <label className={classes.reply} onClick={answerActionHandler}>
           Reply
         </label>
         <LikeButton
