@@ -23,25 +23,24 @@ const QuestionItem = function ({
   answersState,
 }) {
   const { ReplyFormAnchor, show } = useReplyForm();
-
   const router = useRouter();
-
-  const redirectToQuestion = () => {
-    router.push("/questions/" + questionData.uid);
-  };
-
-  useEffect(() => {
-    initWithForm && show();
-  }, []);
-
-  // Controls likes
-  const user = useSelector((slices) => slices.auth.user);
+  const { user, authStatus, authStatusNames } = useSelector(
+    (slices) => slices.auth
+  );
   const [likesAmount, setLikesAmount] = useState(questionData.likes.length);
   const [questionLikes, setQuestionLikes] = useState(questionData.likes);
   const [likedByUser, setLikedByUser] = useState(null);
   const [questionAnswersQuantity, setQuestionAnswersQuantity] = useState(
     questionData.questionAnswers.length
   );
+
+  const redirectToQuestion = () => {
+    router.push("/questions/" + questionData.uid);
+  };
+
+  useEffect(() => {
+    initWithForm && user && show();
+  }, [user]);
 
   useEffect(() => {
     // Wait to see if user data loads. Sets liked class on liked button
@@ -324,6 +323,25 @@ const QuestionItem = function ({
     }
   }, [user]);
 
+  const actionHandler = () => {
+    const isQuestionDetails =
+      router.asPath.split("?")[0] === "/questions/" + questionData.uid;
+
+    // if QuestionItem component is NOT under QuestionDetails, redirect to QuestionDetails.
+    if (!isQuestionDetails) {
+      redirectToQuestion();
+    }
+
+    // If QuestionItem component is under QuestionDetails, but the user is not authenticated, redirect to "/login"
+    if (isQuestionDetails && authStatus === authStatusNames.notLoaded) {
+      router.push("/login");
+      return;
+    }
+
+    // If QuestionItem component is under QuestionDetails, and the user is authenticated, show reply form.
+    if (isQuestionDetails && authStatus === authStatusNames.loaded) show();
+  };
+
   return (
     <li className={`${classes.container} ${className || ""}`}>
       <div className={classes.info}>
@@ -342,11 +360,13 @@ const QuestionItem = function ({
               <Link
                 className={classes.username}
                 href={`/${questionData.askedBy}`}
+                translate="no"
               >
                 {questionData.askedBy}
               </Link>
             )}
             <div className={classes["dot-time"]}>
+              <span className={classes.dot}>•</span>
               <p>
                 <TimeAgo
                   date={questionData.date}
@@ -396,11 +416,7 @@ const QuestionItem = function ({
             />
             <ReplyButton
               answers={questionAnswersQuantity}
-              onClick={
-                router.asPath.split("?")[0] === "/questions/" + questionData.uid
-                  ? show
-                  : redirectToQuestion
-              }
+              onClick={actionHandler}
             />
           </div>
         </div>

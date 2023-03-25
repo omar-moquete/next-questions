@@ -67,6 +67,10 @@
   font-size: 1.1rem;
 }
 
+.dot {
+  display: none;
+}
+
 .username {
   cursor: pointer;
   text-decoration: none;
@@ -146,6 +150,11 @@
   .username-time {
     flex-direction: row;
     gap: 12px;
+    align-items: center;
+  }
+
+  .dot {
+    display: flex;
     align-items: center;
   }
 }

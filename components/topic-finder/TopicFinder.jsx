@@ -16,7 +16,6 @@ const TopicFinder = function ({
   onChange,
   className = "",
   placeholder,
-  value,
   required = false,
   resetSearchBar,
 }) {
@@ -102,7 +101,9 @@ const TopicFinder = function ({
 
   const handleResults = () => {
     onChange && onChange();
-    const currentQuery = topicInputRef.current.value;
+    const inputValue = topicInputRef.current.value.trim();
+    topicInputRef.current.value = inputValue;
+    const currentQuery = inputValue;
 
     if (TOPIC_VALIDATION_REGEX.test(currentQuery)) setIsTopicValid(true);
     else setIsTopicValid(false);
@@ -136,7 +137,6 @@ const TopicFinder = function ({
           onFocus={onFocus}
           type="text"
           placeholder={placeholder || ""}
-          value={value}
           required={required}
         />
         {router.asPath.split("?")[0] === "/feed" && user && (

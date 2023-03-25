@@ -69,8 +69,6 @@ const useAuth = function () {
             await getPrivateUserData(usersCollectionDocData.userId)
           ).data();
 
-          console.log("privateUserData", privateUserData);
-
           const userData = {
             email: privateUserData.email,
             username: usersCollectionDocData.username,

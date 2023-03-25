@@ -127,6 +127,7 @@ const Topic = function ({ topicUid, className, title, userTopicsState }) {
       className={`${className || ""} ${
         isFollowing ? classes.topicFollowed : classes.topic
       }`}
+      translate="no"
     >
       {isRemoving && (
         <div

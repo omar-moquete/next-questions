@@ -43,7 +43,6 @@ export default async function handler(req, res) {
         message: `The ${req.body.type} "${req.body.exists}" is available for use.`,
       });
   } catch (error) {
-    console.log("error", error);
     // If there was an unexpected error
     res.status(400).json({ found: false, error: error.message });
   }

@@ -64,7 +64,7 @@ const QuestionFinder = function ({ searchBarValueState }) {
       <SearchIcon />
       <input
         type="text"
-        placeholder="Search..."
+        placeholder="Search questions..."
         onChange={changeHandler}
         onKeyUp={findOnKeyUpHandler}
         value={inputValue}

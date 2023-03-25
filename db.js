@@ -116,19 +116,16 @@ export const getUserDataWithUsername = async function (username) {
 
 export const getTopicInfoWithTopicUid = async function (topicUid) {
   try {
-    const topicDocRef = await getDoc(doc(db, `/topics/${topicUid}`));
+    const [topicDocRef, questionsAskedQuerySnapshot] = await Promise.all([
+      getDoc(doc(db, `/topics/${topicUid}`)),
+      getDocs(collection(db, `/topics/${topicUid}/questionsAsked`)),
+    ]);
+
     const topicDocRefData = topicDocRef.data();
-
-    // Add questionsAsked
-    const questionsAskedQueryRef = query(
-      collection(db, `/topics/${topicUid}/questionsAsked`)
-    );
-
     const questionsAsked = [];
-    (await getDocs(questionsAskedQueryRef)).forEach((docRef) =>
+    questionsAskedQuerySnapshot.forEach((docRef) =>
       questionsAsked.push(docRef.data())
     );
-
     return {
       ...topicDocRefData,
       uid: topicDocRef.id,
@@ -516,21 +513,21 @@ export const getQuestionDetails = async function (questionUid) {
     // **
     // get likes and imageUrl for answers
     for (let i = 0; i < questionAnswers.length; i++) {
-      const answerLikes = await getAnswerLikes(questionAnswers[i].uid);
+      const [answerLikes, answerAuthorData] = await Promise.all([
+        getAnswerLikes(questionAnswers[i].uid),
+        getUserDataWithUsername(questionAnswers[i].answeredBy),
+      ]);
+
       answerLikes.forEach(
         (like) => (like.date = new Date(like.date.toDate()).toISOString())
       );
 
       // add imageUrl
-      const answerAuthorData = await getUserDataWithUsername(
-        questionAnswers[i].answeredBy
-      );
       questionAnswers[i].answerAuthorData = {
         imageUrl: answerAuthorData.imageUrl,
       };
       questionAnswers[i].likes = answerLikes;
     }
-
     // ***
     questionLikes.forEach(
       (like) => (like.date = new Date(like.date.toDate()).toISOString())
@@ -635,10 +632,29 @@ export const getLatestQuestions = async function (daysAgo, resultsLimit = 15) {
     });
 
     for (let i = 0; i < latestQuestionsData.length; i++) {
-      // add topic
-      const topicRef = await getDoc(
-        doc(db, `/topics/${latestQuestionsData[i].topic.uid}`)
-      );
+      const [
+        topicRef,
+        userDataQuerySnapshot,
+        answersQuerySnapshot,
+        likesDocsRef,
+      ] = await Promise.all([
+        getDoc(doc(db, `/topics/${latestQuestionsData[i].topic.uid}`)),
+        getDocs(
+          query(
+            collection(db, `/users`),
+            where("username", "==", latestQuestionsData[i].askedBy)
+          )
+        ),
+
+        getDocs(
+          collection(db, `/questions/${latestQuestionsData[i].uid}/answers`)
+        ),
+        getDocs(
+          collection(db, `/questions/${latestQuestionsData[i].uid}/likes`)
+        ),
+      ]);
+
+      // 1)
       const topicRefData = topicRef.data();
       latestQuestionsData[i].topic = topicRefData;
       latestQuestionsData[i].topic.uid = topicRef.id;
@@ -646,14 +662,7 @@ export const getLatestQuestions = async function (daysAgo, resultsLimit = 15) {
         latestQuestionsData[i].topic.date.toDate()
       ).toISOString();
 
-      // add questionAuthorData
-      const userDataQuerySnapshot = await getDocs(
-        query(
-          collection(db, `/users`),
-          where("username", "==", latestQuestionsData[i].askedBy)
-        )
-      );
-
+      // 2)
       // add imageUrl. Only 1 result returns from querySnapshot.forEach. If no result, add {imageUrl: null}. This will automatically be set to the avatar image for each question.
       if (!userDataQuerySnapshot.empty)
         userDataQuerySnapshot.forEach((docRef) => {
@@ -666,22 +675,13 @@ export const getLatestQuestions = async function (daysAgo, resultsLimit = 15) {
           imageUrl: null,
         };
 
-      // add answers (light version. Only QuestionDetails page needs the full version)
-      const queryRef = query(
-        collection(db, `/questions/${latestQuestionsData[i].uid}/answers`)
-      );
-
-      const querySnapshot = await getDocs(queryRef);
+      // 3)
       const answers = [];
-      querySnapshot.forEach((docRef) => answers.push(docRef.data()));
+      answersQuerySnapshot.forEach((docRef) => answers.push(docRef.data()));
       latestQuestionsData[i].questionAnswers = answers;
 
-      // add likes
+      // 4)
       const likes = [];
-      const likesDocsRef = await getDocs(
-        collection(db, `/questions/${latestQuestionsData[i].uid}/likes`)
-      );
-
       likesDocsRef.forEach((likeDocRef) => {
         const likesDocRefData = likeDocRef.data();
         const likeData = {
@@ -723,32 +723,34 @@ export const getQuestionsWithTopicUid = async function (topicUid) {
     });
 
     for (let i = 0; i < questions.length; i++) {
-      // Add likes
-      const likes = await getQuestionLikes(questions[i].uid);
+      const [likes, askedByUserData, answersQuerySnapshot, newTopicData] =
+        await Promise.all([
+          // 1) Add likes
+          getQuestionLikes(questions[i].uid),
+
+          // 2) Add author information
+          getUserDataWithUsername(questions[i].askedBy),
+
+          // 3) add answers (light version. Only QuestionDetails page needs the full version)
+          getDocs(collection(db, `/questions/${questions[i].uid}/answers`)),
+
+          // 4) Add topic information
+          getTopicInfoWithTopicUid(questions[i].topic.uid),
+        ]);
+      // 1)
       questions[i].likes = likes;
 
-      // Add author information
-      const askedByUserData = await getUserDataWithUsername(
-        questions[i].askedBy
-      );
+      // 2)
       questions[i].questionAuthorData = {
         imageUrl: askedByUserData.imageUrl,
       };
-      // add answers (light version. Only QuestionDetails page needs the full version)
-      const queryRef = query(
-        collection(db, `/questions/${questions[i].uid}/answers`)
-      );
 
-      const querySnapshot = await getDocs(queryRef);
+      // 3)
       const answers = [];
-      querySnapshot.forEach((docRef) => answers.push(docRef.data()));
+      answersQuerySnapshot.forEach((docRef) => answers.push(docRef.data()));
       questions[i].questionAnswers = answers;
 
-      // Add topic information
-      const newTopicData = await getTopicInfoWithTopicUid(
-        questions[i].topic.uid
-      );
-
+      // 4)
       questions[i].topic = newTopicData;
     }
     return questions;
@@ -759,11 +761,14 @@ export const getQuestionsWithTopicUid = async function (topicUid) {
 
 export const getQuestionsWithTopicUids = async function (topicUids) {
   try {
-    const results = [];
+    const resultsPromises = [];
     for (let i = 0; i < topicUids.length; i++) {
-      const questions = await getQuestionsWithTopicUid(topicUids[i]);
-      results.push(questions);
+      const questionsPromise = getQuestionsWithTopicUid(topicUids[i]);
+      resultsPromises.push(questionsPromise);
     }
+
+    const results = await Promise.all(resultsPromises);
+
     return results.flat();
   } catch (error) {
     console.error(`@getQuestionsWithTopicUids()🚨${error}`);
@@ -783,14 +788,17 @@ export const getUserFollowedTopics = async function (userId) {
 
     if (followedTopicsRefsData.length === 0) return [];
 
-    const followedTopicsData = [];
+    const followedTopicsDataPromises = [];
     for (let i = 0; i < followedTopicsRefsData.length; i++) {
-      const followedTopicData = await getTopicInfoWithTopicUid(
+      const followedTopicDataPromise = getTopicInfoWithTopicUid(
         followedTopicsRefsData[i].uid
       );
 
-      followedTopicsData.push(followedTopicData);
+      followedTopicsDataPromises.push(followedTopicDataPromise);
     }
+
+    const followedTopicsData = await Promise.all(followedTopicsDataPromises);
+
     return followedTopicsData;
   } catch (error) {
     console.error(`@getUserFollowedTopics()🚨${error}`);
@@ -1153,7 +1161,9 @@ export const followTopic = async function (topicUid) {
     if (!topicUid) throw new Error("Invalid topic uid.");
     const user = store.getState().auth.user;
     if (!user) throw new Error("No user found in state");
-
+    const userTopics = await getUserFollowedTopics(user.userId);
+    // Check if topic is already followed.
+    if (userTopics.some((userTopicUid) => userTopicUid === topicUid)) return;
     await addDoc(collection(db, `/users/${user.userId}/followedTopics/`), {
       uid: topicUid,
     });
@@ -1238,6 +1248,7 @@ export const getQuestionDetailsLite = async function (questionUid) {
 
 export const getUserAskedQuestions = async function (userId) {
   try {
+    //BUG: optimize
     const queryRef = query(collection(db, `/users/${userId}/questionsAsked`));
 
     const docsRefs = await getDocs(queryRef);

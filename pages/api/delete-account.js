@@ -97,7 +97,6 @@ export default async function handler(req, res) {
     // Replace questions/quiestionUid and questions/questionUid/likes/likedBy with DELETED_USER_USERNAME.
     const questionsCollectionRef = collection(db, "/questions");
 
-    console.log("user", user);
     const questionQueryRef = query(
       questionsCollectionRef,
       where("askedBy", "==", user.username)

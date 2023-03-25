@@ -42,8 +42,10 @@ const Feed = function () {
     if (!selectedTopicUid) return;
     setLoading(true);
     (async () => {
-      const feed = await getQuestionsWithTopicUid(selectedTopicUid);
-      const topicInfo = await getTopicInfoWithTopicUid(selectedTopicUid);
+      const [feed, topicInfo] = await Promise.all([
+        getQuestionsWithTopicUid(selectedTopicUid),
+        getTopicInfoWithTopicUid(selectedTopicUid),
+      ]);
       setSelectedTopicInfo(topicInfo);
       setCurrentFeed(feed);
       setLoading(false);

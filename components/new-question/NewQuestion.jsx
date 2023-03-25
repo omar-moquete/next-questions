@@ -30,6 +30,7 @@ const NewQuestion = function () {
   const titleRef = useRef();
   const detailsRef = useRef();
   const [blocked, setBlocked] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [isNewTopic, setIsNewTopic] = useState(false);
   // topic data
@@ -60,6 +61,7 @@ const NewQuestion = function () {
 
     try {
       // Ensures only one request is sent
+      setLoading(true);
       setBlocked(true);
       const title = titleRef.current.value;
       const details = detailsRef.current.value;
@@ -88,6 +90,7 @@ const NewQuestion = function () {
       router.replace(`/questions/${questionUid}`);
     } catch (e) {
       console.error(e);
+      setLoading(false);
       setBlocked(false);
     }
   };
@@ -158,8 +161,8 @@ const NewQuestion = function () {
             className={`${classes.submit} ${blocked ? classes.inactive : ""}`}
             disabled={blocked}
           >
-            {blocked && <InlineSpinner2 width="24px" color="#005c97" />}
-            {!blocked && "Submit"}
+            {loading && <InlineSpinner2 width="24px" color="#005c97" />}
+            {!loading && "Submit"}
           </SecondaryButton>
         </div>
       </form>
