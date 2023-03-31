@@ -22,9 +22,9 @@ const NavBar = function () {
     else setIsFixed(true);
   }, [router.asPath]);
 
-  const { user, authStatus, authStatusNames } = useSelector(
-    (state) => state.auth
-  );
+  const user = useSelector((state) => state.auth.user);
+  const authStatus = useSelector((state) => state.auth.authStatus);
+  const authStatusNames = useSelector((state) => state.auth.authStatusNames);
 
   return (
     <header

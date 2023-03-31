@@ -122,6 +122,7 @@ const TopicFinder = function ({
 
   // Will clear topic input field if a search is occurring.
   const searchParam = useSelector((slices) => slices.global.searchParam);
+
   useEffect(() => {
     if (searchParam) topicInputRef.current.value = "";
   }, [searchParam]);

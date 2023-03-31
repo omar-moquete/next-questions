@@ -8,7 +8,6 @@ const UserImage = function ({ imageUrl }) {
   /* If user and viewing user's profile page, the image will be tied to a state in case it changes. */
   const user = useSelector((slices) => slices.auth.user);
   const router = useRouter();
-
   const visitedUser = router.asPath.split("/")[1];
 
   // If user visiting self and there is an image

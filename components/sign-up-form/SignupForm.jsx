@@ -37,9 +37,10 @@ const SignUpForm = function () {
     data: { email: null, username: null, password1: null, password2: null },
   });
   const [isSubmitting, setIssubmitting] = useState(false);
+  const [submitAttempts, setSubmitAttempts] = useState(0);
   const router = useRouter();
 
-  const { createAccount } = useAuth();
+  const auth = useAuth();
   const clearMessage = () => {
     if (message === "") return;
     else setMessage("");
@@ -48,7 +49,7 @@ const SignUpForm = function () {
   const validateEmail = async () => {
     // Ensures message is cleared on email field change
     clearMessage();
-    const email = emailInputRef.current.value;
+    const email = emailInputRef.current.value.trim().toLowerCase();
 
     // Ensure test only happens when user finishes typing a correct email address. If user types a valid email address, set emailValid = true
     if (!EMAIL_VALIDATION_REGEX.test(email)) {
@@ -106,7 +107,8 @@ const SignUpForm = function () {
   const validateUsername = async () => {
     // This function is the same as validate email, but for username. See comments on that function for help.
     clearMessage();
-    const username = usernameInputRef.current.value;
+    const username = usernameInputRef.current.value.trim();
+
     if (!USERNAME_VALIDATION_REGEX.test(username)) {
       if (formState.usernameValid === false) return;
       setFormState((latestState) => {
@@ -156,10 +158,10 @@ const SignUpForm = function () {
 
   const submitHandler = async function (e) {
     e.preventDefault();
-    const email = emailInputRef.current.value;
-    const username = usernameInputRef.current.value;
-    const password1 = password1InputRef.current.value;
-    const password2 = password2InputRef.current.value;
+    const email = emailInputRef.current.value.trim().toLowerCase();
+    const username = usernameInputRef.current.value.trim();
+    const password1 = password1InputRef.current.value.trim();
+    const password2 = password2InputRef.current.value.trim();
 
     // check if email is valid
     if (!formState.emailValid) {
@@ -202,6 +204,8 @@ const SignUpForm = function () {
         data: { email, username, password1, password2 },
       };
     });
+
+    setSubmitAttempts((ls) => ls + 1);
   };
 
   useEffect(() => {
@@ -221,20 +225,20 @@ const SignUpForm = function () {
 
       try {
         setIssubmitting(true);
-        const userData = await createAccount(
-          emailInputRef.current.value,
-          password1InputRef.current.value,
-          usernameInputRef.current.value
+        const userData = await auth.createAccount(
+          formState.data.email,
+          formState.data.password1,
+          formState.data.username
         );
         router.replace(`/${userData.username}`);
       } catch (e) {
         console.error(e);
         scrollToTop();
-        setMessage(e.message);
+        setMessage(auth.formatErrorCode(e.message));
         setIssubmitting(false);
       }
     })();
-  }, [formState]);
+  }, [submitAttempts]);
 
   return (
     <PrimaryForm onSubmit={submitHandler}>

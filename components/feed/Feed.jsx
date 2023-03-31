@@ -4,7 +4,6 @@ import classes from "./Feed.module.scss";
 import { useSelector } from "react-redux";
 import InlineSpinner from "../UI/inline-spinner/InlineSpinner";
 import FeedInfo from "./feed-info/FeedInfo";
-import { useRouter } from "next/router";
 import {
   getQuestionsWithSearchParam,
   getQuestionsWithTopicUid,
@@ -22,7 +21,6 @@ const Feed = function () {
 
   const [currentFeed, setCurrentFeed] = useState(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   // When searchParam changes
   useEffect(() => {

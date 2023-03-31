@@ -43,14 +43,9 @@ const DeleteAccountForm = function () {
   const onDeleteAccount = async (e) => {
     e.preventDefault();
     try {
-      // deleteUser will automatically call logout the user
-      // BUG: Enable functionality. Switch to test data with "firebase use <app id>"
+      // deleteUser will automatically call logout.
       setDeleting(true);
-      alert(
-        "Hi! I am sorry, I'm currently working on this functionality. If you wish to delete your data at this moment please reach out to me directly. -Omar"
-      );
-      router.back();
-      // await auth.deleteUser(enteredPassword);
+      await auth.deleteUser(enteredPassword);
     } catch (error) {
       scrollToTop();
       setDeleting(false);

@@ -8,22 +8,12 @@ import {
   updatePassword,
   sendPasswordResetEmail as firebaseAuthSendPasswordResetEmail,
 } from "firebase/auth";
-import {
-  collection,
-  doc,
-  getDocs,
-  getFirestore,
-  query,
-  serverTimestamp,
-  setDoc,
-  where,
-} from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { DELETE_ACCOUNT_ENDPOINT } from "../api-endpoints";
 import { firebaseConfig } from "../api/firebaseApp";
 import { UI_GENERIC_ERROR } from "../app-config";
-import { deleteUserData, getPrivateUserData } from "../db";
+import { createUserInDb, getPrivateUserData, getUserDataWithId } from "../db";
 import { authActions } from "../redux-store/authSlice";
 import { toSerializable } from "../utils";
 
@@ -32,10 +22,9 @@ const useAuth = function () {
   const dispatch = useDispatch();
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db = getFirestore(app);
-  const { listenerActive, authStatusNames, user } = useSelector(
-    (state) => state.auth
-  );
+  const listenerActive = useSelector((slices) => slices.auth.listenerActive);
+  const authStatusNames = useSelector((slices) => slices.auth.authStatusNames);
+  const user = useSelector((slices) => slices.auth.user);
   const router = useRouter();
   // listenerActive prevents the authListener from being set more than once.
   if (!listenerActive) {
@@ -44,21 +33,8 @@ const useAuth = function () {
       if (user) {
         try {
           dispatch(authActions.setAuthStatus(authStatusNames.loading));
-          // Querying data: find username with uid
-          // Get query reference. __name__ is the name of the document which is meant to be the user id
-          const queryInUsers = query(
-            collection(db, "/users"),
-            where("__name__", "==", user.uid)
-          );
 
-          // Get query snapshot
-          const queryInUsersSnapshot = await getDocs(queryInUsers);
-          // Iterate docs
-
-          let usersCollectionDocData = null;
-          queryInUsersSnapshot.forEach(
-            (doc) => (usersCollectionDocData = doc.data())
-          );
+          const usersCollectionDocData = await getUserDataWithId(user.uid);
 
           if (!usersCollectionDocData) {
             dispatch(authActions.setAuthStatus("authStatusNames.error"));
@@ -68,7 +44,6 @@ const useAuth = function () {
           const privateUserData = (
             await getPrivateUserData(usersCollectionDocData.userId)
           ).data();
-
           const userData = {
             email: privateUserData.email,
             username: usersCollectionDocData.username,
@@ -106,25 +81,9 @@ const useAuth = function () {
         await createUserWithEmailAndPassword(auth, email, password)
       ).user;
 
-      // Structure data that will go in firestore
-      const publicUserData = {
-        username,
-        userId,
-        // Make image null when creating account.
-        imageUrl: null,
-        memberSince: serverTimestamp(),
-      };
-      const privateUserDataDocRef = doc(db, `/private_user_data/${userId}`);
+      const userData = await createUserInDb(userId, email, username);
 
-      const privateUserData = { email };
-      const publicUserDataDocRef = doc(db, `/users/${userId}`);
-
-      await Promise.all([
-        setDoc(privateUserDataDocRef, privateUserData),
-        setDoc(publicUserDataDocRef, publicUserData),
-      ]);
-
-      return publicUserData;
+      return userData;
     },
 
     async deleteUser(password) {
@@ -139,8 +98,10 @@ const useAuth = function () {
             },
           })
         ).json();
-
-        if (response?.deleted) await signOut(auth);
+        if (!response.deleted)
+          throw new Error(response?.message || UI_GENERIC_ERROR);
+        if (response.deleted) await signOut(auth);
+        return response;
       } catch (error) {
         throw new Error(error.message);
       }
@@ -168,12 +129,8 @@ const useAuth = function () {
     },
 
     formatErrorCode(errorString) {
-      // Return user readable error and log dev readable error to console.
-      if (!errorString.startsWith("Firebase: Error (auth/")) {
-        console.error(
-          `🚨 @auth.formatErrorCode | UI_GENERIC_ERROR: ${UI_GENERIC_ERROR} | Details: ${errorString}`
-        );
-        return UI_GENERIC_ERROR;
+      if (!errorString.includes("Firebase: Error (auth/")) {
+        return errorString;
       }
       // Initial errorString format: firebaseService/error-message-no-spaces
 

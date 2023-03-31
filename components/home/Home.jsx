@@ -9,6 +9,7 @@ import { getLatestQuestions } from "../../db";
 import HomepageIllustration from "../UI/svg/HomepageIllustration";
 import Tooltip1 from "../UI/tooltips/Tooltip1";
 import { useSelector } from "react-redux";
+import { TOOLTIP_TIMEOUT_SECONDS } from "../../app-config";
 
 const Home = function () {
   const router = useRouter();
@@ -17,7 +18,7 @@ const Home = function () {
     router.push(`/feed?topic=${topicTitle}`);
   };
 
-  const [showTooltip, setShowTooltip] = useState(true);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const user = useSelector((slices) => slices.auth.user);
 
@@ -26,7 +27,7 @@ const Home = function () {
   // Next JS Will render a loader icon during build and this loader icon will be replaced by the data being fetched after hydration.
   useEffect(() => {
     (async () => {
-      const latestQuestions = await getLatestQuestions(7);
+      const latestQuestions = await getLatestQuestions();
       latestQuestions.sort((a, b) => {
         if (a.unixTimestamp > b.unixTimestamp) return -1;
         if (a.unixTimestamp < b.unixTimestamp) return 1;
@@ -41,14 +42,21 @@ const Home = function () {
   };
 
   useEffect(() => {
-    return () => {
-      const seen = Boolean(localStorage.getItem("tooltipSeen"));
+    if (!user) return;
+    const seen = Boolean(localStorage.getItem("tooltipSeen"));
 
-      if (!seen) localStorage.setItem("tooltipSeen", true);
+    if (seen) return;
 
-      if (seen) setShowTooltip(false);
-    };
-  }, []);
+    setShowTooltip(true);
+    localStorage.setItem("tooltipSeen", true);
+    // const timeoutId = setTimeout(() => {
+    //   setShowTooltip(false);
+    // }, TOOLTIP_TIMEOUT_SECONDS * 1000);
+
+    // return () => {
+    //   clearTimeout(timeoutId);
+    // };
+  }, [user]);
 
   return (
     <div className={classes.home}>

@@ -10,6 +10,7 @@ import {
   limit,
   query,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -21,14 +22,60 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
+import { orderBy, throttle } from "lodash";
 import { firebaseConfig } from "./api/firebaseApp";
-import { DELETED_USER_USERNAME } from "./app-config";
+import { DELETED_USER_USERNAME, LIKE_THROTTTLE_MS } from "./app-config";
 import store from "./redux-store/store";
 
 // NOTE: These functions control database requests.
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
+
+export const getUserDataWithId = async (id) => {
+  try {
+    const queryInUsers = query(
+      collection(db, "/users"),
+      where("__name__", "==", id)
+    );
+
+    // Get query snapshot
+    const queryInUsersSnapshot = await getDocs(queryInUsers);
+
+    // Iterate docs
+    let match = null;
+    queryInUsersSnapshot.forEach((doc) => (match = doc.data()));
+    return match;
+  } catch (error) {
+    console.error(`@getUserDataWithId()🚨${error}`);
+  }
+};
+
+export const createUserInDb = async (userId, email, username) => {
+  try {
+    // Structure data that will go in firestore
+    const publicUserData = {
+      username,
+      userId,
+      // Make image null when creating account.
+      imageUrl: null,
+      memberSince: serverTimestamp(),
+    };
+    const privateUserDataDocRef = doc(db, `/private_user_data/${userId}`);
+
+    const privateUserData = { email };
+    const publicUserDataDocRef = doc(db, `/users/${userId}`);
+
+    await Promise.all([
+      setDoc(privateUserDataDocRef, privateUserData),
+      setDoc(publicUserDataDocRef, publicUserData),
+    ]);
+
+    return publicUserData;
+  } catch (error) {
+    console.error(`@createUserCollection()🚨${error}`);
+  }
+};
 
 export const createTopic = async function (topicData) {
   try {
@@ -220,195 +267,216 @@ export const reply = async function (text, answerUid, mention) {
   }
 };
 
-export const likeQuestion = async function (questionUid) {
-  try {
-    const user = store.getState().auth.user;
-    // 1) To like a question the user must be logged in. If user is not logged in, redirect to login page.
-    const likesCollectionRef = collection(
-      db,
-      `/questions/${questionUid}/likes`
-    );
-    // 2) Get likes for the question
-    const likesDocRefs = await getDocs(likesCollectionRef);
+export const likeQuestion = throttle(
+  async function (questionUid) {
+    try {
+      const user = store.getState().auth.user;
+      // 1) To like a question the user must be logged in. If user is not logged in, redirect to login page.
+      const likesCollectionRef = collection(
+        db,
+        `/questions/${questionUid}/likes`
+      );
+      // 2) Get likes for the question
+      const likesDocRefs = await getDocs(likesCollectionRef);
 
-    const likes = [];
-    const currentUserLikeForQuestion = {
-      likedByUser: false,
-      likeUid: "",
-      data: null, // used to update the current doc in db.
-    };
-
-    likesDocRefs.forEach((like) => {
-      const docRefData = like.data();
-      const likeData = {
-        ...docRefData,
-        date: (docRefData.date = new Date(
-          docRefData.date.toDate()
-        ).toISOString()),
+      const likes = [];
+      const currentUserLikeForQuestion = {
+        likedByUser: false,
+        likeUid: "",
+        data: null, // used to update the current doc in db.
       };
 
-      // 3) Check if user already liked (if username is contained in any of the likes docs).
-      if (likeData.likedBy === user.username) {
-        currentUserLikeForQuestion.likedByUser = true;
-        currentUserLikeForQuestion.likeUid = like.id;
-        currentUserLikeForQuestion.data = likeData;
-      }
-      likes.push(likeData);
-    });
+      likesDocRefs.forEach((like) => {
+        const docRefData = like.data();
+        const likeData = {
+          ...docRefData,
+          date: (docRefData.date = new Date(
+            docRefData.date.toDate()
+          ).toISOString()),
+        };
 
-    // 3) Like question if user has not liked
-    if (!currentUserLikeForQuestion.likedByUser) {
-      // If not liked by user, add like
-      await addDoc(likesCollectionRef, {
-        date: serverTimestamp(),
-        likedBy: user.username,
+        // 3) Check if user already liked (if username is contained in any of the likes docs).
+        if (likeData.likedBy === user.username) {
+          currentUserLikeForQuestion.likedByUser = true;
+          currentUserLikeForQuestion.likeUid = like.id;
+          currentUserLikeForQuestion.data = likeData;
+        }
+        likes.push(likeData);
       });
-    } else {
-      // if liked by user remove like
-      await deleteDoc(
-        doc(
-          db,
-          `/questions/${questionUid}/likes/${currentUserLikeForQuestion.likeUid}`
-        )
+
+      // 3) Like question if user has not liked
+      if (!currentUserLikeForQuestion.likedByUser) {
+        // If not liked by user, add like
+        await addDoc(likesCollectionRef, {
+          date: serverTimestamp(),
+          likedBy: user.username,
+        });
+      } else {
+        // if liked by user remove like
+        await deleteDoc(
+          doc(
+            db,
+            `/questions/${questionUid}/likes/${currentUserLikeForQuestion.likeUid}`
+          )
+        );
+      }
+
+      // Get total likes
+      const updatedLikes = await getQuestionLikes(questionUid);
+      // Convert Firebase timestamp to date object
+      updatedLikes.forEach(
+        (like) => (like.date = new Date(like.date.toDate()).toISOString())
       );
+      return updatedLikes;
+    } catch (error) {
+      console.error(`@likeQuestion()🚨${error}`);
     }
-
-    // Get total likes
-    const updatedLikes = await getQuestionLikes(questionUid);
-    // Convert Firebase timestamp to date object
-    updatedLikes.forEach(
-      (like) => (like.date = new Date(like.date.toDate()).toISOString())
-    );
-    return updatedLikes;
-  } catch (error) {
-    console.error(`@likeQuestion()🚨${error}`);
+  },
+  LIKE_THROTTTLE_MS,
+  {
+    leading: true,
+    trailing: false,
   }
-};
+);
 
-export const likeAnswer = async function (answerUid) {
-  try {
-    const user = store.getState().auth.user;
-    // 1) Get collection reference
-    const likesCollectionRef = collection(db, `/answers/${answerUid}/likes`);
-    // 2) Get likes for the answer
-    const likesDocRefs = await getDocs(likesCollectionRef);
+export const likeAnswer = throttle(
+  async function (answerUid) {
+    try {
+      const user = store.getState().auth.user;
+      // 1) Get collection reference
+      const likesCollectionRef = collection(db, `/answers/${answerUid}/likes`);
+      // 2) Get likes for the answer
+      const likesDocRefs = await getDocs(likesCollectionRef);
 
-    const likes = [];
-    const currentUserLikeForAnswer = {
-      likedByUser: false,
-      likeUid: "",
-      data: null, // used to update the current doc in db.
-    };
-
-    likesDocRefs.forEach((like) => {
-      const docRefData = like.data();
-      const likeData = {
-        ...docRefData,
-        date: (docRefData.date = new Date(
-          docRefData.date.toDate()
-        ).toISOString()),
+      const likes = [];
+      const currentUserLikeForAnswer = {
+        likedByUser: false,
+        likeUid: "",
+        data: null, // used to update the current doc in db.
       };
 
-      // 3) Check if user already liked (if username is contained in any of the likes docs).
-      if (likeData.likedBy === user.username) {
-        currentUserLikeForAnswer.likedByUser = true;
-        currentUserLikeForAnswer.likeUid = like.id;
-        currentUserLikeForAnswer.data = likeData;
-      }
-      likes.push(likeData);
-    });
+      likesDocRefs.forEach((like) => {
+        const docRefData = like.data();
+        const likeData = {
+          ...docRefData,
+          date: (docRefData.date = new Date(
+            docRefData.date.toDate()
+          ).toISOString()),
+        };
 
-    // 3) Like question if user has not liked
-    if (!currentUserLikeForAnswer.likedByUser) {
-      // If not liked by user, add like
-      await addDoc(likesCollectionRef, {
-        date: serverTimestamp(),
-        likedBy: user.username,
+        // 3) Check if user already liked (if username is contained in any of the likes docs).
+        if (likeData.likedBy === user.username) {
+          currentUserLikeForAnswer.likedByUser = true;
+          currentUserLikeForAnswer.likeUid = like.id;
+          currentUserLikeForAnswer.data = likeData;
+        }
+        likes.push(likeData);
       });
-    } else {
-      // if liked by user remove like
-      await deleteDoc(
-        doc(
-          db,
-          `/answers/${answerUid}/likes/${currentUserLikeForAnswer.likeUid}`
-        )
+
+      // 3) Like question if user has not liked
+      if (!currentUserLikeForAnswer.likedByUser) {
+        // If not liked by user, add like
+        await addDoc(likesCollectionRef, {
+          date: serverTimestamp(),
+          likedBy: user.username,
+        });
+      } else {
+        // if liked by user remove like
+        await deleteDoc(
+          doc(
+            db,
+            `/answers/${answerUid}/likes/${currentUserLikeForAnswer.likeUid}`
+          )
+        );
+      }
+
+      const updatedLikes = await getAnswerLikes(answerUid);
+      // Convert Firebase timestamp to date object
+      updatedLikes.forEach(
+        (like) => (like.date = new Date(like.date.toDate()).toISOString())
       );
+      return updatedLikes;
+    } catch (error) {
+      console.error(`@likeAnswer()🚨${error}`);
     }
-
-    const updatedLikes = await getAnswerLikes(answerUid);
-    // Convert Firebase timestamp to date object
-    updatedLikes.forEach(
-      (like) => (like.date = new Date(like.date.toDate()).toISOString())
-    );
-    return updatedLikes;
-  } catch (error) {
-    console.error(`@likeAnswer()🚨${error}`);
+  },
+  LIKE_THROTTTLE_MS,
+  {
+    leading: true,
+    trailing: false,
   }
-};
+);
 
-export const likeReply = async function (answerUid, replyUid) {
-  try {
-    const user = store.getState().auth.user;
-    // 1) Get collection reference
-    const likesCollectionRef = collection(
-      db,
-      `/answers/${answerUid}/replies/${replyUid}/likes`
-    );
-    // 2) Get likes for the reply
-    const likesDocRefs = await getDocs(likesCollectionRef);
+export const likeReply = throttle(
+  async function (answerUid, replyUid) {
+    try {
+      const user = store.getState().auth.user;
+      // 1) Get collection reference
+      const likesCollectionRef = collection(
+        db,
+        `/answers/${answerUid}/replies/${replyUid}/likes`
+      );
+      // 2) Get likes for the reply
+      const likesDocRefs = await getDocs(likesCollectionRef);
 
-    const likes = [];
-    const currentUserLikeForReply = {
-      likedByUser: false,
-      likeUid: "",
-      data: null, // used to update the current doc in db.
-    };
-
-    likesDocRefs.forEach((like) => {
-      const docRefData = like.data();
-      const likeData = {
-        ...docRefData,
-        date: (docRefData.date = new Date(
-          docRefData.date.toDate()
-        ).toISOString()),
+      const likes = [];
+      const currentUserLikeForReply = {
+        likedByUser: false,
+        likeUid: "",
+        data: null, // used to update the current doc in db.
       };
 
-      // 3) Check if user already liked (if username is contained in any of the likes docs).
-      if (likeData.likedBy === user.username) {
-        currentUserLikeForReply.likedByUser = true;
-        currentUserLikeForReply.likeUid = like.id;
-        currentUserLikeForReply.data = likeData;
-      }
-      likes.push(likeData);
-    });
+      likesDocRefs.forEach((like) => {
+        const docRefData = like.data();
+        const likeData = {
+          ...docRefData,
+          date: (docRefData.date = new Date(
+            docRefData.date.toDate()
+          ).toISOString()),
+        };
 
-    // 3) Like question if user has not liked
-    if (!currentUserLikeForReply.likedByUser) {
-      // If not liked by user, add like
-      await addDoc(likesCollectionRef, {
-        date: serverTimestamp(),
-        likedBy: user.username,
+        // 3) Check if user already liked (if username is contained in any of the likes docs).
+        if (likeData.likedBy === user.username) {
+          currentUserLikeForReply.likedByUser = true;
+          currentUserLikeForReply.likeUid = like.id;
+          currentUserLikeForReply.data = likeData;
+        }
+        likes.push(likeData);
       });
-    } else {
-      // if liked by user remove like
-      await deleteDoc(
-        doc(
-          db,
-          `/answers/${answerUid}/replies/${replyUid}/likes/${currentUserLikeForReply.likeUid}`
-        )
-      );
-    }
 
-    const updatedLikes = await getAnswerLikes(answerUid);
-    // Convert Firebase timestamp to date object
-    updatedLikes.forEach(
-      (like) => (like.date = new Date(like.date.toDate()).toISOString())
-    );
-    return updatedLikes;
-  } catch (error) {
-    console.error(`@likeReply()🚨${error}`);
+      // 3) Like question if user has not liked
+      if (!currentUserLikeForReply.likedByUser) {
+        // If not liked by user, add like
+        await addDoc(likesCollectionRef, {
+          date: serverTimestamp(),
+          likedBy: user.username,
+        });
+      } else {
+        // if liked by user remove like
+        await deleteDoc(
+          doc(
+            db,
+            `/answers/${answerUid}/replies/${replyUid}/likes/${currentUserLikeForReply.likeUid}`
+          )
+        );
+      }
+
+      const updatedLikes = await getAnswerLikes(answerUid);
+      // Convert Firebase timestamp to date object
+      updatedLikes.forEach(
+        (like) => (like.date = new Date(like.date.toDate()).toISOString())
+      );
+      return updatedLikes;
+    } catch (error) {
+      console.error(`@likeReply()🚨${error}`);
+    }
+  },
+  LIKE_THROTTTLE_MS,
+  {
+    leading: true,
+    trailing: false,
   }
-};
+);
 
 export const getQuestionLikes = async function (questionUid) {
   try {
@@ -608,18 +676,25 @@ export const getQuestionDetails = async function (questionUid) {
   }
 };
 
-export const getLatestQuestions = async function (daysAgo, resultsLimit = 15) {
+export const getLatestQuestions = async function (
+  daysAgo = null,
+  resultsLimit = 30
+) {
   const secondsInOneDay = 86_400;
-  const daysAgoInSeconds = secondsInOneDay * daysAgo;
-  const daysAgoInNanoSeconds = daysAgoInSeconds * 1000;
+  const daysAgoInSeconds = daysAgo && secondsInOneDay * daysAgo;
+  const daysAgoInNanoSeconds = daysAgo && daysAgoInSeconds * 1000;
   try {
-    const queryRef = query(
-      collection(db, "/questions"),
-      where("unixTimestamp", ">=", Date.now() - daysAgoInNanoSeconds),
-      limit(resultsLimit)
-    );
+    const queryRef =
+      daysAgo === null
+        ? query(collection(db, "/questions"), limit(resultsLimit))
+        : query(
+            collection(db, "/questions"),
+            where("unixTimestamp", ">=", Date.now() - daysAgoInNanoSeconds),
+            limit(resultsLimit)
+          );
 
     const querySnapshot = await getDocs(queryRef);
+    if (querySnapshot.empty) return [];
     const latestQuestionsData = [];
 
     querySnapshot.forEach((doc) => {

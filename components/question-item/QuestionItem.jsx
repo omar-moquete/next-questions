@@ -24,9 +24,11 @@ const QuestionItem = function ({
 }) {
   const { ReplyFormAnchor, show } = useReplyForm();
   const router = useRouter();
-  const { user, authStatus, authStatusNames } = useSelector(
-    (slices) => slices.auth
-  );
+
+  const authStatusNames = useSelector((slices) => slices.auth.authStatusNames);
+  const authStatus = useSelector((slices) => slices.auth.authStatus);
+  const user = useSelector((slices) => slices.auth.user);
+
   const [likesAmount, setLikesAmount] = useState(questionData.likes.length);
   const [questionLikes, setQuestionLikes] = useState(questionData.likes);
   const [likedByUser, setLikedByUser] = useState(null);

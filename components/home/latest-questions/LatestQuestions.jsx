@@ -6,7 +6,7 @@ import InlineSpinner2 from "../../UI/inline-spinner/InlineSpinner2";
 const LatestQuestions = function ({ latestQuestionsData }) {
   return (
     <div className={classes.container}>
-      <h2>See what's new</h2>
+      <h2>Latest questions</h2>
       <div className={classes.wrapper}>
         {latestQuestionsData && latestQuestionsData.length === 0 && (
           <div className={classes.nothing}>

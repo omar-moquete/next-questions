@@ -1,4 +1,4 @@
-import { PASSWORD_VALIDATION_REGEX, UI_GENERIC_ERROR } from "./app-config";
+import { PASSWORD_VALIDATION_REGEX } from "./app-config";
 
 export const isValidPassword = (password) =>
   password.match(PASSWORD_VALIDATION_REGEX);

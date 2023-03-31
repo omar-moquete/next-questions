@@ -1,5 +1,5 @@
 {
   "projects": {
-    "default": "njsquestions-production"
+    "default": "nextquestions-development"
   }
 }

@@ -9,9 +9,10 @@ import PageSpinner from "../UI/page-spinner/PageSpinner";
 // redirect path is the path to redirect to.
 
 const RouteGuard = function ({ whenLoggedIn = true, redirectPath, children }) {
-  const { user, authStatus, authStatusNames } = useSelector(
-    (slices) => slices.auth
-  );
+  const user = useSelector((slices) => slices.auth.user);
+  const authStatus = useSelector((slices) => slices.auth.authStatus);
+  const authStatusNames = useSelector((slices) => slices.auth.authStatusNames);
+
   const router = useRouter();
 
   const [CurrentComponent, setCurrentComponent] = useState(<PageSpinner />);

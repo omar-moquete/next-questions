@@ -20,6 +20,7 @@ const NavBarUserProfile = function (props) {
   };
 
   const username = useSelector((state) => state.auth.user.username);
+
   return (
     <div
       className={`${classes["user-navBar-picture"]} ${
