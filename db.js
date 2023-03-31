@@ -1323,7 +1323,6 @@ export const getQuestionDetailsLite = async function (questionUid) {
 
 export const getUserAskedQuestions = async function (userId) {
   try {
-    //BUG: optimize
     const queryRef = query(collection(db, `/users/${userId}/questionsAsked`));
 
     const docsRefs = await getDocs(queryRef);
