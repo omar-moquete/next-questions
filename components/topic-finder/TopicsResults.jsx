@@ -46,7 +46,9 @@ const TopicResults = function ({
         <li className={classes.invalidTopic}>
           <div>
             <h3>Topics cannot contain spaces or special characters.</h3>
-            <p>Example: #TheBeatles</p>
+            <p>
+              Example: <span translate="no">#TheBeatles</span>
+            </p>
           </div>
         </li>
       )}
@@ -97,7 +99,7 @@ const TopicResults = function ({
             onClick={bindArgs(handleSelectedTopic, topic.uid, topic.title)}
           >
             <div className={classes.text}>
-              <h3>
+              <h3 translate="no">
                 <span>#</span>
                 {/* 
               typed query: "carr", length = 4

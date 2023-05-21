@@ -54,7 +54,7 @@
   flex-direction: column;
 
   p,
-  span {
+  span:not(.translation) {
     color: #8c8c8c;
   }
 }
@@ -105,7 +105,7 @@
     text-decoration: none;
   }
   a,
-  span {
+  span:not(.translation) {
     color: variables.$accent-color-1;
     cursor: pointer;
     @media (hover: hover) {

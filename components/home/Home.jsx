@@ -9,7 +9,6 @@ import { getLatestQuestions } from "../../db";
 import HomepageIllustration from "../UI/svg/HomepageIllustration";
 import Tooltip1 from "../UI/tooltips/Tooltip1";
 import { useSelector } from "react-redux";
-import { TOOLTIP_TIMEOUT_SECONDS } from "../../app-config";
 
 const Home = function () {
   const router = useRouter();
@@ -29,6 +28,7 @@ const Home = function () {
     (async () => {
       const latestQuestions = await getLatestQuestions();
       latestQuestions.sort((a, b) => {
+        // Sort questions by timestamp
         if (a.unixTimestamp > b.unixTimestamp) return -1;
         if (a.unixTimestamp < b.unixTimestamp) return 1;
         return 0;
@@ -49,13 +49,6 @@ const Home = function () {
 
     setShowTooltip(true);
     localStorage.setItem("tooltipSeen", true);
-    // const timeoutId = setTimeout(() => {
-    //   setShowTooltip(false);
-    // }, TOOLTIP_TIMEOUT_SECONDS * 1000);
-
-    // return () => {
-    //   clearTimeout(timeoutId);
-    // };
   }, [user]);
 
   return (

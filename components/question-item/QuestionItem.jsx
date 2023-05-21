@@ -87,7 +87,10 @@ const QuestionItem = function ({
 
         setLikedByText(
           <p>
-            Liked by{" "}
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by{" "}
             {username1 === DELETED_USER_USERNAME ? (
               <i>{DELETED_USER_USERNAME}</i>
             ) : (
@@ -106,7 +109,10 @@ const QuestionItem = function ({
         );
         setLikedByText(
           <p>
-            Liked by{" "}
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by{" "}
             {username1 === DELETED_USER_USERNAME ? (
               <i>{DELETED_USER_USERNAME}</i>
             ) : (
@@ -130,7 +136,10 @@ const QuestionItem = function ({
         );
         setLikedByText(
           <p>
-            Liked by{" "}
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by{" "}
             {username1 === DELETED_USER_USERNAME ? (
               <i>{DELETED_USER_USERNAME}</i>
             ) : (
@@ -157,7 +166,10 @@ const QuestionItem = function ({
       if (questionLikes.length > 3) {
         setLikedByText(
           <p>
-            Liked by {questionLikes.length}{" "}
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by {questionLikes.length}{" "}
             <span onClick={() => setModalVisible(true)}>people</span>.
           </p>
         );
@@ -172,7 +184,14 @@ const QuestionItem = function ({
         questionLikes.length === 1 &&
         questionLikes[0].likedBy === user.username
       ) {
-        setLikedByText(<p>Liked by me.</p>);
+        setLikedByText(
+          <p>
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by me.
+          </p>
+        );
         return;
       }
 
@@ -186,7 +205,10 @@ const QuestionItem = function ({
 
         setLikedByText(
           <p>
-            Liked by{" "}
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by{" "}
             {username === DELETED_USER_USERNAME ? (
               <i>{DELETED_USER_USERNAME}</i>
             ) : (
@@ -210,7 +232,10 @@ const QuestionItem = function ({
 
         setLikedByText(
           <p>
-            Liked by{" "}
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by{" "}
             {username === DELETED_USER_USERNAME ? (
               <i>{DELETED_USER_USERNAME}</i>
             ) : (
@@ -234,7 +259,10 @@ const QuestionItem = function ({
 
         setLikedByText(
           <p>
-            Liked by{" "}
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by{" "}
             {username1 === DELETED_USER_USERNAME ? (
               <i>{DELETED_USER_USERNAME}</i>
             ) : (
@@ -263,7 +291,10 @@ const QuestionItem = function ({
 
         setLikedByText(
           <p>
-            Liked by{" "}
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by{" "}
             {username1 === DELETED_USER_USERNAME ? (
               <i>{DELETED_USER_USERNAME}</i>
             ) : (
@@ -289,7 +320,10 @@ const QuestionItem = function ({
       ) {
         setLikedByText(
           <p>
-            Liked by me and {questionLikes.length - 1}{" "}
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by me and {questionLikes.length - 1}{" "}
             <span onClick={() => setModalVisible(true)}>others</span>.
           </p>
         );
@@ -304,7 +338,10 @@ const QuestionItem = function ({
       ) {
         setLikedByText(
           <p>
-            Liked by {questionLikes.length}{" "}
+            <span className={classes.translation} translate="no">
+              Liked
+            </span>{" "}
+            by {questionLikes.length}{" "}
             <span onClick={() => setModalVisible(true)}>people</span>.
           </p>
         );
@@ -386,7 +423,7 @@ const QuestionItem = function ({
         </div>
       </div>
 
-      <div className={classes.text}>
+      <div className={classes.text} translate="no">
         <h3>{questionData.title}</h3>
         <p>{questionData.description}</p>
       </div>

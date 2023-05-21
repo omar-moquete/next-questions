@@ -7,10 +7,10 @@ import ReduxIcon from "../../svg/ReduxIcon";
 import SassIcon from "../../svg/SassIcon";
 import classes from "./MadeWith.module.scss";
 
-const MadeWith = function (props) {
+const MadeWith = function () {
   return (
-    <div className={classes.container}>
-      <h3>Powered by</h3>
+    <div className={classes.container} translate="no">
+      <h3 translate="yes">Made with</h3>
       <ul>
         <li>
           <JavaScriptIcon /> JavaScript

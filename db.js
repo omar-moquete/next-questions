@@ -188,7 +188,11 @@ export const getTopicInfoWithTopicUidLite = async (topicUid) => {
   try {
     // Returns a lighter version of the topic
     const topicDocRef = await getDoc(doc(db, `/topics/${topicUid}`));
-    const topicData = { ...topicDocRef.data(), uid: topicDocRef.id };
+    const topicRefData = topicDocRef.data();
+    const topicData = {
+      ...topicRefData,
+      uid: topicDocRef.id,
+    };
     return topicData;
   } catch (error) {
     console.error(`@getTopicInfoWithTopicUidLite()🚨${error}`);
@@ -708,12 +712,12 @@ export const getLatestQuestions = async function (
 
     for (let i = 0; i < latestQuestionsData.length; i++) {
       const [
-        topicRef,
+        topicData,
         userDataQuerySnapshot,
         answersQuerySnapshot,
         likesDocsRef,
       ] = await Promise.all([
-        getDoc(doc(db, `/topics/${latestQuestionsData[i].topic.uid}`)),
+        getTopicInfoWithTopicUidLite(latestQuestionsData[i].topic.uid),
         getDocs(
           query(
             collection(db, `/users`),
@@ -729,13 +733,8 @@ export const getLatestQuestions = async function (
         ),
       ]);
 
-      // 1)
-      const topicRefData = topicRef.data();
-      latestQuestionsData[i].topic = topicRefData;
-      latestQuestionsData[i].topic.uid = topicRef.id;
-      latestQuestionsData[i].topic.date = new Date(
-        latestQuestionsData[i].topic.date.toDate()
-      ).toISOString();
+      // 1) Add topic data
+      latestQuestionsData[i].topic = topicData;
 
       // 2)
       // add imageUrl. Only 1 result returns from querySnapshot.forEach. If no result, add {imageUrl: null}. This will automatically be set to the avatar image for each question.
@@ -880,6 +879,20 @@ export const getUserFollowedTopics = async function (userId) {
   }
 };
 
+export const getQuestionAnswersLite = async (questionUid) => {
+  try {
+    // add answers (light version. Only QuestionDetails page needs the full version)
+    const queryRef = query(collection(db, `/questions/${questionUid}/answers`));
+
+    const querySnapshot = await getDocs(queryRef);
+    const answers = [];
+    querySnapshot.forEach((docRef) => answers.push(docRef.data()));
+    return answers;
+  } catch (error) {
+    console.error(`@getQuestionAnswersLite()🚨${error}`);
+  }
+};
+
 export const getAllQuestions = async function () {
   try {
     const queryRef = query(collection(db, `/questions`));
@@ -897,31 +910,19 @@ export const getAllQuestions = async function () {
     });
 
     for (let i = 0; i < questions.length; i++) {
-      // Add user data
-      const userData = await getUserDataWithUsername(questions[i].askedBy);
-      const questionAuthorData = {
-        imageUrl: userData.imageUrl,
-      };
-
-      // add answers (light version. Only QuestionDetails page needs the full version)
-      for (let i = 0; i < questions.length; i++) {
-        const queryRef = query(
-          collection(db, `/questions/${questions[i].uid}/answers`)
-        );
-        const querySnapshot = await getDocs(queryRef);
-        const answers = [];
-        querySnapshot.forEach((docRef) => answers.push(docRef.data()));
-        questions[i].questionAnswers = answers;
-      }
-
-      const [topic, likes] = await Promise.all([
+      const [userData, questionAnswers, topic, likes] = await Promise.all([
+        // Add user data
+        getUserDataWithUsername(questions[i].askedBy),
+        // Add question answers
+        getQuestionAnswersLite(questions[i].uid),
         // Add topic data
         getTopicInfoWithTopicUid(questions[i].topic.uid),
         // add likes
         getQuestionLikes(questions[i].uid),
       ]);
 
-      questions[i].questionAuthorData = questionAuthorData;
+      questions[i].questionAuthorData = { imageUrl: userData.imageUrl };
+      questions[i].questionAnswers = questionAnswers;
       questions[i].topic = topic;
       questions[i].likes = likes;
     }
@@ -1335,6 +1336,7 @@ export const getUserAskedQuestions = async function (userId) {
       const question = await getQuestionDetailsLite(userQuestionUids[i]);
       questions.push(question);
     }
+
     return questions;
   } catch (error) {
     console.error(`@getUserAskedQuestions()🚨${error}`);
