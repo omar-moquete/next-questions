@@ -21,13 +21,15 @@ const Introduction = function () {
       {!user && (
         <>
           <p>
-            Are you a curious person? Do you like helping others with their
-            questions about things you know? If your answer is yes, then this is
-            the place!
+            Are you filled with curiosity and a desire to help others by sharing
+            your knowledge? If so, you've found the perfect place!
           </p>
           <p>
-            Here you can ask and answer any questions, follow and create topics,
-            like your favorite questions and answers and much more.
+            Here, you can engage in a diverse range of activities. Ask
+            thought-provoking questions, follow and create topics, show
+            appreciation by liking your favorite questions and answers, and
+            explore an array of exciting features. Join us on this journey of
+            exploration and collaboration!
           </p>
           <PrimaryButton href="/login">Get started</PrimaryButton>
         </>
